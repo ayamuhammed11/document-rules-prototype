@@ -385,6 +385,10 @@
               <div class="cg-label"><span class="cg-name">Entity Type</span><span class="any-badge" id="anyEntities">ANY</span></div>
               <div class="chip-row" id="entityChips"></div>
             </div>
+            <div class="cond-group" data-group="owners">
+              <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><span class="any-badge" id="anyOwners">ANY</span></div>
+              <div class="chip-row" id="ownerChips"></div>
+            </div>
             <div class="cond-group" data-group="industries">
               <div class="cg-label"><span class="cg-name">Industry</span><span class="any-badge" id="anyIndustries">ANY</span></div>
               <div class="chip-row" id="industryChips"></div>
@@ -495,6 +499,7 @@
     'Board Resolution', 'Government Authorization Letter', 'BM PSP Agreement Annex'
   ];
   const ENTITIES = ['Registered Business', 'Freelance Professional', 'Governmental', 'NGO / Charity'];
+  const OWNER_NATIONALITIES = ['Egyptian Owner', 'Foreign Owner'];
   const INDUSTRIES = ['Retail & E-commerce', 'Food & Beverage', 'Healthcare / Pharmacy', 'Education',
     'Travel & Tourism', 'Professional Services', 'Technology / SaaS', 'Real Estate', 'Automotive',
     'Fashion & Beauty', 'Entertainment & Media', 'Non-profit / NGO', 'Government', 'Financial Services',
@@ -504,11 +509,10 @@
   const SERVICES = ['Online Gateway', 'POS', 'Payouts', 'BNPL: ValU', 'BNPL: Souhoola', 'BNPL: Aman',
     'BNPL: Basata', 'BNPL: Forsa', 'BNPL: Contact', 'BNPL: Mogo', 'BNPL: TRU',
     'Lending: Flend', 'Lending: Erada', 'Lending: OLIV'];
-  const FLAGS = ['Foreign Cross-border', 'Foreign Owner', 'High Risk / SMM'];
+  const FLAGS = ['Foreign Cross-border', 'High Risk / SMM'];
   /* Where each flag comes from — merchants/salespeople never select these in the form. */
   const FLAG_SOURCES = {
     'Foreign Cross-border': 'AUTO',              // derived from registration country / settlement currency
-    'Foreign Owner':        'AUTO',              // derived from owner's ID document type / nationality in KYC data
     'High Risk / SMM':      'RISK & COMPLIANCE', // assigned by the risk engine or a compliance reviewer
   };
 
@@ -516,7 +520,7 @@
   let rules = [];
   let nextId = 1;
 
-  const CONDITION_KEYS = ['entities', 'industries', 'banks', 'modules', 'services', 'flags'];
+  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services', 'flags'];
   const isUniversal = r => CONDITION_KEYS.every(k => r[k].length === 0);
 
   /* ══════════ Toast ══════════ */
@@ -530,7 +534,7 @@
   }
 
   /* ══════════ Builder state ══════════ */
-  const draft = { docs: [], entities: [], industries: [], banks: [], modules: [], services: [], flags: [] };
+  const draft = { docs: [], entities: [], owners: [], industries: [], banks: [], modules: [], services: [], flags: [] };
   let editingId = null;
 
   function chipEl(label, group, arr) {
@@ -581,7 +585,7 @@
   }
 
   function updateAnyBadges() {
-    const map = { entities: 'anyEntities', industries: 'anyIndustries', banks: 'anyBanks', modules: 'anyModules', services: 'anyServices' };
+    const map = { entities: 'anyEntities', owners: 'anyOwners', industries: 'anyIndustries', banks: 'anyBanks', modules: 'anyModules', services: 'anyServices' };
     Object.entries(map).forEach(([k, id]) => {
       const empty = draft[k].length === 0;
       $(id).textContent = empty ? 'ANY ✓' : draft[k].length + ' selected';
@@ -592,6 +596,7 @@
   function renderBuilder() {
     renderChipGroup('docChips', DOC_TYPES, 'docs', draft.docs);
     renderChipGroup('entityChips', ENTITIES, 'entities', draft.entities);
+    renderChipGroup('ownerChips', OWNER_NATIONALITIES, 'owners', draft.owners);
     renderChipGroup('industryChips', INDUSTRIES, 'industries', draft.industries);
     renderChipGroup('bankChips', BANKS, 'banks', draft.banks);
     renderChipGroup('moduleChips', MODULES, 'modules', draft.modules);
@@ -703,6 +708,7 @@
         conds = '<span class="universal-tag"><span class="dot"></span>UNIVERSAL</span>';
       } else {
         conds += r.entities.map(e => '<span class="cond-pill entity">' + esc(e) + '</span>').join('');
+        conds += r.owners.map(v => '<span class="cond-pill">' + esc(v) + '</span>').join('');
         conds += r.industries.map(v => '<span class="cond-pill">' + esc(v) + '</span>').join('');
         conds += r.banks.map(v => '<span class="cond-pill">' + esc(v) + '</span>').join('');
         conds += r.modules.map(v => '<span class="cond-pill">' + esc(v) + '</span>').join('');
