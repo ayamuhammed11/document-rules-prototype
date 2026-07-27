@@ -214,6 +214,16 @@
   .cond-cols { display: flex; gap: 32px; flex-wrap: wrap; }
   .cond-cols .cond-group { margin-bottom: 0; }
   .none-hint { font-size: 12px; font-style: italic; color: var(--cadet-05); align-self: center; }
+
+  /* System-derived flags — separated from merchant/salesperson selections */
+  .derived-section { margin-top: 20px; border-top: 1px dashed var(--border); padding-top: 16px; }
+  .ds-tag { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    background: var(--warning-bg); color: #92620A; border-radius: 4px; padding: 2px 8px; }
+  .ds-hint { font-size: 12px; color: var(--cadet-04); margin: 8px 0 12px; line-height: 1.55; max-width: 660px; }
+  .ds-hint b { color: var(--cadet-base); }
+  .chip .chip-src { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .05em;
+    border-radius: 3px; padding: 1px 5px; margin-left: 7px; background: var(--warning-bg); color: #92620A; }
+  .chip.on .chip-src { background: rgba(255,255,255,.22); color: #fff; }
   .builder-actions { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
 
   /* Empty state */
@@ -393,8 +403,12 @@
                 <div class="chip-row" id="serviceChips"></div>
               </div>
             </div>
-            <div class="cond-group" data-group="flags" style="margin-top:16px;">
-              <div class="cg-label"><span class="cg-name">Flags</span><span class="any-badge" id="anyFlags" style="display:none;">ANY</span></div>
+            <div class="derived-section" data-group="flags">
+              <div class="cg-label">
+                <span class="cg-name">System-Derived Flags</span>
+                <span class="ds-tag">auto-detected / assigned by risk &amp; compliance</span>
+              </div>
+              <p class="ds-hint">These are <b>not chosen</b> by the merchant or salesperson during onboarding. A rule with a flag activates automatically when the system detects the attribute from application data, or when risk &amp; compliance assigns it — and the required documents are added to the application at that moment, even mid-review.</p>
               <div class="chip-row" id="flagChips"></div>
             </div>
 
@@ -491,6 +505,12 @@
     'BNPL: Basata', 'BNPL: Forsa', 'BNPL: Contact', 'BNPL: Mogo', 'BNPL: TRU',
     'Lending: Flend', 'Lending: Erada', 'Lending: OLIV'];
   const FLAGS = ['Foreign Cross-border', 'Foreign Owner', 'High Risk / SMM'];
+  /* Where each flag comes from — merchants/salespeople never select these in the form. */
+  const FLAG_SOURCES = {
+    'Foreign Cross-border': 'AUTO',              // derived from registration country / settlement currency
+    'Foreign Owner':        'AUTO',              // derived from owner's ID document type / nationality in KYC data
+    'High Risk / SMM':      'RISK & COMPLIANCE', // assigned by the risk engine or a compliance reviewer
+  };
 
   /* ══════════ Seed rules ══════════ */
   let rules = [];
@@ -533,6 +553,28 @@
     options.forEach(opt => c.appendChild(chipEl(opt, group, arr)));
   }
 
+  /* Flag chips carry a source tag (AUTO / RISK & COMPLIANCE) — same toggle behavior. */
+  function renderFlagChips() {
+    const c = $('flagChips');
+    c.innerHTML = '';
+    FLAGS.forEach(label => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip' + (draft.flags.includes(label) ? ' on' : '');
+      b.appendChild(document.createTextNode(label));
+      const src = document.createElement('span');
+      src.className = 'chip-src';
+      src.textContent = FLAG_SOURCES[label];
+      b.appendChild(src);
+      b.addEventListener('click', () => {
+        const i = draft.flags.indexOf(label);
+        if (i >= 0) draft.flags.splice(i, 1); else draft.flags.push(label);
+        b.classList.toggle('on');
+      });
+      c.appendChild(b);
+    });
+  }
+
   function updateDocHint() {
     $('docHint').textContent = draft.docs.length + ' selected';
     if (draft.docs.length) $('docErr').classList.remove('show');
@@ -554,7 +596,7 @@
     renderChipGroup('bankChips', BANKS, 'banks', draft.banks);
     renderChipGroup('moduleChips', MODULES, 'modules', draft.modules);
     renderChipGroup('serviceChips', SERVICES, 'services', draft.services);
-    renderChipGroup('flagChips', FLAGS, 'flags', draft.flags);
+    renderFlagChips();
     updateDocHint();
     updateAnyBadges();
   }
