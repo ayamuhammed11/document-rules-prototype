@@ -6,7 +6,7 @@
 <title>Kashier | Document Rules</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&family=Inter:wght@600&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Kashier design tokens */
@@ -215,38 +215,44 @@
   .cond-cols .cond-group { margin-bottom: 0; }
   .none-hint { font-size: 12px; font-style: italic; color: var(--cadet-05); align-self: center; }
 
-  /* ---------- Events (audit trail) — same components as the On-Hold Logs table ---------- */
+  /* ---------- Events (audit trail) — Kashier DS: Data Table §10d, Badge §4.3, Avatar §4.6 ---------- */
+  /* Container: bg white · rounded · overflow-hidden · 3-layer shadow */
+  .dt-container { background: #fff; border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(152,161,178,.1), 0 1px 4px 0 rgba(69,75,87,.12), 0 0 2px 0 rgba(0,0,0,.08); }
   .table-scroll { overflow-x: auto; }
   #eventsTable { width: 100%; border-collapse: collapse; min-width: 640px; }
-  #eventsTable thead th { height: 42px; padding: 0 10px; border-top: 1px solid var(--border-subtle);
-    border-bottom: 1px solid var(--border-subtle); background: var(--muted); font-size: 11px; font-weight: 700;
-    color: var(--cadet-base); text-transform: uppercase; letter-spacing: .3px; text-align: left; white-space: nowrap; }
-  #eventsTable tbody tr:nth-child(even) { background: rgba(248,249,249,.6); }
-  #eventsTable tbody tr:hover { background: var(--primary-10); }
-  #eventsTable tbody td { padding: 12px 10px; font-size: 13px; font-weight: 400; color: var(--foreground);
-    vertical-align: middle; border-bottom: 1px solid var(--border-subtle); }
-  #eventsTable tbody tr:last-child td { border-bottom: none; }
+  /* Header: h-40 · px-8 · rgba(245,246,246,.75) + blur(4px) · border-b #E9EDF5 · Inter SemiBold 11px #464F60 */
+  #eventsTable thead th { height: 40px; padding: 0 8px; background: rgba(245,246,246,.75);
+    backdrop-filter: blur(4px); border-bottom: 1px solid #E9EDF5;
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; line-height: 16px;
+    color: #464F60; text-transform: uppercase; letter-spacing: .44px; text-align: left; white-space: nowrap; }
+  /* Rows: h-49 · px-8 · Noto Sans 14px #202020 · even rows rgba(248,249,249,.75) */
+  #eventsTable tbody td { height: 49px; padding: 0 8px; font-family: 'Noto Sans', sans-serif;
+    font-size: 14px; font-weight: 400; color: var(--foreground); vertical-align: middle; white-space: nowrap; }
+  #eventsTable tbody tr:nth-child(even) { background: rgba(248,249,249,.75); }
 
-  .badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 4px; font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .3px; padding: 4px 9px; white-space: nowrap; }
-  .badge .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-  .badge-created { background: var(--success-bg); color: var(--success-text); }
-  .badge-updated { background: var(--primary-10); color: var(--primary); }
-  .badge-deleted { background: var(--destructive-bg); color: var(--destructive); }
+  /* Badge §4.3: rounded-full · 11px bold uppercase tracking .3px · px-2.5 py-0.5 · dot bg-current */
+  .badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 9999px;
+    font-family: 'Noto Sans', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .3px; padding: 2px 10px; white-space: nowrap; }
+  .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .badge-created { background: #F3FFF4; color: #388E3B; }  /* success: lemon-10 / lemon-80 */
+  .badge-updated { background: #F1F6FF; color: #2955B1; }  /* primary: ocean-10 / ocean-80 */
+  .badge-deleted { background: #FFEAED; color: #A50017; }  /* error: watermelon-10 / base  */
 
-  .log-when { white-space: nowrap; }
   .log-when .abs { color: var(--foreground); }
-  .log-when .rel { font-size: 11.5px; color: var(--cadet-05); margin-top: 3px; }
-  .ev-rule-name { font-weight: 600; font-size: 13px; color: var(--foreground); white-space: nowrap; }
-  .ev-rule-sub { font-size: 11.5px; color: var(--cadet-05); margin-top: 3px; white-space: nowrap; }
+  .log-when .rel { font-size: 12px; color: #687182; margin-top: 3px; }
+  .ev-rule-name { font-weight: 600; font-size: 14px; color: var(--foreground); }
+  .ev-rule-sub { font-size: 12px; color: #687182; margin-top: 3px; }
 
+  /* Avatar §4.6: sm 32px · rounded-full · Outfit Bold · solid primary bg · white initials */
   .actor { display: flex; align-items: center; gap: 8px; }
-  .actor .av { width: 26px; height: 26px; border-radius: 50%; background: #E7ECF7; color: var(--primary);
-    display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-weight: 700;
-    font-size: 10px; flex-shrink: 0; }
+  .actor .av { width: 32px; height: 32px; border-radius: 9999px; background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif;
+    font-weight: 700; font-size: 11px; letter-spacing: .04em; flex-shrink: 0; }
   .actor .who { min-width: 0; }
-  .actor .who-name { font-weight: 600; font-size: 13px; color: var(--foreground); white-space: nowrap; }
-  .actor .who-role { font-size: 11px; color: var(--cadet-05); white-space: nowrap; }
+  .actor .who-name { font-weight: 600; font-size: 14px; color: var(--foreground); }
+  .actor .who-role { font-size: 12px; color: #687182; }
 
   .events-empty { display: none; text-align: center; font-size: 13px; color: var(--cadet-05); padding: 26px 0 14px; }
   .events-empty.show { display: block; }
@@ -498,6 +504,7 @@
           </div>
         </div>
         <div class="card-body">
+          <div class="dt-container">
           <div class="table-scroll">
             <table id="eventsTable">
               <thead>
@@ -510,6 +517,7 @@
               </thead>
               <tbody id="eventsBody"></tbody>
             </table>
+          </div>
           </div>
           <div class="events-empty" id="eventsEmpty">No events recorded yet — actions on rules will appear here.</div>
         </div>
@@ -841,7 +849,7 @@
 
   function renderEvents() {
     $('eventsEmpty').classList.toggle('show', events.length === 0);
-    $('eventsTable').style.display = events.length === 0 ? 'none' : '';
+    document.querySelector('.dt-container').style.display = events.length === 0 ? 'none' : '';
     $('eventsBody').innerHTML = events.map(ev => `
       <tr>
         <td>
