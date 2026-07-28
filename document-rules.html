@@ -222,6 +222,10 @@
   .ev-icon { width: 40px; height: 40px; border-radius: 50%; background: #E3E5E5; color: var(--cadet-base);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .ev-icon svg { width: 17px; height: 17px; }
+  /* Icon is tinted by action — green: created · yellow: updated · red: deleted */
+  .ev-icon.created { background: var(--success-bg); color: var(--success-80); }
+  .ev-icon.updated { background: var(--warning-bg); color: #92620A; }
+  .ev-icon.deleted { background: var(--destructive-bg); color: var(--destructive); }
   .ev-body { min-width: 0; padding-top: 1px; }
   .ev-ts { font-size: 13px; color: var(--cadet-04); }
   .ev-sentence { font-size: 14px; color: var(--cadet-04); margin-top: 7px; line-height: 1.45; }
@@ -776,7 +780,7 @@
     $('eventsEmpty').classList.toggle('show', events.length === 0);
     $('eventsList').innerHTML = events.map(ev => `
       <div class="event-item">
-        <div class="ev-icon">${PENCIL_ICON}</div>
+        <div class="ev-icon ${ev.action.toLowerCase()}">${PENCIL_ICON}</div>
         <div class="ev-body">
           <div class="ev-ts">${formatEventTime(ev.ts)}</div>
           <div class="ev-sentence"><b>${esc(ev.actor)}</b> ${EVENT_PHRASE[ev.action]} <b>${esc(ev.ruleName)}</b></div>
