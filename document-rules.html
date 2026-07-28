@@ -6,7 +6,7 @@
 <title>Kashier | Document Rules</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Kashier design tokens */
@@ -215,44 +215,17 @@
   .cond-cols .cond-group { margin-bottom: 0; }
   .none-hint { font-size: 12px; font-style: italic; color: var(--cadet-05); align-self: center; }
 
-  /* ---------- Events (audit trail) — Kashier DS: Data Table §10d, Badge §4.3, Avatar §4.6 ---------- */
-  /* Container: bg white · rounded · overflow-hidden · 3-layer shadow */
-  .dt-container { background: #fff; border-radius: var(--radius); overflow: hidden;
-    box-shadow: 0 0 0 1px rgba(152,161,178,.1), 0 1px 4px 0 rgba(69,75,87,.12), 0 0 2px 0 rgba(0,0,0,.08); }
-  .table-scroll { overflow-x: auto; }
-  #eventsTable { width: 100%; border-collapse: collapse; min-width: 640px; }
-  /* Header: h-40 · px-8 · rgba(245,246,246,.75) + blur(4px) · border-b #E9EDF5 · Inter SemiBold 11px #464F60 */
-  #eventsTable thead th { height: 40px; padding: 0 8px; background: rgba(245,246,246,.75);
-    backdrop-filter: blur(4px); border-bottom: 1px solid #E9EDF5;
-    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; line-height: 16px;
-    color: #464F60; text-transform: uppercase; letter-spacing: .44px; text-align: left; white-space: nowrap; }
-  /* Rows: h-49 · px-8 · Noto Sans 14px #202020 · even rows rgba(248,249,249,.75) */
-  #eventsTable tbody td { height: 49px; padding: 0 8px; font-family: 'Noto Sans', sans-serif;
-    font-size: 14px; font-weight: 400; color: var(--foreground); vertical-align: middle; white-space: nowrap; }
-  #eventsTable tbody tr:nth-child(even) { background: rgba(248,249,249,.75); }
-
-  /* Badge §4.3: rounded-full · 11px bold uppercase tracking .3px · px-2.5 py-0.5 · dot bg-current */
-  .badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 9999px;
-    font-family: 'Noto Sans', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .3px; padding: 2px 10px; white-space: nowrap; }
-  .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .badge-created { background: #F3FFF4; color: #388E3B; }  /* success: lemon-10 / lemon-80 */
-  .badge-updated { background: #F1F6FF; color: #2955B1; }  /* primary: ocean-10 / ocean-80 */
-  .badge-deleted { background: #FFEAED; color: #A50017; }  /* error: watermelon-10 / base  */
-
-  .log-when .abs { color: var(--foreground); }
-  .log-when .rel { font-size: 12px; color: #687182; margin-top: 3px; }
-  .ev-rule-name { font-weight: 600; font-size: 14px; color: var(--foreground); }
-  .ev-rule-sub { font-size: 12px; color: #687182; margin-top: 3px; }
-
-  /* Avatar §4.6: sm 32px · rounded-full · Outfit Bold · solid primary bg · white initials */
-  .actor { display: flex; align-items: center; gap: 8px; }
-  .actor .av { width: 32px; height: 32px; border-radius: 9999px; background: var(--primary); color: #fff;
-    display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif;
-    font-weight: 700; font-size: 11px; letter-spacing: .04em; flex-shrink: 0; }
-  .actor .who { min-width: 0; }
-  .actor .who-name { font-weight: 600; font-size: 14px; color: var(--foreground); }
-  .actor .who-role { font-size: 12px; color: #687182; }
+  /* ---------- Events (audit trail) — feed layout, matching the Kashier portal ---------- */
+  .event-item { display: flex; align-items: flex-start; gap: 16px; padding: 18px 4px;
+    border-bottom: 1px solid var(--border-subtle); }
+  .event-item:last-child { border-bottom: none; }
+  .ev-icon { width: 40px; height: 40px; border-radius: 50%; background: #E3E5E5; color: var(--cadet-base);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ev-icon svg { width: 17px; height: 17px; }
+  .ev-body { min-width: 0; padding-top: 1px; }
+  .ev-ts { font-size: 13px; color: var(--cadet-04); }
+  .ev-sentence { font-size: 14px; color: var(--cadet-04); margin-top: 7px; line-height: 1.45; }
+  .ev-sentence b { font-weight: 700; color: var(--foreground); }
 
   .events-empty { display: none; text-align: center; font-size: 13px; color: var(--cadet-05); padding: 26px 0 14px; }
   .events-empty.show { display: block; }
@@ -496,7 +469,7 @@
       <div class="card">
         <div class="card-head">
           <div class="ch-left">
-            <svg class="hi ch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+            <svg class="hi ch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/></svg>
             <div>
               <h2>Events</h2>
               <p class="ch-sub">Full audit trail of this module — every rule that is created, updated, or deleted is recorded here with who did it and when.</p>
@@ -504,21 +477,7 @@
           </div>
         </div>
         <div class="card-body">
-          <div class="dt-container">
-          <div class="table-scroll">
-            <table id="eventsTable">
-              <thead>
-                <tr>
-                  <th>Date &amp; Time</th>
-                  <th>Action</th>
-                  <th>Rule</th>
-                  <th>Performed By</th>
-                </tr>
-              </thead>
-              <tbody id="eventsBody"></tbody>
-            </table>
-          </div>
-          </div>
+          <div id="eventsList"></div>
           <div class="events-empty" id="eventsEmpty">No events recorded yet — actions on rules will appear here.</div>
         </div>
       </div>
@@ -794,85 +753,35 @@
   const CURRENT_USER = 'Aya Muhammed';
   const events = [];  // newest first
 
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const now = () => new Date();
+  const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>';
 
-  function clockOf(d) {
+  /** "07/22/2026. 03:08:56 PM" — the portal's event timestamp format. */
+  function formatEventTime(d) {
+    const p = n => String(n).padStart(2, '0');
     let h = d.getHours();
     const ampm = h >= 12 ? 'PM' : 'AM';
     h = h % 12 || 12;
-    return String(h).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ' ' + ampm;
+    return p(d.getMonth() + 1) + '/' + p(d.getDate()) + '/' + d.getFullYear() + '. ' +
+      p(h) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()) + ' ' + ampm;
   }
 
-  function isSameDay(a, b) {
-    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-  }
-
-  /** "Today 12:32 AM" for today, otherwise "26 Jul 2026 06:00 AM". */
-  function formatDateTime(d) {
-    if (isSameDay(d, now())) return 'Today ' + clockOf(d);
-    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ' ' + clockOf(d);
-  }
-
-  function relativeTime(d) {
-    const diff = d - now();
-    const abs = Math.abs(diff);
-    const units = [['day', 86400000], ['hour', 3600000], ['minute', 60000]];
-    for (const [unit, ms] of units) {
-      if (abs >= ms) {
-        const v = Math.round(abs / ms);
-        const plural = v === 1 ? unit : unit + 's';
-        return diff < 0 ? v + ' ' + plural + ' ago' : 'in ' + v + ' ' + plural;
-      }
-    }
-    return 'just now';
-  }
-
-  function initialsOf(name) {
-    return name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
-  }
-
-  const EVENT_BADGE = { Created: 'badge-created', Updated: 'badge-updated', Deleted: 'badge-deleted' };
-
-  function actionBadge(action) {
-    return '<span class="badge ' + EVENT_BADGE[action] + '"><span class="dot"></span>' + action + '</span>';
-  }
+  const EVENT_PHRASE = { Created: 'created rule', Updated: 'updated rule', Deleted: 'deleted rule' };
 
   function logEvent(action, rule) {
-    events.unshift({
-      ts: new Date(), action,
-      ruleName: rule.name, docsCount: rule.docs.length,
-      actor: CURRENT_USER, role: 'Agent Admin',
-    });
+    events.unshift({ ts: new Date(), action, ruleName: rule.name, actor: CURRENT_USER });
     renderEvents();
   }
 
   function renderEvents() {
     $('eventsEmpty').classList.toggle('show', events.length === 0);
-    document.querySelector('.dt-container').style.display = events.length === 0 ? 'none' : '';
-    $('eventsBody').innerHTML = events.map(ev => `
-      <tr>
-        <td>
-          <div class="log-when">
-            <div class="abs">${formatDateTime(ev.ts)}</div>
-            <div class="rel">${relativeTime(ev.ts)}</div>
-          </div>
-        </td>
-        <td>${actionBadge(ev.action)}</td>
-        <td>
-          <div class="ev-rule-name">${esc(ev.ruleName)}</div>
-          <div class="ev-rule-sub">${ev.docsCount} document${ev.docsCount === 1 ? '' : 's'}</div>
-        </td>
-        <td>
-          <div class="actor">
-            <div class="av">${initialsOf(ev.actor)}</div>
-            <div class="who">
-              <div class="who-name">${esc(ev.actor)}</div>
-              <div class="who-role">${esc(ev.role)}</div>
-            </div>
-          </div>
-        </td>
-      </tr>`).join('');
+    $('eventsList').innerHTML = events.map(ev => `
+      <div class="event-item">
+        <div class="ev-icon">${PENCIL_ICON}</div>
+        <div class="ev-body">
+          <div class="ev-ts">${formatEventTime(ev.ts)}</div>
+          <div class="ev-sentence"><b>${esc(ev.actor)}</b> ${EVENT_PHRASE[ev.action]} <b>${esc(ev.ruleName)}</b></div>
+        </div>
+      </div>`).join('');
   }
 
   /* ══════════ Sidebar (mobile) ══════════ */
