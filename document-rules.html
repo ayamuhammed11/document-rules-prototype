@@ -177,6 +177,36 @@
   .icon-btn.danger { opacity: 0; }
   .rule-card:hover .icon-btn.danger { opacity: 1; }
   .icon-btn.danger:hover { background: var(--destructive-bg); color: var(--destructive); }
+
+  /* Role switch — prototype control for the signed-in user's permission level */
+  .role-switch { display: inline-flex; background: var(--muted); border-radius: 6px; padding: 3px; }
+  .rs-btn { border: none; background: none; cursor: pointer; border-radius: 4px; padding: 6px 14px;
+    font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--cadet-base); }
+  .rs-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+
+  /* View-only users cannot create, edit, or delete — only read */
+  body.role-viewer #addRuleBtn,
+  body.role-viewer .icon-btn[data-act="edit"],
+  body.role-viewer .icon-btn[data-act="delete"] { display: none; }
+
+  /* Read-only rule details modal */
+  .modal.modal-lg { max-width: 560px; }
+  .ro-note { display: flex; align-items: center; gap: 8px; background: var(--primary-10); color: var(--primary);
+    border-radius: 5px; padding: 10px 12px; font-size: 13px; margin-bottom: 20px; }
+  .ro-note svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .vd-section { margin-bottom: 20px; }
+  .vd-section:last-child { margin-bottom: 0; }
+  .vd-label { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--cadet-05); margin-bottom: 9px; }
+  .vd-name { font-size: 16px; font-weight: 700; color: var(--foreground); }
+  .vd-doc { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--foreground);
+    padding: 7px 0; border-bottom: 1px solid var(--border-subtle); }
+  .vd-doc:last-child { border-bottom: none; }
+  .vd-doc svg { width: 15px; height: 15px; color: var(--cadet-04); flex-shrink: 0; }
+  .vd-cond { display: flex; gap: 10px; padding: 7px 0; }
+  .vd-cond-key { font-size: 12.5px; color: var(--cadet-base); min-width: 150px; flex-shrink: 0; }
+  .vd-cond-val { display: flex; gap: 6px; flex-wrap: wrap; }
+  .vd-any { font-size: 12.5px; color: var(--cadet-05); font-style: italic; }
   .icon-btn svg { width: 16px; height: 16px; }
 
   /* ---------- Rule builder ---------- */
@@ -351,6 +381,10 @@
           <p class="sub">Create customized rules that decide which documents a merchant must submit to proceed with the onboarding application — driven by conditions such as entity type, industry, bank, module, service, and risk flags. A rule with no conditions applies to every applicant.</p>
         </div>
         <div class="head-actions">
+          <div class="role-switch" id="roleSwitch" title="Prototype control — switch the signed-in user's permission level">
+            <button class="rs-btn active" data-role="admin">Admin</button>
+            <button class="rs-btn" data-role="viewer">View-only</button>
+          </div>
           <button class="btn btn-primary" id="addRuleBtn">
             <svg class="hi-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
             Add Rule
@@ -489,6 +523,26 @@
     </div>
   </main>
 
+  <!-- Rule details — read-only -->
+  <div class="modal-backdrop" id="viewBackdrop">
+    <div class="modal modal-lg">
+      <div class="modal-head">
+        <h2>Rule Details</h2>
+        <button class="modal-close" id="viewClose"><svg class="hi-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="ro-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+          View only — this rule cannot be changed from here.
+        </div>
+        <div id="viewContent"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="viewCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Delete confirm modal -->
   <div class="modal-backdrop" id="deleteBackdrop">
     <div class="modal">
@@ -602,6 +656,7 @@
   }
 
   function openBuilder(rule) {
+    if (role === 'viewer') return;   // view-only users cannot create or edit
     editingId = rule ? rule.id : null;
     $('builderTitle').textContent = rule ? 'Edit Requirement Rule' : 'New Requirement Rule';
     $('saveRuleLabel').textContent = rule ? 'Save Changes' : 'Add Rule';
@@ -679,6 +734,7 @@
   /* ══════════ Rule list ══════════ */
   const DOC_ICON = '<svg class="hi rc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>';
   const PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>';
+  const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>';
   const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
   const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -722,19 +778,81 @@
           '<div class="rc-conds">' + conds + '</div>' +
         '</div>' +
         '<div class="rc-actions">' +
+          '<button class="icon-btn" data-act="view" title="View rule details">' + EYE + '</button>' +
           '<button class="icon-btn" data-act="edit" title="Edit rule">' + PENCIL + '</button>' +
           '<button class="icon-btn danger" data-act="delete" title="Delete rule">' + TRASH + '</button>' +
         '</div>';
 
+      card.querySelector('[data-act="view"]').addEventListener('click', () => openView(r));
       card.querySelector('[data-act="edit"]').addEventListener('click', () => openBuilder(r));
       card.querySelector('[data-act="delete"]').addEventListener('click', () => openDelete(r));
       list.appendChild(card);
     });
   }
 
+  /* ══════════ View rule (read-only) ══════════ */
+  const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
+
+  const COND_LABELS = [
+    ['entities',   'Entity Type'],
+    ['owners',     'Business Owner Nationality'],
+    ['industries', 'Industry'],
+    ['banks',      'Bank'],
+    ['modules',    'Module'],
+    ['services',   'Service'],
+    ['flags',      'Flags'],
+  ];
+
+  function openView(r) {
+    const docs = r.docs.map(d => '<div class="vd-doc">' + CHECK_ICON + esc(d) + '</div>').join('');
+
+    let conds;
+    if (isUniversal(r)) {
+      conds = '<span class="universal-tag"><span class="dot"></span>UNIVERSAL — required for every applicant</span>';
+    } else {
+      conds = COND_LABELS.map(([key, label]) => {
+        const vals = r[key];
+        const pillClass = key === 'flags' ? 'flag-pill' : (key === 'entities' ? 'cond-pill entity' : 'cond-pill');
+        const body = vals.length
+          ? vals.map(v => '<span class="' + pillClass + '">' + esc(v) + '</span>').join('')
+          : '<span class="vd-any">Any</span>';
+        return '<div class="vd-cond"><div class="vd-cond-key">' + label + '</div>' +
+               '<div class="vd-cond-val">' + body + '</div></div>';
+      }).join('');
+    }
+
+    $('viewContent').innerHTML =
+      '<div class="vd-section"><div class="vd-label">Rule Name</div>' +
+        '<div class="vd-name">' + esc(r.name) + '</div></div>' +
+      '<div class="vd-section"><div class="vd-label">Required Documents (' + r.docs.length + ')</div>' +
+        docs + '</div>' +
+      '<div class="vd-section"><div class="vd-label">Conditions — when is this document required?</div>' +
+        conds + '</div>';
+
+    $('viewBackdrop').classList.add('open');
+  }
+
+  function closeView() { $('viewBackdrop').classList.remove('open'); }
+  $('viewClose').addEventListener('click', closeView);
+  $('viewCloseBtn').addEventListener('click', closeView);
+  $('viewBackdrop').addEventListener('click', e => { if (e.target === $('viewBackdrop')) closeView(); });
+
+  /* ══════════ Role (prototype permission switch) ══════════ */
+  let role = 'admin';
+  $('roleSwitch').addEventListener('click', e => {
+    const btn = e.target.closest('.rs-btn');
+    if (!btn) return;
+    role = btn.dataset.role;
+    document.querySelectorAll('.rs-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.body.classList.toggle('role-viewer', role === 'viewer');
+    if (role === 'viewer') closeBuilder();
+    toast(role === 'viewer' ? 'Viewing as a view-only user — editing is disabled' : 'Viewing as an admin');
+  });
+
   /* ══════════ Delete modal ══════════ */
   let deleteTarget = null;
   function openDelete(r) {
+    if (role === 'viewer') return;   // view-only users cannot delete
     deleteTarget = r;
     $('deleteText').innerHTML = 'Are you sure you want to delete the rule <b>' + esc(r.name) + '</b>? ' +
       'Merchants matching its conditions will no longer be asked for: <b>' + r.docs.map(esc).join(', ') + '</b>.';
