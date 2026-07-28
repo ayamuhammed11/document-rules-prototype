@@ -214,6 +214,28 @@
   .cond-cols { display: flex; gap: 32px; flex-wrap: wrap; }
   .cond-cols .cond-group { margin-bottom: 0; }
   .none-hint { font-size: 12px; font-style: italic; color: var(--cadet-05); align-self: center; }
+
+  /* ---------- Events (audit trail) ---------- */
+  .event-row { display: flex; align-items: flex-start; gap: 14px; padding: 13px 4px;
+    border-bottom: 1px solid var(--border-subtle); }
+  .event-row:last-child { border-bottom: none; }
+  .ev-badge { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    border-radius: 4px; padding: 3px 9px; flex-shrink: 0; margin-top: 2px; white-space: nowrap; }
+  .ev-badge.created { background: var(--success-bg); color: var(--success-80); }
+  .ev-badge.updated { background: var(--ocean-10); color: var(--link); }
+  .ev-badge.deleted { background: var(--destructive-bg); color: var(--destructive); }
+  .ev-main { flex: 1; min-width: 0; }
+  .ev-title { font-size: 13.5px; font-weight: 600; color: var(--foreground); }
+  .ev-detail { font-size: 12.5px; color: var(--cadet-04); margin-top: 3px; line-height: 1.5; }
+  .ev-meta { flex-shrink: 0; text-align: right; }
+  .ev-time { font-size: 12px; color: var(--cadet-05); white-space: nowrap; }
+  .ev-actor { font-size: 12px; font-weight: 600; color: var(--cadet-base); margin-top: 3px; }
+  .events-empty { display: none; text-align: center; font-size: 13px; color: var(--cadet-05); padding: 26px 0 14px; }
+  .events-empty.show { display: block; }
+  @media (max-width: 640px) {
+    .event-row { flex-wrap: wrap; }
+    .ev-meta { text-align: left; width: 100%; display: flex; gap: 10px; padding-left: 0; }
+  }
   .builder-actions { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
 
   /* Empty state */
@@ -450,6 +472,23 @@
         </div>
       </div>
 
+      <!-- ══════════ Events ══════════ -->
+      <div class="card">
+        <div class="card-head">
+          <div class="ch-left">
+            <svg class="hi ch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+            <div>
+              <h2>Events</h2>
+              <p class="ch-sub">Full audit trail of this module — every rule that is created, updated, or deleted is recorded here with who did it and when.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="eventList"></div>
+          <div class="events-empty" id="eventsEmpty">No events recorded yet — actions on rules will appear here.</div>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -603,11 +642,13 @@
       r.docs = [...draft.docs];
       CONDITION_KEYS.forEach(k => r[k] = [...draft[k]]);
       toast('Rule "' + name + '" updated');
+      logEvent('updated', 'Rule "' + name + '" updated', ruleSummary(r));
     } else {
       const r = { id: nextId++, name, docs: [...draft.docs] };
       CONDITION_KEYS.forEach(k => r[k] = [...draft[k]]);
       rules.push(r);
       toast('Rule "' + name + '" added');
+      logEvent('created', 'Rule "' + name + '" created', ruleSummary(r));
     }
     closeBuilder();
     renderRules();
@@ -710,9 +751,55 @@
     if (!deleteTarget) return;
     rules = rules.filter(r => r.id !== deleteTarget.id);
     toast('Rule "' + deleteTarget.name + '" deleted');
+    logEvent('deleted', 'Rule "' + deleteTarget.name + '" deleted', ruleSummary(deleteTarget));
     closeDelete();
     renderRules();
   });
+
+  /* ══════════ Events (audit trail) ══════════ */
+  const CURRENT_USER = 'Aya Muhammed';
+  const events = [];  // newest first
+
+  /* One-line description of a rule: its documents + the conditions it fires on. */
+  function ruleSummary(r) {
+    const conds = [];
+    if (r.entities.length)   conds.push('Entity: ' + r.entities.join(' / '));
+    if (r.owners.length)     conds.push('Owner: ' + r.owners.join(' / '));
+    if (r.industries.length) conds.push('Industry: ' + r.industries.join(' / '));
+    if (r.banks.length)      conds.push('Bank: ' + r.banks.join(' / '));
+    if (r.modules.length)    conds.push('Module: ' + r.modules.join(' / '));
+    if (r.services.length)   conds.push('Service: ' + r.services.join(' / '));
+    if (r.flags.length)      conds.push('Flags: ' + r.flags.join(' / '));
+    return r.docs.length + ' document' + (r.docs.length === 1 ? '' : 's') + ' (' + r.docs.join(', ') + ') — ' +
+      (conds.length ? 'Conditions: ' + conds.join(' · ') : 'Universal — applies to every applicant');
+  }
+
+  function fmtTime(d) {
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' +
+      d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function logEvent(action, title, detail) {
+    events.unshift({ ts: new Date(), action, title, detail, actor: CURRENT_USER });
+    renderEvents();
+  }
+
+  function renderEvents() {
+    const list = $('eventList');
+    list.innerHTML = '';
+    events.forEach(ev => {
+      const row = document.createElement('div');
+      row.className = 'event-row';
+      row.innerHTML =
+        '<span class="ev-badge ' + ev.action + '">' + ev.action + '</span>' +
+        '<div class="ev-main"><div class="ev-title">' + esc(ev.title) + '</div>' +
+        '<div class="ev-detail">' + esc(ev.detail) + '</div></div>' +
+        '<div class="ev-meta"><div class="ev-time">' + fmtTime(ev.ts) + '</div>' +
+        '<div class="ev-actor">' + esc(ev.actor) + '</div></div>';
+      list.appendChild(row);
+    });
+    $('eventsEmpty').classList.toggle('show', events.length === 0);
+  }
 
   /* ══════════ Sidebar (mobile) ══════════ */
   $('hamburger').addEventListener('click', () => {
@@ -733,6 +820,7 @@
 
   /* ══════════ Init ══════════ */
   renderRules();
+  renderEvents();
 </script>
 </body>
 </html>
