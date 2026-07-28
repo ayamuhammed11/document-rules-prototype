@@ -215,27 +215,42 @@
   .cond-cols .cond-group { margin-bottom: 0; }
   .none-hint { font-size: 12px; font-style: italic; color: var(--cadet-05); align-self: center; }
 
-  /* ---------- Events (audit trail) ---------- */
-  .event-row { display: flex; align-items: flex-start; gap: 14px; padding: 13px 4px;
-    border-bottom: 1px solid var(--border-subtle); }
-  .event-row:last-child { border-bottom: none; }
-  .ev-badge { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-    border-radius: 4px; padding: 3px 9px; flex-shrink: 0; margin-top: 2px; white-space: nowrap; }
-  .ev-badge.created { background: var(--success-bg); color: var(--success-80); }
-  .ev-badge.updated { background: var(--ocean-10); color: var(--link); }
-  .ev-badge.deleted { background: var(--destructive-bg); color: var(--destructive); }
-  .ev-main { flex: 1; min-width: 0; }
-  .ev-title { font-size: 13.5px; font-weight: 600; color: var(--foreground); }
-  .ev-detail { font-size: 12.5px; color: var(--cadet-04); margin-top: 3px; line-height: 1.5; }
-  .ev-meta { flex-shrink: 0; text-align: right; }
-  .ev-time { font-size: 12px; color: var(--cadet-05); white-space: nowrap; }
-  .ev-actor { font-size: 12px; font-weight: 600; color: var(--cadet-base); margin-top: 3px; }
+  /* ---------- Events (audit trail) — same components as the On-Hold Logs table ---------- */
+  .table-scroll { overflow-x: auto; }
+  #eventsTable { width: 100%; border-collapse: collapse; min-width: 900px; }
+  #eventsTable thead th { height: 42px; padding: 0 10px; border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle); background: var(--muted); font-size: 11px; font-weight: 700;
+    color: var(--cadet-base); text-transform: uppercase; letter-spacing: .3px; text-align: left; white-space: nowrap; }
+  #eventsTable tbody tr:nth-child(even) { background: rgba(248,249,249,.6); }
+  #eventsTable tbody tr:hover { background: var(--primary-10); }
+  #eventsTable tbody td { padding: 12px 10px; font-size: 13px; font-weight: 400; color: var(--foreground);
+    vertical-align: middle; border-bottom: 1px solid var(--border-subtle); }
+  #eventsTable tbody tr:last-child td { border-bottom: none; }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 4px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .3px; padding: 4px 9px; white-space: nowrap; }
+  .badge .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .badge-created { background: var(--success-bg); color: var(--success-text); }
+  .badge-updated { background: var(--primary-10); color: var(--primary); }
+  .badge-deleted { background: var(--destructive-bg); color: var(--destructive); }
+
+  .log-when { white-space: nowrap; }
+  .log-when .abs { color: var(--foreground); }
+  .log-when .rel { font-size: 11.5px; color: var(--cadet-05); margin-top: 3px; }
+  .ev-rule-name { font-weight: 600; font-size: 13px; color: var(--foreground); white-space: nowrap; }
+  .ev-rule-sub { font-size: 11.5px; color: var(--cadet-05); margin-top: 3px; white-space: nowrap; }
+  .log-detail { color: var(--cadet-base); max-width: 320px; line-height: 1.45; }
+
+  .actor { display: flex; align-items: center; gap: 8px; }
+  .actor .av { width: 26px; height: 26px; border-radius: 50%; background: #E7ECF7; color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-weight: 700;
+    font-size: 10px; flex-shrink: 0; }
+  .actor .who { min-width: 0; }
+  .actor .who-name { font-weight: 600; font-size: 13px; color: var(--foreground); white-space: nowrap; }
+  .actor .who-role { font-size: 11px; color: var(--cadet-05); white-space: nowrap; }
+
   .events-empty { display: none; text-align: center; font-size: 13px; color: var(--cadet-05); padding: 26px 0 14px; }
   .events-empty.show { display: block; }
-  @media (max-width: 640px) {
-    .event-row { flex-wrap: wrap; }
-    .ev-meta { text-align: left; width: 100%; display: flex; gap: 10px; padding-left: 0; }
-  }
   .builder-actions { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
 
   /* Empty state */
@@ -484,7 +499,20 @@
           </div>
         </div>
         <div class="card-body">
-          <div id="eventList"></div>
+          <div class="table-scroll">
+            <table id="eventsTable">
+              <thead>
+                <tr>
+                  <th>Date &amp; Time</th>
+                  <th>Action</th>
+                  <th>Rule</th>
+                  <th>Details</th>
+                  <th>Performed By</th>
+                </tr>
+              </thead>
+              <tbody id="eventsBody"></tbody>
+            </table>
+          </div>
           <div class="events-empty" id="eventsEmpty">No events recorded yet — actions on rules will appear here.</div>
         </div>
       </div>
@@ -642,13 +670,13 @@
       r.docs = [...draft.docs];
       CONDITION_KEYS.forEach(k => r[k] = [...draft[k]]);
       toast('Rule "' + name + '" updated');
-      logEvent('updated', 'Rule "' + name + '" updated', ruleSummary(r));
+      logEvent('Updated', r);
     } else {
       const r = { id: nextId++, name, docs: [...draft.docs] };
       CONDITION_KEYS.forEach(k => r[k] = [...draft[k]]);
       rules.push(r);
       toast('Rule "' + name + '" added');
-      logEvent('created', 'Rule "' + name + '" created', ruleSummary(r));
+      logEvent('Created', r);
     }
     closeBuilder();
     renderRules();
@@ -751,7 +779,7 @@
     if (!deleteTarget) return;
     rules = rules.filter(r => r.id !== deleteTarget.id);
     toast('Rule "' + deleteTarget.name + '" deleted');
-    logEvent('deleted', 'Rule "' + deleteTarget.name + '" deleted', ruleSummary(deleteTarget));
+    logEvent('Deleted', deleteTarget);
     closeDelete();
     renderRules();
   });
@@ -774,31 +802,87 @@
       (conds.length ? 'Conditions: ' + conds.join(' · ') : 'Universal — applies to every applicant');
   }
 
-  function fmtTime(d) {
-    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' +
-      d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const now = () => new Date();
+
+  function clockOf(d) {
+    let h = d.getHours();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return String(h).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ' ' + ampm;
   }
 
-  function logEvent(action, title, detail) {
-    events.unshift({ ts: new Date(), action, title, detail, actor: CURRENT_USER });
+  function isSameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  /** "Today 12:32 AM" for today, otherwise "26 Jul 2026 06:00 AM". */
+  function formatDateTime(d) {
+    if (isSameDay(d, now())) return 'Today ' + clockOf(d);
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ' ' + clockOf(d);
+  }
+
+  function relativeTime(d) {
+    const diff = d - now();
+    const abs = Math.abs(diff);
+    const units = [['day', 86400000], ['hour', 3600000], ['minute', 60000]];
+    for (const [unit, ms] of units) {
+      if (abs >= ms) {
+        const v = Math.round(abs / ms);
+        const plural = v === 1 ? unit : unit + 's';
+        return diff < 0 ? v + ' ' + plural + ' ago' : 'in ' + v + ' ' + plural;
+      }
+    }
+    return 'just now';
+  }
+
+  function initialsOf(name) {
+    return name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+  }
+
+  const EVENT_BADGE = { Created: 'badge-created', Updated: 'badge-updated', Deleted: 'badge-deleted' };
+
+  function actionBadge(action) {
+    return '<span class="badge ' + EVENT_BADGE[action] + '"><span class="dot"></span>' + action + '</span>';
+  }
+
+  function logEvent(action, rule) {
+    events.unshift({
+      ts: new Date(), action,
+      ruleName: rule.name, docsCount: rule.docs.length,
+      detail: ruleSummary(rule),
+      actor: CURRENT_USER, role: 'Agent Admin',
+    });
     renderEvents();
   }
 
   function renderEvents() {
-    const list = $('eventList');
-    list.innerHTML = '';
-    events.forEach(ev => {
-      const row = document.createElement('div');
-      row.className = 'event-row';
-      row.innerHTML =
-        '<span class="ev-badge ' + ev.action + '">' + ev.action + '</span>' +
-        '<div class="ev-main"><div class="ev-title">' + esc(ev.title) + '</div>' +
-        '<div class="ev-detail">' + esc(ev.detail) + '</div></div>' +
-        '<div class="ev-meta"><div class="ev-time">' + fmtTime(ev.ts) + '</div>' +
-        '<div class="ev-actor">' + esc(ev.actor) + '</div></div>';
-      list.appendChild(row);
-    });
     $('eventsEmpty').classList.toggle('show', events.length === 0);
+    $('eventsTable').style.display = events.length === 0 ? 'none' : '';
+    $('eventsBody').innerHTML = events.map(ev => `
+      <tr>
+        <td>
+          <div class="log-when">
+            <div class="abs">${formatDateTime(ev.ts)}</div>
+            <div class="rel">${relativeTime(ev.ts)}</div>
+          </div>
+        </td>
+        <td>${actionBadge(ev.action)}</td>
+        <td>
+          <div class="ev-rule-name">${esc(ev.ruleName)}</div>
+          <div class="ev-rule-sub">${ev.docsCount} document${ev.docsCount === 1 ? '' : 's'}</div>
+        </td>
+        <td><div class="log-detail">${esc(ev.detail)}</div></td>
+        <td>
+          <div class="actor">
+            <div class="av">${initialsOf(ev.actor)}</div>
+            <div class="who">
+              <div class="who-name">${esc(ev.actor)}</div>
+              <div class="who-role">${esc(ev.role)}</div>
+            </div>
+          </div>
+        </td>
+      </tr>`).join('');
   }
 
   /* ══════════ Sidebar (mobile) ══════════ */
