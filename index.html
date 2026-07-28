@@ -178,17 +178,6 @@
   .rule-card:hover .icon-btn.danger { opacity: 1; }
   .icon-btn.danger:hover { background: var(--destructive-bg); color: var(--destructive); }
 
-  /* Role switch — prototype control for the signed-in user's permission level */
-  .role-switch { display: inline-flex; background: var(--muted); border-radius: 6px; padding: 3px; }
-  .rs-btn { border: none; background: none; cursor: pointer; border-radius: 4px; padding: 6px 14px;
-    font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--cadet-base); }
-  .rs-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
-
-  /* View-only users cannot create, edit, or delete — only read */
-  body.role-viewer #addRuleBtn,
-  body.role-viewer .icon-btn[data-act="edit"],
-  body.role-viewer .icon-btn[data-act="delete"] { display: none; }
-
   /* Read-only rule details modal */
   .modal.modal-lg { max-width: 560px; }
   .ro-note { display: flex; align-items: center; gap: 8px; background: var(--primary-10); color: var(--primary);
@@ -381,10 +370,6 @@
           <p class="sub">Create customized rules that decide which documents a merchant must submit to proceed with the onboarding application — driven by conditions such as entity type, industry, bank, module, service, and risk flags. A rule with no conditions applies to every applicant.</p>
         </div>
         <div class="head-actions">
-          <div class="role-switch" id="roleSwitch" title="Prototype control — switch the signed-in user's permission level">
-            <button class="rs-btn active" data-role="admin">Admin</button>
-            <button class="rs-btn" data-role="viewer">View-only</button>
-          </div>
           <button class="btn btn-primary" id="addRuleBtn">
             <svg class="hi-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
             Add Rule
@@ -656,7 +641,6 @@
   }
 
   function openBuilder(rule) {
-    if (role === 'viewer') return;   // view-only users cannot create or edit
     editingId = rule ? rule.id : null;
     $('builderTitle').textContent = rule ? 'Edit Requirement Rule' : 'New Requirement Rule';
     $('saveRuleLabel').textContent = rule ? 'Save Changes' : 'Add Rule';
@@ -837,22 +821,9 @@
   $('viewCloseBtn').addEventListener('click', closeView);
   $('viewBackdrop').addEventListener('click', e => { if (e.target === $('viewBackdrop')) closeView(); });
 
-  /* ══════════ Role (prototype permission switch) ══════════ */
-  let role = 'admin';
-  $('roleSwitch').addEventListener('click', e => {
-    const btn = e.target.closest('.rs-btn');
-    if (!btn) return;
-    role = btn.dataset.role;
-    document.querySelectorAll('.rs-btn').forEach(b => b.classList.toggle('active', b === btn));
-    document.body.classList.toggle('role-viewer', role === 'viewer');
-    if (role === 'viewer') closeBuilder();
-    toast(role === 'viewer' ? 'Viewing as a view-only user — editing is disabled' : 'Viewing as an admin');
-  });
-
   /* ══════════ Delete modal ══════════ */
   let deleteTarget = null;
   function openDelete(r) {
-    if (role === 'viewer') return;   // view-only users cannot delete
     deleteTarget = r;
     $('deleteText').innerHTML = 'Are you sure you want to delete the rule <b>' + esc(r.name) + '</b>? ' +
       'Merchants matching its conditions will no longer be asked for: <b>' + r.docs.map(esc).join(', ') + '</b>.';
