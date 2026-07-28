@@ -217,7 +217,7 @@
 
   /* ---------- Events (audit trail) — same components as the On-Hold Logs table ---------- */
   .table-scroll { overflow-x: auto; }
-  #eventsTable { width: 100%; border-collapse: collapse; min-width: 900px; }
+  #eventsTable { width: 100%; border-collapse: collapse; min-width: 640px; }
   #eventsTable thead th { height: 42px; padding: 0 10px; border-top: 1px solid var(--border-subtle);
     border-bottom: 1px solid var(--border-subtle); background: var(--muted); font-size: 11px; font-weight: 700;
     color: var(--cadet-base); text-transform: uppercase; letter-spacing: .3px; text-align: left; white-space: nowrap; }
@@ -239,7 +239,6 @@
   .log-when .rel { font-size: 11.5px; color: var(--cadet-05); margin-top: 3px; }
   .ev-rule-name { font-weight: 600; font-size: 13px; color: var(--foreground); white-space: nowrap; }
   .ev-rule-sub { font-size: 11.5px; color: var(--cadet-05); margin-top: 3px; white-space: nowrap; }
-  .log-detail { color: var(--cadet-base); max-width: 320px; line-height: 1.45; }
 
   .actor { display: flex; align-items: center; gap: 8px; }
   .actor .av { width: 26px; height: 26px; border-radius: 50%; background: #E7ECF7; color: var(--primary);
@@ -506,7 +505,6 @@
                   <th>Date &amp; Time</th>
                   <th>Action</th>
                   <th>Rule</th>
-                  <th>Details</th>
                   <th>Performed By</th>
                 </tr>
               </thead>
@@ -788,20 +786,6 @@
   const CURRENT_USER = 'Aya Muhammed';
   const events = [];  // newest first
 
-  /* One-line description of a rule: its documents + the conditions it fires on. */
-  function ruleSummary(r) {
-    const conds = [];
-    if (r.entities.length)   conds.push('Entity: ' + r.entities.join(' / '));
-    if (r.owners.length)     conds.push('Owner: ' + r.owners.join(' / '));
-    if (r.industries.length) conds.push('Industry: ' + r.industries.join(' / '));
-    if (r.banks.length)      conds.push('Bank: ' + r.banks.join(' / '));
-    if (r.modules.length)    conds.push('Module: ' + r.modules.join(' / '));
-    if (r.services.length)   conds.push('Service: ' + r.services.join(' / '));
-    if (r.flags.length)      conds.push('Flags: ' + r.flags.join(' / '));
-    return r.docs.length + ' document' + (r.docs.length === 1 ? '' : 's') + ' (' + r.docs.join(', ') + ') — ' +
-      (conds.length ? 'Conditions: ' + conds.join(' · ') : 'Universal — applies to every applicant');
-  }
-
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const now = () => new Date();
 
@@ -850,7 +834,6 @@
     events.unshift({
       ts: new Date(), action,
       ruleName: rule.name, docsCount: rule.docs.length,
-      detail: ruleSummary(rule),
       actor: CURRENT_USER, role: 'Agent Admin',
     });
     renderEvents();
@@ -872,7 +855,6 @@
           <div class="ev-rule-name">${esc(ev.ruleName)}</div>
           <div class="ev-rule-sub">${ev.docsCount} document${ev.docsCount === 1 ? '' : 's'}</div>
         </td>
-        <td><div class="log-detail">${esc(ev.detail)}</div></td>
         <td>
           <div class="actor">
             <div class="av">${initialsOf(ev.actor)}</div>
