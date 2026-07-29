@@ -165,8 +165,6 @@
   .cond-pill { font-size: 11px; font-weight: 600; background: var(--pill-bg); color: var(--pill-text);
     border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
   .cond-pill.entity { background: var(--primary-10); color: var(--primary); }
-  .flag-pill { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
-    background: var(--warning-bg); color: #92620A; border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
   .universal-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700;
     letter-spacing: .05em; color: var(--success-80); }
   .universal-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
@@ -367,7 +365,7 @@
       <div class="page-head">
         <div>
           <h1>Document Rules</h1>
-          <p class="sub">Create customized rules that decide which documents a merchant must submit to proceed with the onboarding application — driven by conditions such as entity type, industry, bank, module, service, and risk flags. A rule with no conditions applies to every applicant.</p>
+          <p class="sub">Create customized rules that decide which documents a merchant must submit to proceed with the onboarding application — driven by conditions such as entity type, owner nationality, industry, bank, module, service, and channel. A rule with no conditions applies to every applicant.</p>
         </div>
         <div class="head-actions">
           <button class="btn btn-primary" id="addRuleBtn">
@@ -435,9 +433,9 @@
                 <div class="chip-row" id="serviceChips"></div>
               </div>
             </div>
-            <div class="cond-group" data-group="flags" style="margin-top:16px;">
-              <div class="cg-label"><span class="cg-name">Flags</span><span class="any-badge" id="anyFlags">ANY</span></div>
-              <div class="chip-row" id="flagChips"></div>
+            <div class="cond-group" data-group="channels" style="margin-top:16px;">
+              <div class="cg-label"><span class="cg-name">Channel</span><span class="any-badge" id="anyChannels">ANY</span></div>
+              <div class="chip-row" id="channelChips"></div>
             </div>
 
             <div class="builder-actions">
@@ -559,7 +557,7 @@
     "Owner's Residence Card", 'High Risk Annex (signed & stamped)', 'NGO Registration Certificate',
     'Board Resolution', 'Government Authorization Letter', 'BM PSP Agreement Annex'
   ];
-  const ENTITIES = ['Registered Business', 'Freelance Professional', 'Governmental', 'NGO / Charity'];
+  const ENTITIES = ['Registered Business', 'Freelance Professional'];
   const OWNER_NATIONALITIES = ['Egyptian Owner', 'Foreign Owner'];
   const INDUSTRIES = ['Retail & E-commerce', 'Food & Beverage', 'Healthcare / Pharmacy', 'Education',
     'Travel & Tourism', 'Professional Services', 'Technology / SaaS', 'Real Estate', 'Automotive',
@@ -570,13 +568,13 @@
   const SERVICES = ['Online Gateway', 'POS', 'Payouts', 'BNPL: ValU', 'BNPL: Souhoola', 'BNPL: Aman',
     'BNPL: Basata', 'BNPL: Forsa', 'BNPL: Contact', 'BNPL: Mogo', 'BNPL: TRU',
     'Lending: Flend', 'Lending: Erada', 'Lending: OLIV'];
-  const FLAGS = ['Foreign Cross-border', 'High Risk / SMM'];
+  const CHANNELS = ['Online', 'POS'];
 
   /* ══════════ Seed rules ══════════ */
   let rules = [];
   let nextId = 1;
 
-  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services', 'flags'];
+  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services', 'channels'];
   const isUniversal = r => CONDITION_KEYS.every(k => r[k].length === 0);
 
   /* ══════════ Toast ══════════ */
@@ -590,7 +588,7 @@
   }
 
   /* ══════════ Builder state ══════════ */
-  const draft = { docs: [], entities: [], owners: [], industries: [], banks: [], modules: [], services: [], flags: [] };
+  const draft = { docs: [], entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] };
   let editingId = null;
 
   function chipEl(label, group, arr) {
@@ -619,7 +617,7 @@
   }
 
   function updateAnyBadges() {
-    const map = { entities: 'anyEntities', owners: 'anyOwners', industries: 'anyIndustries', banks: 'anyBanks', modules: 'anyModules', services: 'anyServices', flags: 'anyFlags' };
+    const map = { entities: 'anyEntities', owners: 'anyOwners', industries: 'anyIndustries', banks: 'anyBanks', modules: 'anyModules', services: 'anyServices', channels: 'anyChannels' };
     Object.entries(map).forEach(([k, id]) => {
       const empty = draft[k].length === 0;
       $(id).textContent = empty ? 'ANY ✓' : draft[k].length + ' selected';
@@ -635,7 +633,7 @@
     renderChipGroup('bankChips', BANKS, 'banks', draft.banks);
     renderChipGroup('moduleChips', MODULES, 'modules', draft.modules);
     renderChipGroup('serviceChips', SERVICES, 'services', draft.services);
-    renderChipGroup('flagChips', FLAGS, 'flags', draft.flags);
+    renderChipGroup('channelChips', CHANNELS, 'channels', draft.channels);
     updateDocHint();
     updateAnyBadges();
   }
@@ -750,7 +748,7 @@
         conds += r.banks.map(v => '<span class="cond-pill">' + esc(v) + '</span>').join('');
         conds += r.modules.map(v => '<span class="cond-pill">' + esc(v) + '</span>').join('');
         conds += r.services.map(v => '<span class="cond-pill">' + esc(v) + '</span>').join('');
-        conds += r.flags.map(v => '<span class="flag-pill">' + esc(v) + '</span>').join('');
+        conds += r.channels.map(v => '<span class="cond-pill">' + esc(v) + '</span>').join('');
       }
 
       card.innerHTML = DOC_ICON +
@@ -784,7 +782,7 @@
     ['banks',      'Bank'],
     ['modules',    'Module'],
     ['services',   'Service'],
-    ['flags',      'Flags'],
+    ['channels',   'Channel'],
   ];
 
   function openView(r) {
@@ -796,7 +794,7 @@
     } else {
       conds = COND_LABELS.map(([key, label]) => {
         const vals = r[key];
-        const pillClass = key === 'flags' ? 'flag-pill' : (key === 'entities' ? 'cond-pill entity' : 'cond-pill');
+        const pillClass = key === 'entities' ? 'cond-pill entity' : 'cond-pill';
         const body = vals.length
           ? vals.map(v => '<span class="' + pillClass + '">' + esc(v) + '</span>').join('')
           : '<span class="vd-any">Any</span>';
