@@ -398,13 +398,6 @@
               <div class="inline-err" id="nameErr">Rule name is required.</div>
             </div>
 
-            <div class="field">
-              <label class="lbl">Document Types<span class="req">*</span></label>
-              <div class="chip-row" id="docChips"></div>
-              <div class="chip-hint" id="docHint">0 selected</div>
-              <div class="inline-err" id="docErr">Select at least one document type.</div>
-            </div>
-
             <div class="cond-title">Conditions — when is this document required?</div>
 
             <div class="cond-group" data-group="entities">
@@ -436,6 +429,15 @@
             <div class="cond-group" data-group="channels" style="margin-top:16px;">
               <div class="cg-label"><span class="cg-name">Channel</span><span class="any-badge" id="anyChannels">ANY</span></div>
               <div class="chip-row" id="channelChips"></div>
+            </div>
+
+            <div class="cond-title" style="margin-top:24px;">Required Documents — based on the criteria above</div>
+
+            <div class="field">
+              <label class="lbl">Document Types<span class="req">*</span></label>
+              <div class="chip-row" id="docChips"></div>
+              <div class="chip-hint" id="docHint">0 selected</div>
+              <div class="inline-err" id="docErr">Select at least one document type.</div>
             </div>
 
             <div class="builder-actions">
