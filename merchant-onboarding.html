@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --primary: #001F5F; --primary-hover: #103788; --primary-10: #F1F6FF; --ocean-10: #F1F6FF;
+    --primary: #001F5F; --primary-hover: #103788; --primary-10: #F1F6FF; --ocean-10: #F1F6FF; --ocean-07: #C0D5FF;
     --link: #2955B1; --accent: #00BCB4; --accent-10: #EAFFFE;
     --destructive: #A50017; --destructive-hover: #830012; --destructive-bg: #FFEAED;
     --success: #4AAB4E; --success-bg: #F3FFF4; --success-text: #1A541D; --success-80: #388E3B;
@@ -182,6 +182,14 @@
   .dz-fchip .rm { border: none; background: none; color: var(--cadet-04); cursor: pointer; width: 26px; height: 26px;
     border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .dz-fchip .rm:hover { color: var(--destructive); background: var(--destructive-bg); }
+
+  .link-panel { background: var(--ocean-10); border: 1px solid var(--ocean-07); border-radius: 8px;
+    padding: 16px; margin-top: 18px; }
+  .link-panel[hidden] { display: none; }
+  .link-panel-title { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+  .link-row { display: flex; gap: 10px; }
+  .link-input { flex: 1; font-size: 13px; color: var(--cadet-base); background: #fff; cursor: text; }
+  .link-hint { font-size: 12px; color: var(--cadet-04); margin: 10px 0 0; line-height: 1.5; }
 
   .assist-panel { border-top: 1px dashed var(--border); margin-top: 18px; padding-top: 18px; }
   .assist-summary { font-size: 13px; font-weight: 600; color: var(--cadet-base); margin-bottom: 10px; }
@@ -368,6 +376,15 @@
               <svg class="hi-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
               Upload Documents Now (Agent-Assisted)
             </button>
+          </div>
+
+          <div class="link-panel" id="linkPanel" hidden>
+            <div class="link-panel-title">Application link for the merchant</div>
+            <div class="link-row">
+              <input class="inp link-input" id="appLinkInput" type="text" readonly>
+              <button class="btn btn-outline" id="copyLinkBtn">Copy Link</button>
+            </div>
+            <p class="link-hint">Opening this link pre-fills the merchant's Documents page with the criteria and services entered above — nothing is typed twice.</p>
           </div>
 
           <div class="assist-panel" id="assistPanel" hidden>
@@ -619,11 +636,45 @@
   function onCriteriaChange() {
     computeAndRenderWHN();
     if (!$('assistPanel').hidden) renderAssistPanel();
+    if (!$('linkPanel').hidden) refreshAppLink();
+  }
+
+  /* ══════════ Application link — hands the criteria off to the merchant's own page ══════════ */
+  function buildMerchantLink() {
+    const p = new URLSearchParams();
+    const biz = $('mBiz').value.trim();
+    if (biz) p.set('biz', biz);
+    if (criteria.entity) p.set('entity', criteria.entity);
+    if (criteria.owner) p.set('owner', criteria.owner);
+    if (criteria.industry) p.set('industry', criteria.industry);
+    if (criteria.bank) p.set('bank', criteria.bank);
+    if (criteria.module) p.set('module', criteria.module);
+    if (criteria.services.length) p.set('services', criteria.services.join(','));
+    if (criteria.channels.length) p.set('channels', criteria.channels.join(','));
+    return 'documents-upload.html' + (p.toString() ? '?' + p.toString() : '');
+  }
+  function refreshAppLink() {
+    const url = new URL(buildMerchantLink(), location.href).href;
+    $('appLinkInput').value = url;
+    return url;
   }
 
   $('previewMerchantBtn').addEventListener('click', () => {
     toast("Opening the merchant's onboarding experience in a new tab…");
-    window.open('documents-upload.html', '_blank');
+    window.open(buildMerchantLink(), '_blank');
+  });
+  function fallbackCopy() {
+    try { document.execCommand('copy'); toast('Link copied'); }
+    catch (e) { toast('Copy failed — the link is selected, press Ctrl+C'); }
+  }
+  $('copyLinkBtn').addEventListener('click', () => {
+    const val = $('appLinkInput').value;
+    $('appLinkInput').select();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(val).then(() => toast('Link copied'), fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
   });
   $('assistUploadBtn').addEventListener('click', () => {
     const panel = $('assistPanel');
@@ -654,6 +705,10 @@
     logEvent(biz, total, done);
     $('createAppBtn').textContent = 'Application Created ✓';
     $('createAppBtn').disabled = true;
+
+    $('linkPanel').hidden = false;
+    refreshAppLink();
+    $('linkPanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
   /* ══════════ Events (audit trail) ══════════ */

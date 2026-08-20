@@ -118,6 +118,11 @@
   .crit-chip:hover:not(:disabled) { border-color: var(--cadet-05); }
   .crit-chip.on { border-color: var(--primary); background: var(--ocean-10); color: var(--primary); }
   .crit-chip:disabled { opacity: .6; cursor: not-allowed; }
+  .handoff-note { display: flex; gap: 10px; align-items: flex-start; background: var(--ocean-10); border: 1px solid var(--ocean-07);
+    color: var(--primary); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 13.5px; line-height: 1.5; }
+  .handoff-note[hidden] { display: none; }
+  .handoff-note svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+  .handoff-note b { font-weight: 700; }
   .crit-card.locked-crit { opacity: .55; }
   .crit-card.locked-crit .crit-chip, .crit-card.locked-crit .crit-select { pointer-events: none; }
   .req-via { font-size: 11.5px; color: var(--cadet-05); font-style: italic; margin-top: 9px; }
@@ -290,8 +295,8 @@
 
       <div class="page-head">
         <div>
-          <h1>Documents</h1>
-          <p class="sub">Tell us about your business below. The documents you need to upload update automatically as you complete your criteria and services.</p>
+          <h1 id="pageTitle">Documents</h1>
+          <p class="sub" id="pageSub">Tell us about your business below. The documents you need to upload update automatically as you complete your criteria and services.</p>
         </div>
         <div class="head-actions">
           <button class="btn btn-primary" id="topEdit" type="button" hidden>
@@ -300,6 +305,9 @@
           </button>
         </div>
       </div>
+
+      <!-- Shown only when arriving via an application link sent from New Merchant Application -->
+      <div class="handoff-note" id="handoffNote" hidden></div>
 
       <!-- STEP 1 — Criteria & Services -->
       <section class="card crit-card">
@@ -937,7 +945,40 @@
   document.querySelectorAll('.sim-reject').forEach(b => b.addEventListener('click', () => rejectSection(b.closest('.docs-for'))));
   $('topEdit').addEventListener('click', () => { const s = $('topEdit')._sec; if (s) editSection(s); });
 
-  seedOnboarding();   // open on the locked onboarding view (account type + documents) with an Edit button
+  /* ══════════ Hand-off from New Merchant Application (sales) ══════════
+     If this page was opened via an application link (?biz=...&entity=...), pre-fill
+     the criteria from that link instead of the default "returning approved merchant"
+     demo, and greet the merchant by name. */
+  function applyHandoff() {
+    const p = new URLSearchParams(location.search);
+    const biz = p.get('biz');
+    if (!biz && !p.get('entity')) return false;
+
+    if (ENTITIES.includes(p.get('entity'))) criteria.entity = p.get('entity');
+    if (OWNERS.includes(p.get('owner'))) criteria.owner = p.get('owner');
+    if (INDUSTRIES.includes(p.get('industry'))) { criteria.industry = p.get('industry'); $('critIndustry').value = criteria.industry; }
+    if (BANKS.includes(p.get('bank'))) { criteria.bank = p.get('bank'); $('critBank').value = criteria.bank; }
+    if (MODULES.includes(p.get('module'))) criteria.module = p.get('module');
+    criteria.services = (p.get('services') || '').split(',').filter(s => SERVICES.includes(s));
+    criteria.channels = (p.get('channels') || '').split(',').filter(c => CHANNELS.includes(c));
+
+    renderCriteria();
+    recomputeAndRender();   // section is already 'editing' by default — nothing to unlock
+
+    if (biz) {
+      $('pageTitle').textContent = 'Welcome, ' + biz;
+      $('pageSub').textContent = "Your account manager has started your application. We've pre-filled your business criteria below — review them and upload the required documents to continue.";
+    }
+    const note = $('handoffNote');
+    note.hidden = false;
+    note.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>' +
+      '<span>You\'re continuing an application' + (biz ? ' for <b>' + esc(biz) + '</b>' : '') + ' started by your Kashier account manager. The criteria below were entered on your behalf — check them, then upload the documents required.</span>';
+    return true;
+  }
+
+  if (!applyHandoff()) {
+    seedOnboarding();   // no application link — open on the locked "returning approved merchant" demo
+  }
   updateStatus();
 </script>
 
