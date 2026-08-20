@@ -425,9 +425,9 @@
     'Insurance', 'Marketplace', 'Logistics & Delivery', 'Other'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  const SERVICES = ['Payouts', 'BNPL: ValU', 'BNPL: Souhoola', 'BNPL: Aman',
-    'BNPL: Basata', 'BNPL: Forsa', 'BNPL: Contact', 'BNPL: Mogo', 'BNPL: TRU',
-    'Lending: Flend', 'Lending: Erada', 'Lending: OLIV'];
+  const SERVICES = ['BM-Installment', 'NBE-Installment', 'Instant payout', 'Payout',
+    'BNPL: Valu', 'BNPL: Souhoola', 'BNPL: AMAN', 'BNPL: Contract', 'BNPL: TRU',
+    'Kiosk: Basata', 'BNPL: MOGO', 'Lending: Flend', 'Lending: OLIV', 'E-Wallet acceptance'];
   const CHANNELS = ['Online', 'POS'];
 
   /* Document metadata — kept identical to the Documents (merchant) page for consistency */
@@ -453,7 +453,7 @@
     { name: 'Commercial Registration', docs: ['Commercial Registration (CR)'],                                entities: ['Registered Business'], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
     { name: 'Foreign owner KYC',       docs: ["Owner's Passport", "Owner's Residence Card"],                  entities: [], owners: ['Foreign Owner'], industries: [], banks: [], modules: [], services: [], channels: [] },
     { name: 'Bank Misr PSP annex',     docs: ['BM PSP Agreement Annex'],                                      entities: [], owners: [], industries: [], banks: ['Bank Misr'], modules: ['PSP'], services: [], channels: [] },
-    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: ['Payouts'], channels: [] },
+    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: ['Payout', 'Instant payout'], channels: [] },
     { name: 'Online channel',          docs: ['Brand Authorization Letter'],                                  entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: ['Online'] },
     { name: 'POS channel',             docs: ['Store Lease / Location Proof'],                                entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: ['POS'] },
   ];
