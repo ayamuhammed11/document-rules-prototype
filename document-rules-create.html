@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kashier | Document Rules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#001F5F;
+    --primary-hover:#103788;
+    --primary-10:#F1F6FF;
+    --accent:#00BCB4;
+    --secondary:#FF9D6C;
+    --destructive:#A50017;
+    --destructive-10:#FBE9EB;
+    --warning:#FBAF1F;
+    --warning-10:#FFF6E0;
+    --success:#4AAB4E;
+    --success-10:#EAF7EA;
+    --foreground:#202020;
+    --muted-foreground:#637373;
+    --cadet-base:#556767;
+    --border:#E6E8E8;
+    --border-subtle:#F5F6F6;
+    --muted:#F5F6F6;
+    --link:#2955B1;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Noto Sans',sans-serif;color:var(--foreground);background:#FAFBFB;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4,.font-display{font-family:'Outfit',sans-serif;}
+  button{font-family:inherit;font-size:inherit;cursor:pointer;}
+  input,textarea,select{font-family:inherit;font-size:inherit;}
+  a{color:var(--link);text-decoration:none;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+  /* ---------- Shell ---------- */
+  .app-shell{display:flex;min-height:100vh;}
+  .sidebar{
+    width:236px;flex-shrink:0;background:#fff;border-right:1px solid var(--border-subtle);
+    display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:20;overflow-y:auto;
+  }
+  .sidebar-logo{display:flex;align-items:center;gap:2px;padding:22px 20px 14px;font-family:'Outfit',sans-serif;font-weight:700;font-size:21px;color:var(--primary);}
+  .sidebar-logo .accent{color:var(--accent);}
+  .sidebar-nav{flex:1;padding:6px 14px 16px;}
+  .nav-group-label{display:flex;align-items:center;justify-content:space-between;padding:14px 10px 6px;font-size:11px;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.04em;cursor:pointer;user-select:none;}
+  .nav-group-label svg{width:13px;height:13px;transition:transform .15s;}
+  .nav-group-label.collapsed svg{transform:rotate(-90deg);}
+  .nav-group{overflow:hidden;}
+  .nav-group.collapsed{display:none;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);
+    color:var(--primary);font-size:13.5px;font-weight:500;margin-bottom:1px;background:none;border:none;width:100%;text-align:start;
+  }
+  .nav-item svg{width:18px;height:18px;flex-shrink:0;stroke-width:1.6;}
+  .nav-item:hover{background:var(--muted);}
+  .nav-item.active{background:var(--primary-10);font-weight:700;}
+  .nav-badge{margin-inline-start:auto;font-size:9px;font-weight:700;background:var(--accent);color:#fff;padding:1px 6px;border-radius:8px;letter-spacing:.03em;}
+
+  .main{margin-inline-start:236px;flex:1;min-width:0;display:flex;flex-direction:column;}
+
+  /* ---------- Topbar ---------- */
+  .topbar{height:56px;flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:0 28px;}
+  .lang-toggle{font-size:13px;color:var(--foreground);cursor:pointer;}
+  .topbar-user{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--foreground);}
+  .topbar-user svg{width:18px;height:18px;color:var(--cadet-base);}
+
+  /* ---------- Page content ---------- */
+  .page{max-width:900px;margin:0 auto;padding:8px 28px 48px;width:100%;}
+  .page-header{margin-bottom:20px;}
+  .page-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:28px;margin:0 0 4px;color:#000;}
+  .page-subtitle{color:var(--muted-foreground);font-size:13.5px;margin:0;max-width:640px;}
+
+  /* ---------- Buttons ---------- */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius);font-size:13.5px;font-weight:600;border:1px solid transparent;white-space:nowrap;}
+  .btn svg{width:16px;height:16px;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-hover);}
+  .btn-outline{background:#fff;border-color:var(--border);color:var(--foreground);}
+  .btn-outline:hover{background:var(--muted);}
+  .btn:focus-visible,.nav-item:focus-visible,input:focus-visible,.btn-icon:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border-subtle);margin-bottom:22px;flex-wrap:wrap;}
+  .tab{padding:10px 4px;margin-inline-end:22px;font-size:13.5px;font-weight:600;color:var(--muted-foreground);background:none;border:none;border-bottom:2px solid transparent;position:relative;top:1px;}
+  .tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+  .tab:hover:not(.active){color:var(--foreground);}
+
+  /* ---------- Card ---------- */
+  .card{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius);overflow:hidden;}
+  .card-pad{padding:22px;}
+  .card-title{font-size:16px;margin:0 0 18px;}
+
+  /* ---------- Fields ---------- */
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--cadet-base);margin-bottom:8px;}
+  .field label .req{color:var(--destructive);margin-inline-start:2px;}
+  .field input[type=text]{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;font-family:inherit;color:var(--foreground);outline:none;background:#fff;}
+  .field input[type=text]:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-10);}
+  .field input.invalid{border-color:var(--destructive);}
+  .inline-err{display:none;font-size:12px;color:var(--destructive);margin-top:6px;}
+  .inline-err.show{display:block;}
+
+  /* ---------- Toggle chips (condition / document pickers) ---------- */
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .toggle-chip{border:1px solid var(--border);background:#fff;color:var(--cadet-base);border-radius:var(--radius);
+    font-size:12.5px;font-weight:600;padding:7px 12px;cursor:pointer;transition:all .1s ease;}
+  .toggle-chip:hover{border-color:var(--primary);color:var(--primary);}
+  .toggle-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .chip-hint{font-size:12px;color:var(--muted-foreground);margin-top:8px;}
+
+  .cond-title{font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--muted-foreground);
+    text-transform:uppercase;margin:26px 0 14px;}
+  .cond-group{margin-bottom:18px;}
+  .cond-group:last-of-type{margin-bottom:4px;}
+  .cond-group .cg-label{display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .cond-group .cg-name{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);}
+  .any-badge{font-size:10px;font-weight:700;letter-spacing:.05em;border-radius:var(--radius);padding:2px 7px;
+    background:var(--muted);color:var(--muted-foreground);}
+  .any-badge.on{background:var(--success-10);color:var(--success);}
+  .cond-cols{display:flex;gap:32px;flex-wrap:wrap;}
+  .cond-cols .cond-group{margin-bottom:0;flex:1;min-width:200px;}
+
+  .form-actions{display:flex;align-items:center;gap:12px;margin-top:26px;}
+
+  #toast{position:fixed;bottom:24px;inset-inline-end:24px;background:var(--foreground);color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:200;display:flex;align-items:center;gap:8px;}
+  #toast.show{opacity:1;transform:translateY(0);}
+  #toast svg{width:16px;height:16px;color:var(--accent);}
+
+  @media (max-width:900px){
+    .sidebar{width:64px;}
+    .sidebar-logo span.logo-text,.nav-item span.nav-label,.nav-badge,.nav-group-label span.grp-text{display:none;}
+    .nav-item{justify-content:center;}
+    .main{margin-inline-start:64px;}
+    .page{padding:8px 14px 40px;}
+  }
+  @media (max-width:640px){
+    .cond-cols{gap:16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span class="logo-text">Kashier</span><span class="accent">.</span></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg><span class="nav-label">Home</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"/></svg><span class="nav-label">BIN Management</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"/></svg><span class="nav-label">Financial Institutions</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z"/></svg><span class="nav-label">Merchant</span></a>
+      <a class="nav-item" href="merchant-onboarding.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/></svg><span class="nav-label">New Application</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg><span class="nav-label">Business Industries</span></a>
+      <a class="nav-item" href="document-types.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg><span class="nav-label">Document Types</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span class="nav-label">PCC Templates</span></a>
+      <a class="nav-item" href="terminals.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"/></svg><span class="nav-label">Terminals</span></a>
+      <a class="nav-item active" href="document-rules.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"/></svg><span class="nav-label">Document Rules</span><span class="nav-badge">New</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg><span class="nav-label">Reconciliation</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"/></svg><span class="nav-label">Transfers</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg><span class="nav-label">Bundles</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5v15h18M3 4.5h.375c.621 0 1.125.504 1.125 1.125v.75c0 .621.504 1.125 1.125 1.125m0 0a48.667 48.667 0 0 1 11.964 1.041M9 15l3-3 2.25 2.25L18 10.5"/></svg><span class="nav-label">Lending</span></a>
+
+      <div class="nav-group-label" id="balanceHead"><span class="grp-text">Balance Management</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg></div>
+      <div class="nav-group" id="balanceGroup">
+        <a class="nav-item" href="#" style="padding-inline-start:20px"><span class="nav-label">Settlement Windows</span></a>
+        <a class="nav-item" href="#" style="padding-inline-start:20px"><span class="nav-label">Accounts</span></a>
+        <a class="nav-item" href="on-hold.html" style="padding-inline-start:20px"><span class="nav-label">On-Hold</span></a>
+        <a class="nav-item" href="#" style="padding-inline-start:20px"><span class="nav-label">Vacations</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="lang-toggle" id="langBtn">عربي</div>
+      <div class="topbar-user">Aya Muhammed <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg></div>
+    </header>
+
+    <main class="page">
+      <div class="page-header">
+        <h1 class="page-title">Document Rules</h1>
+        <p class="page-subtitle">Define a document requirement rule — pick the conditions that trigger it, then choose which documents become required.</p>
+      </div>
+
+      <div class="tabs">
+        <a class="tab" href="document-rules.html" style="text-decoration:none;display:inline-block">All Rules</a>
+        <button class="tab active">Create Rule</button>
+      </div>
+
+      <div class="card card-pad">
+        <h2 class="card-title" id="cardTitle">New Requirement Rule</h2>
+
+        <div class="field">
+          <label for="ruleName">Rule Name<span class="req">*</span></label>
+          <input type="text" id="ruleName" placeholder="e.g. POS Location Proof">
+          <div class="inline-err" id="nameErr">Rule name is required.</div>
+        </div>
+
+        <div class="cond-title">Conditions — when is this document required?</div>
+
+        <div class="cond-group" data-group="entities">
+          <div class="cg-label"><span class="cg-name">Entity Type</span><span class="any-badge" id="anyEntities">ANY</span></div>
+          <div class="chip-row" id="entityChips"></div>
+        </div>
+        <div class="cond-group" data-group="owners">
+          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><span class="any-badge" id="anyOwners">ANY</span></div>
+          <div class="chip-row" id="ownerChips"></div>
+        </div>
+        <div class="cond-group" data-group="industries">
+          <div class="cg-label"><span class="cg-name">Industry</span><span class="any-badge" id="anyIndustries">ANY</span></div>
+          <div class="chip-row" id="industryChips"></div>
+        </div>
+        <div class="cond-group" data-group="banks">
+          <div class="cg-label"><span class="cg-name">Bank</span><span class="any-badge" id="anyBanks">ANY</span></div>
+          <div class="chip-row" id="bankChips"></div>
+        </div>
+        <div class="cond-group" data-group="modules">
+          <div class="cg-label"><span class="cg-name">Merchant Type</span><span class="any-badge" id="anyModules">ANY</span></div>
+          <div class="chip-row" id="moduleChips"></div>
+        </div>
+        <div class="cond-group" data-group="services">
+          <div class="cg-label"><span class="cg-name">Service</span><span class="any-badge" id="anyServices">ANY</span></div>
+          <div class="chip-row" id="serviceChips"></div>
+        </div>
+
+        <div class="cond-title" style="margin-top:26px;">Required Documents — based on the criteria above</div>
+
+        <div class="field">
+          <label>Document Types<span class="req">*</span></label>
+          <div class="chip-row" id="docChips"></div>
+          <div class="chip-hint" id="docHint">0 selected</div>
+          <div class="inline-err" id="docErr">Select at least one document type.</div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" id="saveRuleBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            <span id="saveRuleLabel">Add Rule</span>
+          </button>
+          <button class="btn btn-outline" id="cancelRuleBtn">Cancel</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  /* ══════════ Reference data ══════════ */
+  const DOC_TYPES = [
+    'Commercial Registration (CR)', 'Tax Identification Card', 'National ID — Front', 'National ID — Back',
+    'Bank Account Letter / IBAN proof', 'Brand Authorization Letter', 'Store Lease / Location Proof',
+    'Visit Report', 'Signed Payout Contract', 'Disbursement Authorization Letter', 'Passport',
+    'Commercial Registration (foreign)', 'Tax ID (foreign)', 'Foreign Residence Card', "Owner's Passport",
+    "Owner's Residence Card", 'High Risk Annex (signed & stamped)', 'NGO Registration Certificate',
+    'Board Resolution', 'Government Authorization Letter', 'BM PSP Agreement Annex'
+  ];
+  const ENTITIES = ['Individual Seller', 'Registered Business', 'Professional Business'];
+  const OWNER_NATIONALITIES = ['Egyptian Owner', 'Foreign Owner'];
+  const INDUSTRIES = ['Retail & E-commerce', 'Food & Beverage', 'Healthcare / Pharmacy', 'Education',
+    'Travel & Tourism', 'Professional Services', 'Technology / SaaS', 'Real Estate', 'Automotive',
+    'Fashion & Beauty', 'Entertainment & Media', 'Non-profit / NGO', 'Government', 'Financial Services',
+    'Insurance', 'Marketplace', 'Logistics & Delivery', 'Other'];
+  const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
+  const MODULES = ['PF', 'PSP'];
+  /* Channel is folded into Service: every service comes in a POS and an Online variant. */
+  const SERVICE_NAMES = ['BM-Installment', 'NBE-Installment', 'Instant payout', 'Payout',
+    'BNPL: Valu', 'BNPL: Souhoola', 'BNPL: AMAN', 'BNPL: Contract', 'BNPL: TRU',
+    'Kiosk: Basata', 'BNPL: MOGO', 'Lending: Flend', 'Lending: OLIV', 'E-Wallet acceptance'];
+  const SERVICES = ['POS', 'Online'].flatMap(ch => SERVICE_NAMES.map(s => ch + '-' + s));
+
+  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services'];
+
+  /* ══════════ Shared storage — same keys as document-rules.html ══════════ */
+  const RULES_KEY = 'kashier_document_rules_v1';
+  const NEXT_ID_KEY = 'kashier_document_rules_next_id_v1';
+  const EVENTS_KEY = 'kashier_document_rules_events_v1';
+  function loadRules() { try { return JSON.parse(localStorage.getItem(RULES_KEY)) || []; } catch (e) { return []; } }
+  function saveRules(list) { localStorage.setItem(RULES_KEY, JSON.stringify(list)); }
+  function loadNextId() { return parseInt(localStorage.getItem(NEXT_ID_KEY) || '1', 10); }
+  function saveNextId(n) { localStorage.setItem(NEXT_ID_KEY, String(n)); }
+  function loadEvents() {
+    try { return (JSON.parse(localStorage.getItem(EVENTS_KEY)) || []).map(e => ({ ...e, ts: new Date(e.ts) })); }
+    catch (e) { return []; }
+  }
+  function saveEvents(list) { localStorage.setItem(EVENTS_KEY, JSON.stringify(list.map(e => ({ ...e, ts: e.ts.toISOString() })))); }
+  function logEvent(action, rule) {
+    const events = loadEvents();
+    events.unshift({ ts: new Date(), action, ruleName: rule.name, actor: 'Aya Muhammed' });
+    saveEvents(events);
+  }
+
+  /* ══════════ Toast ══════════ */
+  const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast');
+    t.innerHTML = CHECK_ICON + '<span>' + msg + '</span>';
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  /* ══════════ Form state ══════════ */
+  const draft = { docs: [], entities: [], owners: [], industries: [], banks: [], modules: [], services: [] };
+  let editingId = null;
+
+  function chipEl(label, group, arr) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'toggle-chip' + (arr.includes(label) ? ' on' : '');
+    b.textContent = label;
+    b.addEventListener('click', () => {
+      const i = arr.indexOf(label);
+      if (i >= 0) arr.splice(i, 1); else arr.push(label);
+      b.classList.toggle('on');
+      if (group === 'docs') updateDocHint(); else updateAnyBadges();
+    });
+    return b;
+  }
+
+  function renderChipGroup(containerId, options, group, arr) {
+    const c = $(containerId);
+    c.innerHTML = '';
+    options.forEach(opt => c.appendChild(chipEl(opt, group, arr)));
+  }
+
+  function updateDocHint() {
+    $('docHint').textContent = draft.docs.length + ' selected';
+    if (draft.docs.length) $('docErr').classList.remove('show');
+  }
+
+  function updateAnyBadges() {
+    const map = { entities: 'anyEntities', owners: 'anyOwners', industries: 'anyIndustries', banks: 'anyBanks', modules: 'anyModules', services: 'anyServices' };
+    Object.entries(map).forEach(([k, id]) => {
+      const empty = draft[k].length === 0;
+      $(id).textContent = empty ? 'ANY ✓' : draft[k].length + ' selected';
+      $(id).classList.toggle('on', empty);
+    });
+  }
+
+  function renderForm() {
+    renderChipGroup('docChips', DOC_TYPES, 'docs', draft.docs);
+    renderChipGroup('entityChips', ENTITIES, 'entities', draft.entities);
+    renderChipGroup('ownerChips', OWNER_NATIONALITIES, 'owners', draft.owners);
+    renderChipGroup('industryChips', INDUSTRIES, 'industries', draft.industries);
+    renderChipGroup('bankChips', BANKS, 'banks', draft.banks);
+    renderChipGroup('moduleChips', MODULES, 'modules', draft.modules);
+    renderChipGroup('serviceChips', SERVICES, 'services', draft.services);
+    updateDocHint();
+    updateAnyBadges();
+  }
+
+  /* ══════════ Load an existing rule when opened as ?edit=<id> ══════════ */
+  (function initEditMode() {
+    const editParam = new URLSearchParams(location.search).get('edit');
+    if (!editParam) { renderForm(); return; }
+    const id = Number(editParam);
+    const rule = loadRules().find(r => r.id === id);
+    if (!rule) { location.href = 'document-rules.html'; return; }
+
+    editingId = rule.id;
+    $('cardTitle').textContent = 'Edit Requirement Rule';
+    $('saveRuleLabel').textContent = 'Save Changes';
+    $('ruleName').value = rule.name;
+    draft.docs = [...rule.docs];
+    CONDITION_KEYS.forEach(k => draft[k] = [...rule[k]]);
+    renderForm();
+  })();
+
+  $('cancelRuleBtn').addEventListener('click', () => { location.href = 'document-rules.html'; });
+
+  $('saveRuleBtn').addEventListener('click', () => {
+    const name = $('ruleName').value.trim();
+    let ok = true;
+    if (!name) { $('ruleName').classList.add('invalid'); $('nameErr').classList.add('show'); ok = false; }
+    else { $('ruleName').classList.remove('invalid'); $('nameErr').classList.remove('show'); }
+    if (!draft.docs.length) { $('docErr').classList.add('show'); ok = false; }
+    if (!ok) return;
+
+    const rules = loadRules();
+
+    if (editingId != null) {
+      const r = rules.find(r => r.id === editingId);
+      if (!r) { location.href = 'document-rules.html'; return; }
+      r.name = name;
+      r.docs = [...draft.docs];
+      CONDITION_KEYS.forEach(k => r[k] = [...draft[k]]);
+      saveRules(rules);
+      logEvent('Updated', r);
+      location.href = 'document-rules.html?updated=' + encodeURIComponent(name);
+    } else {
+      const nextId = loadNextId();
+      const r = { id: nextId, name, docs: [...draft.docs] };
+      CONDITION_KEYS.forEach(k => r[k] = [...draft[k]]);
+      rules.push(r);
+      saveRules(rules);
+      saveNextId(nextId + 1);
+      logEvent('Created', r);
+      location.href = 'document-rules.html?created=' + encodeURIComponent(name);
+    }
+  });
+
+  /* ══════════ Sidebar (collapsible groups) ══════════ */
+  $('balanceHead').addEventListener('click', () => {
+    $('balanceHead').classList.toggle('collapsed');
+    $('balanceGroup').classList.toggle('collapsed');
+  });
+  $('langBtn').addEventListener('click', () => {
+    const toAr = $('langBtn').textContent.trim() === 'عربي';
+    $('langBtn').textContent = toAr ? 'English' : 'عربي';
+    toast(toAr ? 'تم التبديل إلى العربية (عرض توضيحي)' : 'Switched to English');
+  });
+</script>
+</body>
+</html>

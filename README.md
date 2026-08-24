@@ -1,31 +1,46 @@
 # Document Rules — Kashier Onboarding Prototype
 
-A standalone HTML prototype of Kashier's document-rules-driven merchant onboarding — three
+A standalone HTML prototype of Kashier's document-rules-driven merchant onboarding — four
 connected pages spanning the agent (sales) side and the merchant (self-serve) side.
 
 ## Pages
 
-- **[document-rules.html](document-rules.html)** — the agent-portal module where authorized
-  users create requirement rules. Each rule links one or more document types to conditions
-  (entity type, owner nationality, industry, bank, module, service, channel). When a
-  merchant's or salesperson's selections match a rule's conditions, the linked documents are
-  required to proceed with onboarding. Includes a rules list with filters and an Events audit
-  trail.
+- **[document-rules.html](document-rules.html)** — **All Rules.** The agent-portal list of
+  requirement rules, with filters by entity, bank, merchant type, and service, an Events
+  audit trail, and view/edit/delete actions on each rule.
+
+- **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
+  builder, reached from All Rules' tab bar or "Add Rule" — also handles editing an existing
+  rule via `?edit=<id>`. Each rule links one or more document types to conditions (entity
+  type, owner nationality, industry, bank, merchant type, service). Rules, ids, and events
+  are shared with the list page through `localStorage`, so actions on either page are
+  reflected on the other without a backend.
 
 - **[merchant-onboarding.html](merchant-onboarding.html)** — **sales side.** A salesperson
   starts a new merchant application: Merchant Details, then the same Criteria & Services
   conditions as Document Rules. The required-documents checklist computes live as criteria
   are picked. From there the agent can preview the merchant's own upload experience, or
   collect documents in person via an inline agent-assisted upload panel, then create the
-  application — logged to an Events audit trail.
+  application — logged to an Events audit trail, and generates a shareable application link
+  that hands the entered criteria off to the merchant's own page.
 
 - **[documents-upload.html](documents-upload.html)** — **merchant side.** The self-serve
   page a merchant completes during onboarding: the same Criteria & Services form drives a
   live-computed required-documents checklist, with per-document upload, draft-save,
-  submit-for-review, and simulated compliance approve/reject states.
+  submit-for-review, and simulated compliance approve/reject states. Opening it via an
+  application link from `merchant-onboarding.html` pre-fills the criteria and greets the
+  merchant by name instead of showing the default seeded demo.
 
-Both onboarding pages use the **identical rule-matching logic and document set** as
-Document Rules, so a given set of criteria produces the same checklist on either side.
+All four pages use the **identical rule-matching logic and document set**, so a given set of
+criteria produces the same checklist everywhere.
+
+## Conditions
+
+Entity Type (Individual Seller / Registered Business / Professional Business), Business
+Owner Nationality, Industry, Bank, Merchant Type (PF / PSP), and Service — each service
+comes in a `POS-` and an `Online-` variant (e.g. `POS-BM-Installment`,
+`Online-E-Wallet acceptance`), folding channel into the service dimension rather than
+tracking it separately.
 
 ## Matching semantics
 
@@ -37,13 +52,14 @@ requirements) with no conditions in a group matches everyone.
 No build step — every page is self-contained:
 
 ```bash
-open document-rules.html        # rule builder (agent/admin)
-open merchant-onboarding.html   # new application (sales)
-open documents-upload.html      # document upload (merchant)
+open document-rules.html          # All Rules (agent/admin)
+open document-rules-create.html   # Create/Edit Rule (agent/admin)
+open merchant-onboarding.html     # New Application (sales)
+open documents-upload.html        # Documents (merchant)
 ```
 
 `index.html` mirrors `document-rules.html` so the repo root also works on GitHub Pages.
 
 > Note: each page's sidebar links to other portal pages (Terminals, Home, On-Hold, …) that
 > are part of the full prototype project and are not included in this repo — those links
-> will 404 here. Links between the three pages above work normally.
+> will 404 here. Links between the pages above work normally.

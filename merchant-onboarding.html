@@ -339,12 +339,8 @@
               <select class="crit-select" id="critBank"><option value="">Select bank…</option></select>
             </div>
             <div class="crit-group">
-              <div class="crit-label">Module<span class="req">*</span></div>
+              <div class="crit-label">Merchant Type<span class="req">*</span></div>
               <div class="crit-chips" id="critModule"></div>
-            </div>
-            <div class="crit-group">
-              <div class="crit-label">Channel<span class="opt">(select all that apply)</span></div>
-              <div class="crit-chips" id="critChannel"></div>
             </div>
             <div class="crit-group full">
               <div class="crit-label">Services<span class="opt">(select all that apply)</span></div>
@@ -434,7 +430,7 @@
   }
 
   /* ══════════ Criteria vocabulary — mirrors the Document Rules module ══════════ */
-  const ENTITIES = ['Registered Business', 'Freelance Professional'];
+  const ENTITIES = ['Individual Seller', 'Registered Business', 'Professional Business'];
   const OWNERS = ['Egyptian Owner', 'Foreign Owner'];
   const INDUSTRIES = ['Retail & E-commerce', 'Food & Beverage', 'Healthcare / Pharmacy', 'Education',
     'Travel & Tourism', 'Professional Services', 'Technology / SaaS', 'Real Estate', 'Automotive',
@@ -442,10 +438,11 @@
     'Insurance', 'Marketplace', 'Logistics & Delivery', 'Other'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  const SERVICES = ['BM-Installment', 'NBE-Installment', 'Instant payout', 'Payout',
+  /* Channel is folded into Service: every service comes in a POS and an Online variant. */
+  const SERVICE_NAMES = ['BM-Installment', 'NBE-Installment', 'Instant payout', 'Payout',
     'BNPL: Valu', 'BNPL: Souhoola', 'BNPL: AMAN', 'BNPL: Contract', 'BNPL: TRU',
     'Kiosk: Basata', 'BNPL: MOGO', 'Lending: Flend', 'Lending: OLIV', 'E-Wallet acceptance'];
-  const CHANNELS = ['Online', 'POS'];
+  const SERVICES = ['POS', 'Online'].flatMap(ch => SERVICE_NAMES.map(s => ch + '-' + s));
 
   /* Document metadata — kept identical to the Documents (merchant) page for consistency */
   const DOC_META = {
@@ -464,18 +461,18 @@
 
   /* Same OR-within-group / AND-across-groups matching semantics as Document Rules */
   const RULES = [
-    { name: 'Identity (universal)',    docs: ['National ID'],                                                entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Bank proof (universal)',  docs: ['Bank Account Letter / IBAN proof'],                            entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Tax registration',        docs: ['Tax Identification Card'],                                     entities: ['Registered Business', 'Freelance Professional'], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Commercial Registration', docs: ['Commercial Registration (CR)'],                                entities: ['Registered Business'], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Foreign owner KYC',       docs: ["Owner's Passport", "Owner's Residence Card"],                  entities: [], owners: ['Foreign Owner'], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Bank Misr PSP annex',     docs: ['BM PSP Agreement Annex'],                                      entities: [], owners: [], industries: [], banks: ['Bank Misr'], modules: ['PSP'], services: [], channels: [] },
-    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: ['Payout', 'Instant payout'], channels: [] },
-    { name: 'Online channel',          docs: ['Brand Authorization Letter'],                                  entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: ['Online'] },
-    { name: 'POS channel',             docs: ['Store Lease / Location Proof'],                                entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: ['POS'] },
+    { name: 'Identity (universal)',    docs: ['National ID'],                                                entities: [], owners: [], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Bank proof (universal)',  docs: ['Bank Account Letter / IBAN proof'],                            entities: [], owners: [], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Tax registration',        docs: ['Tax Identification Card'],                                     entities: ['Registered Business', 'Professional Business'], owners: [], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Commercial Registration', docs: ['Commercial Registration (CR)'],                                entities: ['Registered Business'], owners: [], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Foreign owner KYC',       docs: ["Owner's Passport", "Owner's Residence Card"],                  entities: [], owners: ['Foreign Owner'], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Bank Misr PSP annex',     docs: ['BM PSP Agreement Annex'],                                      entities: [], owners: [], industries: [], banks: ['Bank Misr'], modules: ['PSP'], services: [] },
+    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.endsWith('-Payout') || s.endsWith('-Instant payout')) },
+    { name: 'Online services',         docs: ['Brand Authorization Letter'],                                  entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.startsWith('Online-')) },
+    { name: 'POS services',            docs: ['Store Lease / Location Proof'],                                entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.startsWith('POS-')) },
   ];
 
-  const criteria = { entity: '', owner: '', industry: '', bank: '', module: '', services: [], channels: [] };
+  const criteria = { entity: '', owner: '', industry: '', bank: '', module: '', services: [] };
 
   function ruleMatches(r, cfg) {
     if (r.entities.length && !r.entities.includes(cfg.entity)) return false;
@@ -484,7 +481,6 @@
     if (r.banks.length && !r.banks.includes(cfg.bank)) return false;
     if (r.modules.length && !r.modules.includes(cfg.module)) return false;
     if (r.services.length && !r.services.some(s => cfg.services.includes(s))) return false;
-    if (r.channels.length && !r.channels.some(c => cfg.channels.includes(c))) return false;
     return true;
   }
   function computeRequiredDocs(cfg) {
@@ -523,7 +519,6 @@
     renderSingleChips('critEntity', ENTITIES, 'entity');
     renderSingleChips('critOwner', OWNERS, 'owner');
     renderSingleChips('critModule', MODULES, 'module');
-    renderMultiChips('critChannel', CHANNELS, 'channels');
     renderMultiChips('critService', SERVICES, 'services');
   }
   function fillSelect(id, options) {
@@ -650,7 +645,6 @@
     if (criteria.bank) p.set('bank', criteria.bank);
     if (criteria.module) p.set('module', criteria.module);
     if (criteria.services.length) p.set('services', criteria.services.join(','));
-    if (criteria.channels.length) p.set('channels', criteria.channels.join(','));
     return 'documents-upload.html' + (p.toString() ? '?' + p.toString() : '');
   }
   function refreshAppLink() {

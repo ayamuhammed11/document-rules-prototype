@@ -332,12 +332,8 @@
               <select class="crit-select" id="critBank"><option value="">Select bank…</option></select>
             </div>
             <div class="crit-group">
-              <div class="crit-label">Module<span class="req">*</span></div>
+              <div class="crit-label">Merchant Type<span class="req">*</span></div>
               <div class="crit-chips" id="critModule"></div>
-            </div>
-            <div class="crit-group">
-              <div class="crit-label">Channel<span class="opt">(select all that apply)</span></div>
-              <div class="crit-chips" id="critChannel"></div>
             </div>
             <div class="crit-group full">
               <div class="crit-label">Services<span class="opt">(select all that apply)</span></div>
@@ -398,7 +394,7 @@
   const extOf = n => (n.split('.').pop() || '').toUpperCase().replace('JPEG', 'JPG');
 
   /* ══════════ Criteria vocabulary — mirrors the Document Rules module ══════════ */
-  const ENTITIES = ['Registered Business', 'Freelance Professional'];
+  const ENTITIES = ['Individual Seller', 'Registered Business', 'Professional Business'];
   const OWNERS = ['Egyptian Owner', 'Foreign Owner'];
   const INDUSTRIES = ['Retail & E-commerce', 'Food & Beverage', 'Healthcare / Pharmacy', 'Education',
     'Travel & Tourism', 'Professional Services', 'Technology / SaaS', 'Real Estate', 'Automotive',
@@ -406,10 +402,11 @@
     'Insurance', 'Marketplace', 'Logistics & Delivery', 'Other'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  const SERVICES = ['BM-Installment', 'NBE-Installment', 'Instant payout', 'Payout',
+  /* Channel is folded into Service: every service comes in a POS and an Online variant. */
+  const SERVICE_NAMES = ['BM-Installment', 'NBE-Installment', 'Instant payout', 'Payout',
     'BNPL: Valu', 'BNPL: Souhoola', 'BNPL: AMAN', 'BNPL: Contract', 'BNPL: TRU',
     'Kiosk: Basata', 'BNPL: MOGO', 'Lending: Flend', 'Lending: OLIV', 'E-Wallet acceptance'];
-  const CHANNELS = ['Online', 'POS'];
+  const SERVICES = ['POS', 'Online'].flatMap(ch => SERVICE_NAMES.map(s => ch + '-' + s));
 
   /* ══════════ Document metadata — presentation details per document type ══════════ */
   const DOC_META = {
@@ -446,18 +443,18 @@
   /* ══════════ Requirement rules — same OR-within-group / AND-across-groups matching
      semantics as the Document Rules module. An empty condition group matches everyone. ══════════ */
   const RULES = [
-    { name: 'Identity (universal)',    docs: ['National ID'],                                                entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Bank proof (universal)',  docs: ['Bank Account Letter / IBAN proof'],                            entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Tax registration',        docs: ['Tax Identification Card'],                                     entities: ['Registered Business', 'Freelance Professional'], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Commercial Registration', docs: ['Commercial Registration (CR)'],                                entities: ['Registered Business'], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Foreign owner KYC',       docs: ["Owner's Passport", "Owner's Residence Card"],                  entities: [], owners: ['Foreign Owner'], industries: [], banks: [], modules: [], services: [], channels: [] },
-    { name: 'Bank Misr PSP annex',     docs: ['BM PSP Agreement Annex'],                                      entities: [], owners: [], industries: [], banks: ['Bank Misr'], modules: ['PSP'], services: [], channels: [] },
-    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: ['Payout', 'Instant payout'], channels: [] },
-    { name: 'Online channel',          docs: ['Brand Authorization Letter'],                                  entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: ['Online'] },
-    { name: 'POS channel',             docs: ['Store Lease / Location Proof'],                                entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: ['POS'] },
+    { name: 'Identity (universal)',    docs: ['National ID'],                                                entities: [], owners: [], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Bank proof (universal)',  docs: ['Bank Account Letter / IBAN proof'],                            entities: [], owners: [], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Tax registration',        docs: ['Tax Identification Card'],                                     entities: ['Registered Business', 'Professional Business'], owners: [], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Commercial Registration', docs: ['Commercial Registration (CR)'],                                entities: ['Registered Business'], owners: [], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Foreign owner KYC',       docs: ["Owner's Passport", "Owner's Residence Card"],                  entities: [], owners: ['Foreign Owner'], industries: [], banks: [], modules: [], services: [] },
+    { name: 'Bank Misr PSP annex',     docs: ['BM PSP Agreement Annex'],                                      entities: [], owners: [], industries: [], banks: ['Bank Misr'], modules: ['PSP'], services: [] },
+    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.endsWith('-Payout') || s.endsWith('-Instant payout')) },
+    { name: 'Online services',         docs: ['Brand Authorization Letter'],                                  entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.startsWith('Online-')) },
+    { name: 'POS services',            docs: ['Store Lease / Location Proof'],                                entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.startsWith('POS-')) },
   ];
 
-  const criteria = { entity: '', owner: '', industry: '', bank: '', module: '', services: [], channels: [] };
+  const criteria = { entity: '', owner: '', industry: '', bank: '', module: '', services: [] };
 
   /* Within a group: OR. Across groups: AND. Empty group on the rule = matches anyone. */
   function ruleMatches(r, cfg) {
@@ -467,7 +464,6 @@
     if (r.banks.length && !r.banks.includes(cfg.bank)) return false;
     if (r.modules.length && !r.modules.includes(cfg.module)) return false;
     if (r.services.length && !r.services.some(s => cfg.services.includes(s))) return false;
-    if (r.channels.length && !r.channels.some(c => cfg.channels.includes(c))) return false;
     return true;
   }
 
@@ -594,7 +590,6 @@
     renderSingleChips('critEntity', ENTITIES, 'entity');
     renderSingleChips('critOwner', OWNERS, 'owner');
     renderSingleChips('critModule', MODULES, 'module');
-    renderMultiChips('critChannel', CHANNELS, 'channels');
     renderMultiChips('critService', SERVICES, 'services');
     const locked = document.querySelector('.crit-card')?.classList.contains('locked-crit');
     document.querySelectorAll('.crit-chip').forEach(c => c.disabled = !!locked);
@@ -867,7 +862,7 @@
     if (!sec) return;
     Object.assign(criteria, {
       entity: 'Registered Business', owner: 'Egyptian Owner', industry: 'Retail & E-commerce',
-      bank: 'Bank Misr', module: 'PF', services: [], channels: ['Online'],
+      bank: 'Bank Misr', module: 'PF', services: ['Online-BM-Installment'],
     });
     $('critIndustry').value = criteria.industry;
     $('critBank').value = criteria.bank;
@@ -960,7 +955,6 @@
     if (BANKS.includes(p.get('bank'))) { criteria.bank = p.get('bank'); $('critBank').value = criteria.bank; }
     if (MODULES.includes(p.get('module'))) criteria.module = p.get('module');
     criteria.services = (p.get('services') || '').split(',').filter(s => SERVICES.includes(s));
-    criteria.channels = (p.get('channels') || '').split(',').filter(c => CHANNELS.includes(c));
 
     renderCriteria();
     recomputeAndRender();   // section is already 'editing' by default — nothing to unlock
