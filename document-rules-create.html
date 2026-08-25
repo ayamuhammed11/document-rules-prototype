@@ -120,9 +120,6 @@
   .cond-group:last-of-type{margin-bottom:4px;}
   .cond-group .cg-label{display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;}
   .cond-group .cg-name{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);}
-  .any-badge{font-size:10px;font-weight:700;letter-spacing:.05em;border-radius:var(--radius);padding:2px 7px;
-    background:var(--muted);color:var(--muted-foreground);}
-  .any-badge.on{background:var(--success-10);color:var(--success);}
   .select-all-btn{background:none;border:1px solid transparent;padding:3px;margin-inline-start:8px;
     border-radius:var(--radius);color:var(--muted-foreground);cursor:pointer;display:inline-flex;
     align-items:center;justify-content:center;vertical-align:middle;}
@@ -209,27 +206,27 @@
         <div class="cond-title">Conditions — when is this document required?</div>
 
         <div class="cond-group" data-group="entities">
-          <div class="cg-label"><span class="cg-name">Entity Type</span><span class="any-badge" id="anyEntities">ANY</span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Entity Type</span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="entityChips"></div>
         </div>
         <div class="cond-group" data-group="owners">
-          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><span class="any-badge" id="anyOwners">ANY</span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="ownerChips"></div>
         </div>
         <div class="cond-group" data-group="industries">
-          <div class="cg-label"><span class="cg-name">Industry</span><span class="any-badge" id="anyIndustries">ANY</span><button type="button" class="select-all-btn" id="selAllIndustries" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Industry</span><button type="button" class="select-all-btn" id="selAllIndustries" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="industryChips"></div>
         </div>
         <div class="cond-group" data-group="banks">
-          <div class="cg-label"><span class="cg-name">Bank</span><span class="any-badge" id="anyBanks">ANY</span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Bank</span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="bankChips"></div>
         </div>
         <div class="cond-group" data-group="modules">
-          <div class="cg-label"><span class="cg-name">Merchant Type</span><span class="any-badge" id="anyModules">ANY</span><button type="button" class="select-all-btn" id="selAllModules" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Merchant Type</span><button type="button" class="select-all-btn" id="selAllModules" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="moduleChips"></div>
         </div>
         <div class="cond-group" data-group="services">
-          <div class="cg-label"><span class="cg-name">Service</span><span class="any-badge" id="anyServices">ANY</span><button type="button" class="select-all-btn" id="selAllServices" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Service</span><button type="button" class="select-all-btn" id="selAllServices" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="serviceChips"></div>
         </div>
 
@@ -328,7 +325,7 @@
       const i = arr.indexOf(label);
       if (i >= 0) arr.splice(i, 1); else arr.push(label);
       b.classList.toggle('on');
-      if (group === 'docs') updateDocHint(); else updateAnyBadges();
+      if (group === 'docs') updateDocHint(); else updateSelectAllLabels();
     });
     return b;
   }
@@ -342,16 +339,6 @@
   function updateDocHint() {
     $('docHint').textContent = draft.docs.length + ' selected';
     if (draft.docs.length) $('docErr').classList.remove('show');
-    updateSelectAllLabels();
-  }
-
-  function updateAnyBadges() {
-    const map = { entities: 'anyEntities', owners: 'anyOwners', industries: 'anyIndustries', banks: 'anyBanks', modules: 'anyModules', services: 'anyServices' };
-    Object.entries(map).forEach(([k, id]) => {
-      const empty = draft[k].length === 0;
-      $(id).textContent = empty ? 'ANY ✓' : draft[k].length + ' selected';
-      $(id).classList.toggle('on', empty);
-    });
     updateSelectAllLabels();
   }
 
@@ -381,7 +368,7 @@
     const allSelected = draft[key].length === meta.options.length;
     draft[key] = allSelected ? [] : [...meta.options];
     renderChipGroup(meta.container, meta.options, key, draft[key]);
-    if (key === 'docs') updateDocHint(); else updateAnyBadges();
+    if (key === 'docs') updateDocHint(); else updateSelectAllLabels();
   }
   Object.entries(SELECT_ALL_GROUPS).forEach(([key, meta]) => {
     $(meta.btn).addEventListener('click', () => toggleSelectAll(key));
@@ -396,7 +383,7 @@
     renderChipGroup('moduleChips', MODULES, 'modules', draft.modules);
     renderChipGroup('serviceChips', SERVICES, 'services', draft.services);
     updateDocHint();
-    updateAnyBadges();
+    updateSelectAllLabels();
   }
 
   /* ══════════ Load an existing rule when opened as ?edit=<id> ══════════ */
