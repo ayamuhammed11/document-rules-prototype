@@ -346,11 +346,22 @@
   const ENTITIES = ['Individual Seller', 'Registered Business', 'Professional Business'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  /* Channel is folded into Service: every service comes in a POS and an Online variant. */
-  const SERVICE_NAMES = ['BM-Installment', 'NBE-Installment', 'Instant payout', 'Payout',
-    'BNPL: Valu', 'BNPL: Souhoola', 'BNPL: AMAN', 'BNPL: Contract', 'BNPL: TRU',
-    'Kiosk: Basata', 'BNPL: MOGO', 'Lending: Flend', 'Lending: OLIV', 'E-Wallet acceptance'];
-  const SERVICES = ['POS', 'Online'].flatMap(ch => SERVICE_NAMES.map(s => ch + '-' + s));
+  /* Service catalog — mirrors the Kashier Services operations portal: services split
+     into Basic / Add-on tiers, grouped by category within each. Channel is part of the
+     service name itself (Online Card / POS Card). */
+  const SERVICE_CATALOG = [
+    { tier: 'Basic Services', categories: [
+      { name: 'Online', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online Octo', 'Online Auth n Cap'] },
+      { name: 'POS',    services: ['POS Card', 'POS Wallet', 'POS Valu', 'POS Octo', 'POS Auth n Cap'] },
+    ] },
+    { tier: 'Add-on Services', categories: [
+      { name: 'Payouts',         services: ['Instant Settlement'] },
+      { name: 'Not categorized', services: ['Branches', 'Currency Conversion'] },
+    ] },
+  ];
+  const BASIC_SERVICES = SERVICE_CATALOG[0].categories.flatMap(c => c.services);
+  const ADDON_SERVICES = SERVICE_CATALOG[1].categories.flatMap(c => c.services);
+  const SERVICES = [...BASIC_SERVICES, ...ADDON_SERVICES];
 
   const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services'];
   const isUniversal = r => CONDITION_KEYS.every(k => r[k].length === 0);

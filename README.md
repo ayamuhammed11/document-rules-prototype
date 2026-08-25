@@ -11,9 +11,10 @@ connected pages spanning the agent (sales) side and the merchant (self-serve) si
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
   builder, reached from All Rules' tab bar or "Add Rule" — also handles editing an existing
-  rule via `?edit=<id>`. Each rule links one or more document types to conditions (entity
-  type, owner nationality, industry, bank, merchant type, service). Rules, ids, and events
-  are shared with the list page through `localStorage`, so actions on either page are
+  rule via `?edit=<id>`. Every rule is built on a **single service**, picked first, and then
+  narrowed with any additional conditions (entity type, owner nationality, industry, bank,
+  merchant type) before choosing which document types become required. Rules, ids, and
+  events are shared with the list page through `localStorage`, so actions on either page are
   reflected on the other without a backend.
 
 - **[merchant-onboarding.html](merchant-onboarding.html)** — **sales side.** A salesperson
@@ -34,18 +35,36 @@ connected pages spanning the agent (sales) side and the merchant (self-serve) si
 All four pages use the **identical rule-matching logic and document set**, so a given set of
 criteria produces the same checklist everywhere.
 
-## Conditions
+## Services
+
+The service catalog mirrors the Kashier Services operations portal — split into **Basic**
+and **Add-on** tiers, grouped by category within each:
+
+| Tier | Category | Services |
+| --- | --- | --- |
+| Basic | Online | Online Card, Online Wallet, Online Valu, Online Octo, Online Auth n Cap |
+| Basic | POS | POS Card, POS Wallet, POS Valu, POS Octo, POS Auth n Cap |
+| Add-on | Payouts | Instant Settlement |
+| Add-on | Not categorized | Branches, Currency Conversion |
+
+Channel is part of the service name itself (`Online Card` / `POS Card`) rather than a
+separate condition. The source portal defines a `Transfers` category too, but nothing is
+assigned to it, so it isn't rendered.
+
+> The category assignments above are inferred: the source portal has all four categories
+> defined with zero services assigned. Update them here if they are ever assigned for real.
+
+## Other conditions
 
 Entity Type (Individual Seller / Registered Business / Professional Business), Business
-Owner Nationality, Industry, Bank, Merchant Type (PF / PSP), and Service — each service
-comes in a `POS-` and an `Online-` variant (e.g. `POS-BM-Installment`,
-`Online-E-Wallet acceptance`), folding channel into the service dimension rather than
-tracking it separately.
+Owner Nationality, Industry, Bank, and Merchant Type (PF / PSP) — used to narrow a rule
+beyond its service.
 
 ## Matching semantics
 
 Within a condition group: OR. Across groups: AND. A rule (or the built-in universal
-requirements) with no conditions in a group matches everyone.
+requirements) with no conditions in a group matches everyone. Service is the exception —
+each rule carries exactly one.
 
 ## Run it
 

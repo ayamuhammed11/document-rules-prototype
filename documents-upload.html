@@ -112,6 +112,15 @@
   .crit-select:focus { outline: none; border-color: var(--primary); }
   .crit-select:disabled { opacity: .6; cursor: not-allowed; background: var(--muted); }
   .crit-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* Services picker mirrors the Kashier Services portal: Basic / Add-on tiers,
+     grouped by category within each. */
+  .svc-group { margin-bottom: 14px; }
+  .svc-group:last-child { margin-bottom: 0; }
+  .svc-group-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--cadet-05); margin-bottom: 8px; }
+  .svc-cat { margin-bottom: 9px; padding-inline-start: 10px; border-inline-start: 2px solid var(--border); }
+  .svc-cat:last-child { margin-bottom: 0; }
+  .svc-cat-label { font-size: 11.5px; font-weight: 600; color: var(--cadet-05); margin-bottom: 6px; }
   .crit-chip { border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 600;
     font-family: inherit; color: var(--cadet-base); background: #fff; cursor: pointer;
     transition: border-color .12s ease, background .12s ease, color .12s ease; }
@@ -337,7 +346,7 @@
             </div>
             <div class="crit-group full">
               <div class="crit-label">Services<span class="opt">(select all that apply)</span></div>
-              <div class="crit-chips" id="critService"></div>
+              <div id="critService"></div>
             </div>
           </div>
         </div>
@@ -402,11 +411,22 @@
     'Insurance', 'Marketplace', 'Logistics & Delivery', 'Other'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  /* Channel is folded into Service: every service comes in a POS and an Online variant. */
-  const SERVICE_NAMES = ['BM-Installment', 'NBE-Installment', 'Instant payout', 'Payout',
-    'BNPL: Valu', 'BNPL: Souhoola', 'BNPL: AMAN', 'BNPL: Contract', 'BNPL: TRU',
-    'Kiosk: Basata', 'BNPL: MOGO', 'Lending: Flend', 'Lending: OLIV', 'E-Wallet acceptance'];
-  const SERVICES = ['POS', 'Online'].flatMap(ch => SERVICE_NAMES.map(s => ch + '-' + s));
+  /* Service catalog — mirrors the Kashier Services operations portal: services split
+     into Basic / Add-on tiers, grouped by category within each. Channel is part of the
+     service name itself (Online Card / POS Card). */
+  const SERVICE_CATALOG = [
+    { tier: 'Basic Services', categories: [
+      { name: 'Online', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online Octo', 'Online Auth n Cap'] },
+      { name: 'POS',    services: ['POS Card', 'POS Wallet', 'POS Valu', 'POS Octo', 'POS Auth n Cap'] },
+    ] },
+    { tier: 'Add-on Services', categories: [
+      { name: 'Payouts',         services: ['Instant Settlement'] },
+      { name: 'Not categorized', services: ['Branches', 'Currency Conversion'] },
+    ] },
+  ];
+  const BASIC_SERVICES = SERVICE_CATALOG[0].categories.flatMap(c => c.services);
+  const ADDON_SERVICES = SERVICE_CATALOG[1].categories.flatMap(c => c.services);
+  const SERVICES = [...BASIC_SERVICES, ...ADDON_SERVICES];
 
   /* ══════════ Document metadata — presentation details per document type ══════════ */
   const DOC_META = {
@@ -449,9 +469,9 @@
     { name: 'Commercial Registration', docs: ['Commercial Registration (CR)'],                                entities: ['Registered Business'], owners: [], industries: [], banks: [], modules: [], services: [] },
     { name: 'Foreign owner KYC',       docs: ["Owner's Passport", "Owner's Residence Card"],                  entities: [], owners: ['Foreign Owner'], industries: [], banks: [], modules: [], services: [] },
     { name: 'Bank Misr PSP annex',     docs: ['BM PSP Agreement Annex'],                                      entities: [], owners: [], industries: [], banks: ['Bank Misr'], modules: ['PSP'], services: [] },
-    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.endsWith('-Payout') || s.endsWith('-Instant payout')) },
-    { name: 'Online services',         docs: ['Brand Authorization Letter'],                                  entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.startsWith('Online-')) },
-    { name: 'POS services',            docs: ['Store Lease / Location Proof'],                                entities: [], owners: [], industries: [], banks: [], modules: [], services: SERVICES.filter(s => s.startsWith('POS-')) },
+    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: ['Instant Settlement'] },
+    { name: 'Online services',         docs: ['Brand Authorization Letter'],                                  entities: [], owners: [], industries: [], banks: [], modules: [], services: BASIC_SERVICES.filter(s => s.startsWith('Online ')) },
+    { name: 'POS services',            docs: ['Store Lease / Location Proof'],                                entities: [], owners: [], industries: [], banks: [], modules: [], services: BASIC_SERVICES.filter(s => s.startsWith('POS ')) },
   ];
 
   const criteria = { entity: '', owner: '', industry: '', bank: '', module: '', services: [] };
@@ -586,11 +606,52 @@
     });
   }
 
+  /* Services picker mirrors the Kashier Services portal: Basic / Add-on tiers,
+     grouped by category within each. */
+  function renderServiceCatalogChips() {
+    const c = $('critService'); c.innerHTML = '';
+    SERVICE_CATALOG.forEach(tier => {
+      const group = document.createElement('div');
+      group.className = 'svc-group';
+      const label = document.createElement('div');
+      label.className = 'svc-group-label';
+      label.textContent = tier.tier;
+      group.appendChild(label);
+      tier.categories.forEach(cat => {
+        if (!cat.services.length) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'svc-cat';
+        const catLabel = document.createElement('div');
+        catLabel.className = 'svc-cat-label';
+        catLabel.textContent = cat.name;
+        wrap.appendChild(catLabel);
+        const row = document.createElement('div');
+        row.className = 'crit-chips';
+        cat.services.forEach(name => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'crit-chip' + (criteria.services.includes(name) ? ' on' : '');
+          b.textContent = name;
+          b.addEventListener('click', () => {
+            const i = criteria.services.indexOf(name);
+            if (i >= 0) criteria.services.splice(i, 1); else criteria.services.push(name);
+            renderCriteria();
+            recomputeAndRender();
+          });
+          row.appendChild(b);
+        });
+        wrap.appendChild(row);
+        group.appendChild(wrap);
+      });
+      c.appendChild(group);
+    });
+  }
+
   function renderCriteria() {
     renderSingleChips('critEntity', ENTITIES, 'entity');
     renderSingleChips('critOwner', OWNERS, 'owner');
     renderSingleChips('critModule', MODULES, 'module');
-    renderMultiChips('critService', SERVICES, 'services');
+    renderServiceCatalogChips();
     const locked = document.querySelector('.crit-card')?.classList.contains('locked-crit');
     document.querySelectorAll('.crit-chip').forEach(c => c.disabled = !!locked);
   }
@@ -862,7 +923,7 @@
     if (!sec) return;
     Object.assign(criteria, {
       entity: 'Registered Business', owner: 'Egyptian Owner', industry: 'Retail & E-commerce',
-      bank: 'Bank Misr', module: 'PF', services: ['Online-BM-Installment'],
+      bank: 'Bank Misr', module: 'PF', services: ['Online Card'],
     });
     $('critIndustry').value = criteria.industry;
     $('critBank').value = criteria.bank;
