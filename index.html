@@ -283,7 +283,7 @@
 
         <div class="empty-state" id="rulesEmpty">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
-          <p id="emptyText" style="margin-bottom:0;">No requirement rules yet — create your first one.</p>
+          <p id="emptyText" style="margin-bottom:0;">No documents rules yet — create your first one.</p>
         </div>
       </div>
 
@@ -417,7 +417,7 @@
     $('matchCount').textContent = visible.length + (visible.length === 1 ? ' rule' : ' rules') + ' matching filters';
     $('rulesEmpty').style.display = visible.length === 0 ? 'block' : 'none';
     $('emptyText').textContent = rules.length === 0
-      ? 'No requirement rules yet — create your first one.'
+      ? 'No documents rules yet — create your first one.'
       : 'No rules match your filters — try clearing them, or add a new rule.';
     list.innerHTML = '';
 
