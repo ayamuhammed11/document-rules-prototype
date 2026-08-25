@@ -123,6 +123,11 @@
   .any-badge{font-size:10px;font-weight:700;letter-spacing:.05em;border-radius:var(--radius);padding:2px 7px;
     background:var(--muted);color:var(--muted-foreground);}
   .any-badge.on{background:var(--success-10);color:var(--success);}
+  .select-all-btn{background:none;border:1px solid transparent;padding:3px;margin-inline-start:8px;
+    border-radius:var(--radius);color:var(--muted-foreground);cursor:pointer;display:inline-flex;
+    align-items:center;justify-content:center;vertical-align:middle;}
+  .select-all-btn svg{width:15px;height:15px;}
+  .select-all-btn:hover{background:var(--muted);color:var(--primary);}
   .cond-cols{display:flex;gap:32px;flex-wrap:wrap;}
   .cond-cols .cond-group{margin-bottom:0;flex:1;min-width:200px;}
 
@@ -193,7 +198,7 @@
       </div>
 
       <div class="card card-pad">
-        <h2 class="card-title" id="cardTitle">New Requirement Rule</h2>
+        <h2 class="card-title" id="cardTitle">New Document Rule</h2>
 
         <div class="field">
           <label for="ruleName">Rule Name<span class="req">*</span></label>
@@ -204,34 +209,34 @@
         <div class="cond-title">Conditions — when is this document required?</div>
 
         <div class="cond-group" data-group="entities">
-          <div class="cg-label"><span class="cg-name">Entity Type</span><span class="any-badge" id="anyEntities">ANY</span></div>
+          <div class="cg-label"><span class="cg-name">Entity Type</span><span class="any-badge" id="anyEntities">ANY</span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="entityChips"></div>
         </div>
         <div class="cond-group" data-group="owners">
-          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><span class="any-badge" id="anyOwners">ANY</span></div>
+          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><span class="any-badge" id="anyOwners">ANY</span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="ownerChips"></div>
         </div>
         <div class="cond-group" data-group="industries">
-          <div class="cg-label"><span class="cg-name">Industry</span><span class="any-badge" id="anyIndustries">ANY</span></div>
+          <div class="cg-label"><span class="cg-name">Industry</span><span class="any-badge" id="anyIndustries">ANY</span><button type="button" class="select-all-btn" id="selAllIndustries" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="industryChips"></div>
         </div>
         <div class="cond-group" data-group="banks">
-          <div class="cg-label"><span class="cg-name">Bank</span><span class="any-badge" id="anyBanks">ANY</span></div>
+          <div class="cg-label"><span class="cg-name">Bank</span><span class="any-badge" id="anyBanks">ANY</span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="bankChips"></div>
         </div>
         <div class="cond-group" data-group="modules">
-          <div class="cg-label"><span class="cg-name">Merchant Type</span><span class="any-badge" id="anyModules">ANY</span></div>
+          <div class="cg-label"><span class="cg-name">Merchant Type</span><span class="any-badge" id="anyModules">ANY</span><button type="button" class="select-all-btn" id="selAllModules" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="moduleChips"></div>
         </div>
         <div class="cond-group" data-group="services">
-          <div class="cg-label"><span class="cg-name">Service</span><span class="any-badge" id="anyServices">ANY</span></div>
+          <div class="cg-label"><span class="cg-name">Service</span><span class="any-badge" id="anyServices">ANY</span><button type="button" class="select-all-btn" id="selAllServices" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="serviceChips"></div>
         </div>
 
         <div class="cond-title" style="margin-top:26px;">Required Documents — based on the criteria above</div>
 
         <div class="field">
-          <label>Document Types<span class="req">*</span></label>
+          <label>Document Types<span class="req">*</span><button type="button" class="select-all-btn" id="selAllDocs" title="Select all" aria-label="Select all"></button></label>
           <div class="chip-row" id="docChips"></div>
           <div class="chip-hint" id="docHint">0 selected</div>
           <div class="inline-err" id="docErr">Select at least one document type.</div>
@@ -337,6 +342,7 @@
   function updateDocHint() {
     $('docHint').textContent = draft.docs.length + ' selected';
     if (draft.docs.length) $('docErr').classList.remove('show');
+    updateSelectAllLabels();
   }
 
   function updateAnyBadges() {
@@ -346,7 +352,40 @@
       $(id).textContent = empty ? 'ANY ✓' : draft[k].length + ' selected';
       $(id).classList.toggle('on', empty);
     });
+    updateSelectAllLabels();
   }
+
+  /* ══════════ Select all / Unselect all — one toggle button per chip group ══════════ */
+  const SELECT_ALL_GROUPS = {
+    entities:   { options: ENTITIES,             container: 'entityChips',   btn: 'selAllEntities' },
+    owners:     { options: OWNER_NATIONALITIES,  container: 'ownerChips',    btn: 'selAllOwners' },
+    industries: { options: INDUSTRIES,           container: 'industryChips', btn: 'selAllIndustries' },
+    banks:      { options: BANKS,                container: 'bankChips',    btn: 'selAllBanks' },
+    modules:    { options: MODULES,              container: 'moduleChips',  btn: 'selAllModules' },
+    services:   { options: SERVICES,             container: 'serviceChips', btn: 'selAllServices' },
+    docs:       { options: DOC_TYPES,            container: 'docChips',     btn: 'selAllDocs' },
+  };
+  const SELECT_ALL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
+  const UNSELECT_ALL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
+  function updateSelectAllLabels() {
+    Object.entries(SELECT_ALL_GROUPS).forEach(([key, meta]) => {
+      const allSelected = draft[key].length === meta.options.length;
+      const btn = $(meta.btn);
+      btn.innerHTML = allSelected ? UNSELECT_ALL_ICON : SELECT_ALL_ICON;
+      btn.title = allSelected ? 'Unselect all' : 'Select all';
+      btn.setAttribute('aria-label', btn.title);
+    });
+  }
+  function toggleSelectAll(key) {
+    const meta = SELECT_ALL_GROUPS[key];
+    const allSelected = draft[key].length === meta.options.length;
+    draft[key] = allSelected ? [] : [...meta.options];
+    renderChipGroup(meta.container, meta.options, key, draft[key]);
+    if (key === 'docs') updateDocHint(); else updateAnyBadges();
+  }
+  Object.entries(SELECT_ALL_GROUPS).forEach(([key, meta]) => {
+    $(meta.btn).addEventListener('click', () => toggleSelectAll(key));
+  });
 
   function renderForm() {
     renderChipGroup('docChips', DOC_TYPES, 'docs', draft.docs);
@@ -369,7 +408,7 @@
     if (!rule) { location.href = 'document-rules.html'; return; }
 
     editingId = rule.id;
-    $('cardTitle').textContent = 'Edit Requirement Rule';
+    $('cardTitle').textContent = 'Edit Document Rule';
     $('saveRuleLabel').textContent = 'Save Changes';
     $('ruleName').value = rule.name;
     draft.docs = [...rule.docs];
