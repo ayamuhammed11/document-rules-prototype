@@ -476,11 +476,11 @@
     updateSelectAllLabels();
   }
 
-  /* ══════════ Migration — retired services ══════════
+  /* ══════════ Migration — stale saved rules ══════════
      Mirrors document-rules.html, so landing straight on this page with ?edit=<id> sees the
-     same pruned data. A rule whose only service has been retired is removed, and the edit
-     lookup below then falls through to the list page. */
-  function pruneRetiredServices() {
+     same pruned data. A rule left without a valid service — retired, or never set on an old
+     "universal" rule — is removed, and the edit lookup below falls through to the list. */
+  function pruneStaleRules() {
     const known = new Set(SERVICES);
     const kept = [];
     let changed = false;
@@ -492,7 +492,7 @@
     });
     if (changed) saveRules(kept);
   }
-  pruneRetiredServices();
+  pruneStaleRules();
 
   /* ══════════ Load an existing rule when opened as ?edit=<id> ══════════ */
   (function initEditMode() {

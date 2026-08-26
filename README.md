@@ -63,9 +63,10 @@ Every condition group needs at least one option, so a rule can no longer be left
 dimension. Service and Settlement type are single-select, so for them that means exactly
 one.
 
-Services can be retired from the catalog. On load, both Document Rules pages prune saved
-rules that still reference them — a rule keeps whatever services remain valid, and one left
-with none is removed and logged to the Events trail.
+On load, both Document Rules pages prune stale saved rules — those written before the
+catalog shrank or before every condition became required. A rule keeps whatever services
+remain valid; one left with none can never match anything, so it is removed and logged to
+the Events trail as either `service retired` or `no service set`.
 
 (The built-in universal requirements on the onboarding pages — National ID, bank proof —
 still apply to every applicant; that is baked-in demo data, not an authored rule.)

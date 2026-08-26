@@ -178,7 +178,6 @@
   .vd-cond{display:flex;gap:10px;padding:7px 0;}
   .vd-cond-key{font-size:12.5px;color:var(--cadet-base);min-width:150px;flex-shrink:0;}
   .vd-cond-val{display:flex;gap:6px;flex-wrap:wrap;}
-  .vd-any{font-size:12.5px;color:var(--muted-foreground);font-style:italic;}
 
   #toast{position:fixed;bottom:24px;inset-inline-end:24px;background:var(--foreground);color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:200;display:flex;align-items:center;gap:8px;}
   #toast.show{opacity:1;transform:translateY(0);}
@@ -359,8 +358,6 @@
   const SERVICES = [...BASIC_SERVICES, ...ADDON_SERVICES];
 
   const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services'];
-  const isUniversal = r => CONDITION_KEYS.every(k => r[k].length === 0);
-
   /* ══════════ Shared storage — rules, ids, and events are read/written here and on
      document-rules-create.html, so actions on either page are reflected on the other. ══════════ */
   const RULES_KEY = 'kashier_document_rules_v1';
@@ -373,11 +370,12 @@
   }
   function saveEvents(list) { localStorage.setItem(EVENTS_KEY, JSON.stringify(list.map(e => ({ ...e, ts: e.ts.toISOString() })))); }
 
-  /* ══════════ Migration — retired services ══════════
-     Services can be dropped from the catalog, leaving saved rules pointing at names that
-     no longer exist. Prune those references; a rule left with no valid service can never
-     match anything, so it is removed. Returns the rules that were dropped. */
-  function pruneRetiredServices() {
+  /* ══════════ Migration — stale saved rules ══════════
+     Rules saved before the catalog shrank, or before every condition became required, can
+     point at services that no longer exist or carry no service at all (the old "universal"
+     rule that applied to everyone). Prune retired service names; a rule left without a
+     service can never match anything, so it is removed. Returns what was dropped and why. */
+  function pruneStaleRules() {
     const known = new Set(SERVICES);
     const kept = [], dropped = [];
     let pruned = false;
@@ -385,12 +383,13 @@
       const before = r.services || [];
       const valid = before.filter(s => known.has(s));
       if (valid.length !== before.length) pruned = true;
-      if (valid.length) { r.services = valid; kept.push(r); } else dropped.push(r);
+      if (valid.length) { r.services = valid; kept.push(r); }
+      else dropped.push({ rule: r, reason: before.length ? 'service retired' : 'no service set' });
     });
     if (pruned || dropped.length) saveRules(kept);
     return dropped;
   }
-  const retiredRules = pruneRetiredServices();
+  const staleRules = pruneStaleRules();
 
   let rules = loadRules();
 
@@ -450,18 +449,13 @@
       const card = document.createElement('div');
       card.className = 'record-card';
 
-      let conds = '';
-      if (isUniversal(r)) {
-        conds = '<span class="chip chip-success">' + CHECK_ICON + 'Universal</span>';
-      } else {
-        const pill = (v, isEntity) => '<span class="chip ' + (isEntity ? 'chip-accent' : 'chip-muted') + '">' + esc(v) + '</span>';
-        conds += r.entities.map(v => pill(v, true)).join('');
-        conds += r.owners.map(v => pill(v)).join('');
-        conds += r.industries.map(v => pill(v)).join('');
-        conds += r.banks.map(v => pill(v)).join('');
-        conds += r.modules.map(v => pill(v)).join('');
-        conds += r.services.map(v => pill(v)).join('');
-      }
+      const pill = (v, isEntity) => '<span class="chip ' + (isEntity ? 'chip-accent' : 'chip-muted') + '">' + esc(v) + '</span>';
+      let conds = r.entities.map(v => pill(v, true)).join('');
+      conds += r.owners.map(v => pill(v)).join('');
+      conds += r.industries.map(v => pill(v)).join('');
+      conds += r.banks.map(v => pill(v)).join('');
+      conds += r.modules.map(v => pill(v)).join('');
+      conds += r.services.map(v => pill(v)).join('');
 
       card.innerHTML =
         '<div class="record-icon">' + DOC_ICON + '</div>' +
@@ -500,20 +494,14 @@
   function openView(r) {
     const docs = r.docs.map(d => '<div class="vd-doc">' + CHECK_ICON + esc(d) + '</div>').join('');
 
-    let conds;
-    if (isUniversal(r)) {
-      conds = '<span class="chip chip-success">Universal — required for every applicant</span>';
-    } else {
-      conds = COND_LABELS.map(([key, label]) => {
-        const vals = r[key];
-        const pillClass = key === 'entities' ? 'chip-accent' : 'chip-muted';
-        const body = vals.length
-          ? vals.map(v => '<span class="chip ' + pillClass + '">' + esc(v) + '</span>').join('')
-          : '<span class="vd-any">Any</span>';
-        return '<div class="vd-cond"><div class="vd-cond-key">' + label + '</div>' +
-               '<div class="vd-cond-val">' + body + '</div></div>';
-      }).join('');
-    }
+    const conds = COND_LABELS.map(([key, label]) => {
+      const vals = r[key];
+      if (!vals.length) return '';
+      const pillClass = key === 'entities' ? 'chip-accent' : 'chip-muted';
+      const body = vals.map(v => '<span class="chip ' + pillClass + '">' + esc(v) + '</span>').join('');
+      return '<div class="vd-cond"><div class="vd-cond-key">' + label + '</div>' +
+             '<div class="vd-cond-val">' + body + '</div></div>';
+    }).join('');
 
     $('viewContent').innerHTML =
       '<div class="vd-section"><div class="vd-label">Rule Name</div>' +
@@ -613,12 +601,12 @@
   renderRules();
   renderEvents();
 
-  /* Report anything the retired-service migration removed. */
-  retiredRules.forEach(r => logEvent('Removed — service retired', r));
-  if (retiredRules.length) {
-    toast(retiredRules.length === 1
-      ? '1 rule removed — its service is no longer available'
-      : retiredRules.length + ' rules removed — their services are no longer available');
+  /* Report anything the migration removed. */
+  staleRules.forEach(d => logEvent('Removed — ' + d.reason, d.rule));
+  if (staleRules.length) {
+    toast(staleRules.length === 1
+      ? '1 outdated rule removed — see Events'
+      : staleRules.length + ' outdated rules removed — see Events');
   }
 </script>
 </body>
