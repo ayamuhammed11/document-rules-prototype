@@ -1,21 +1,29 @@
 # Document Rules — Kashier Onboarding Prototype
 
-A standalone HTML prototype of Kashier's document-rules-driven merchant onboarding — four
+A standalone HTML prototype of Kashier's document-rules-driven merchant onboarding — five
 connected pages spanning the agent (sales) side and the merchant (self-serve) side.
+
+In the agent portal sidebar, **Document Types** and **Document Rules** sit together under a
+collapsible **Documents** module.
 
 ## Pages
 
 - **[document-rules.html](document-rules.html)** — **All Rules.** The agent-portal list of
-  requirement rules, with filters by entity, bank, merchant type, and service, an Events
+  requirement rules, with filters by entity, bank, settlement type, and service, an Events
   audit trail, and view/edit/delete actions on each rule.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
   builder, reached from All Rules' tab bar or "Add Rule" — also handles editing an existing
   rule via `?edit=<id>`. Every rule is built on a **single service**, picked first, and then
   narrowed with any additional conditions (entity type, owner nationality, industry, bank,
-  merchant type) before choosing which document types become required. Rules, ids, and
+  settlement type) before choosing which document types become required. Rules, ids, and
   events are shared with the list page through `localStorage`, so actions on either page are
   reflected on the other without a backend.
+
+- **[document-types.html](document-types.html)** — **Document Types.** The catalogue the
+  rules draw on: each document type's name (English and Arabic), description, required
+  conditions, accepted formats, size limit, and whether it is captured as one file or as
+  named parts (front/back).
 
 - **[merchant-onboarding.html](merchant-onboarding.html)** — **sales side.** A salesperson
   starts a new merchant application: Merchant Details, then the same Criteria & Services
@@ -32,8 +40,8 @@ connected pages spanning the agent (sales) side and the merchant (self-serve) si
   application link from `merchant-onboarding.html` pre-fills the criteria and greets the
   merchant by name instead of showing the default seeded demo.
 
-All four pages use the **identical rule-matching logic and document set**, so a given set of
-criteria produces the same checklist everywhere.
+The rules and onboarding pages use the **identical rule-matching logic and document set**, so
+a given set of criteria produces the same checklist everywhere.
 
 ## Services
 
@@ -78,6 +86,7 @@ No build step — every page is self-contained:
 ```bash
 open document-rules.html          # All Rules (agent/admin)
 open document-rules-create.html   # Create/Edit Rule (agent/admin)
+open document-types.html          # Document Types catalogue (agent/admin)
 open merchant-onboarding.html     # New Application (sales)
 open documents-upload.html        # Documents (merchant)
 ```
