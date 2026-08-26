@@ -373,6 +373,25 @@
   }
   function saveEvents(list) { localStorage.setItem(EVENTS_KEY, JSON.stringify(list.map(e => ({ ...e, ts: e.ts.toISOString() })))); }
 
+  /* ══════════ Migration — retired services ══════════
+     Services can be dropped from the catalog, leaving saved rules pointing at names that
+     no longer exist. Prune those references; a rule left with no valid service can never
+     match anything, so it is removed. Returns the rules that were dropped. */
+  function pruneRetiredServices() {
+    const known = new Set(SERVICES);
+    const kept = [], dropped = [];
+    let pruned = false;
+    loadRules().forEach(r => {
+      const before = r.services || [];
+      const valid = before.filter(s => known.has(s));
+      if (valid.length !== before.length) pruned = true;
+      if (valid.length) { r.services = valid; kept.push(r); } else dropped.push(r);
+    });
+    if (pruned || dropped.length) saveRules(kept);
+    return dropped;
+  }
+  const retiredRules = pruneRetiredServices();
+
   let rules = loadRules();
 
   /* ══════════ Toast ══════════ */
@@ -593,6 +612,14 @@
   /* ══════════ Init ══════════ */
   renderRules();
   renderEvents();
+
+  /* Report anything the retired-service migration removed. */
+  retiredRules.forEach(r => logEvent('Removed — service retired', r));
+  if (retiredRules.length) {
+    toast(retiredRules.length === 1
+      ? '1 rule removed — its service is no longer available'
+      : retiredRules.length + ' rules removed — their services are no longer available');
+  }
 </script>
 </body>
 </html>

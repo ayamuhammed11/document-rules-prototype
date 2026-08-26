@@ -60,8 +60,12 @@ beyond its service. Settlement type takes a single option; the rest allow severa
 Within a condition group: OR. Across groups: AND.
 
 Every condition group needs at least one option, so a rule can no longer be left open on a
-dimension. The two exceptions: Service carries exactly one, and Settlement type is optional
-— left empty, it simply does not constrain the rule.
+dimension. Service and Settlement type are single-select, so for them that means exactly
+one.
+
+Services can be retired from the catalog. On load, both Document Rules pages prune saved
+rules that still reference them — a rule keeps whatever services remain valid, and one left
+with none is removed and logged to the Events trail.
 
 (The built-in universal requirements on the onboarding pages — National ID, bank proof —
 still apply to every applicant; that is baked-in demo data, not an authored rule.)
