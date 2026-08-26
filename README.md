@@ -42,7 +42,7 @@ and **Add-on** tiers:
 
 | Tier | Services |
 | --- | --- |
-| Basic | Online Card, Online Wallet, Online Valu, Online Octo, Online Auth n Cap, POS Card, POS Wallet, POS Valu, POS Octo, POS Auth n Cap |
+| Basic | Online Card, Online Wallet, Online Auth n Cap, POS Card, POS Wallet, POS Auth n Cap |
 | Add-on | Branches, Currency Conversion, Instant Settlement |
 
 Channel is part of the service name itself (`Online Card` / `POS Card`) rather than a
