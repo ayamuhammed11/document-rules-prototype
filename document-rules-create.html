@@ -123,9 +123,6 @@
   .svc-group:last-child{margin-bottom:0;}
   .svc-group-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
     color:var(--muted-foreground);margin-bottom:8px;}
-  .svc-cat{margin-bottom:9px;padding-inline-start:10px;border-inline-start:2px solid var(--border);}
-  .svc-cat:last-child{margin-bottom:0;}
-  .svc-cat-label{font-size:11.5px;font-weight:600;color:var(--cadet-base);margin-bottom:6px;}
 
   .cond-title{font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--muted-foreground);
     text-transform:uppercase;margin:26px 0 14px;}
@@ -292,20 +289,15 @@
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
   /* Service catalog — mirrors the Kashier Services operations portal: services split
-     into Basic / Add-on tiers, grouped by category within each. Channel is part of the
-     service name itself (Online Card / POS Card). */
+     into Basic / Add-on tiers. Channel is part of the service name itself
+     (Online Card / POS Card). */
   const SERVICE_CATALOG = [
-    { tier: 'Basic Services', categories: [
-      { name: 'Online', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online Octo', 'Online Auth n Cap'] },
-      { name: 'POS',    services: ['POS Card', 'POS Wallet', 'POS Valu', 'POS Octo', 'POS Auth n Cap'] },
-    ] },
-    { tier: 'Add-on Services', categories: [
-      { name: 'Payouts',         services: ['Instant Settlement'] },
-      { name: 'Not categorized', services: ['Branches', 'Currency Conversion'] },
-    ] },
+    { tier: 'Basic Services', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online Octo',
+      'Online Auth n Cap', 'POS Card', 'POS Wallet', 'POS Valu', 'POS Octo', 'POS Auth n Cap'] },
+    { tier: 'Add-on Services', services: ['Branches', 'Currency Conversion', 'Instant Settlement'] },
   ];
-  const BASIC_SERVICES = SERVICE_CATALOG[0].categories.flatMap(c => c.services);
-  const ADDON_SERVICES = SERVICE_CATALOG[1].categories.flatMap(c => c.services);
+  const BASIC_SERVICES = SERVICE_CATALOG[0].services;
+  const ADDON_SERVICES = SERVICE_CATALOG[1].services;
   const SERVICES = [...BASIC_SERVICES, ...ADDON_SERVICES];
 
   const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services'];
@@ -394,20 +386,10 @@
       label.className = 'svc-group-label';
       label.textContent = tier.tier;
       group.appendChild(label);
-      tier.categories.forEach(cat => {
-        if (!cat.services.length) return;
-        const wrap = document.createElement('div');
-        wrap.className = 'svc-cat';
-        const catLabel = document.createElement('div');
-        catLabel.className = 'svc-cat-label';
-        catLabel.textContent = cat.name;
-        wrap.appendChild(catLabel);
-        const row = document.createElement('div');
-        row.className = 'chip-row';
-        cat.services.forEach(name => row.appendChild(serviceChip(name)));
-        wrap.appendChild(row);
-        group.appendChild(wrap);
-      });
+      const row = document.createElement('div');
+      row.className = 'chip-row';
+      tier.services.forEach(name => row.appendChild(serviceChip(name)));
+      group.appendChild(row);
       root.appendChild(group);
     });
   }

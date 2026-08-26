@@ -37,22 +37,17 @@ criteria produces the same checklist everywhere.
 
 ## Services
 
-The service catalog mirrors the Kashier Services operations portal — split into **Basic**
-and **Add-on** tiers, grouped by category within each:
+The service catalog mirrors the Kashier Services operations portal, split into **Basic**
+and **Add-on** tiers:
 
-| Tier | Category | Services |
-| --- | --- | --- |
-| Basic | Online | Online Card, Online Wallet, Online Valu, Online Octo, Online Auth n Cap |
-| Basic | POS | POS Card, POS Wallet, POS Valu, POS Octo, POS Auth n Cap |
-| Add-on | Payouts | Instant Settlement |
-| Add-on | Not categorized | Branches, Currency Conversion |
+| Tier | Services |
+| --- | --- |
+| Basic | Online Card, Online Wallet, Online Valu, Online Octo, Online Auth n Cap, POS Card, POS Wallet, POS Valu, POS Octo, POS Auth n Cap |
+| Add-on | Branches, Currency Conversion, Instant Settlement |
 
 Channel is part of the service name itself (`Online Card` / `POS Card`) rather than a
-separate condition. The source portal defines a `Transfers` category too, but nothing is
-assigned to it, so it isn't rendered.
-
-> The category assignments above are inferred: the source portal has all four categories
-> defined with zero services assigned. Update them here if they are ever assigned for real.
+separate condition. The source portal also groups services by category, but every category
+there is currently empty, so that layer isn't reproduced here.
 
 ## Other conditions
 
