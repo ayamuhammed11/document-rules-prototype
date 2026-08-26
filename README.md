@@ -57,9 +57,14 @@ beyond its service. Settlement type takes a single option; the rest allow severa
 
 ## Matching semantics
 
-Within a condition group: OR. Across groups: AND. A rule (or the built-in universal
-requirements) with no conditions in a group matches everyone. Service is the exception —
-each rule carries exactly one.
+Within a condition group: OR. Across groups: AND.
+
+Every condition group needs at least one option, so a rule can no longer be left open on a
+dimension. The two exceptions: Service carries exactly one, and Settlement type is optional
+— left empty, it simply does not constrain the rule.
+
+(The built-in universal requirements on the onboarding pages — National ID, bank proof —
+still apply to every applicant; that is baked-in demo data, not an authored rule.)
 
 ## Run it
 

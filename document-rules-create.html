@@ -196,7 +196,7 @@
     <main class="page">
       <div class="page-header">
         <h1 class="page-title">Document Rules</h1>
-        <p class="page-subtitle">Define a document requirement rule — pick the service it is built on, narrow it with any extra conditions, then choose which documents become required.</p>
+        <p class="page-subtitle">Define a document requirement rule — pick the service it is built on, set the conditions that trigger it, then choose which documents become required.</p>
       </div>
 
       <div class="tabs">
@@ -221,23 +221,27 @@
           <div class="inline-err" id="nameErr">Rule name is required.</div>
         </div>
 
-        <div class="cond-title">Additional conditions — narrow the rule further</div>
+        <div class="cond-title">Conditions — when does this rule apply?</div>
 
         <div class="cond-group" data-group="entities">
-          <div class="cg-label"><span class="cg-name">Entity Type</span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Entity Type<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="entityChips"></div>
+          <div class="inline-err" id="entitiesErr">Select at least one entity type.</div>
         </div>
         <div class="cond-group" data-group="owners">
-          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Business Owner Nationality<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="ownerChips"></div>
+          <div class="inline-err" id="ownersErr">Select at least one owner nationality.</div>
         </div>
         <div class="cond-group" data-group="industries">
-          <div class="cg-label"><span class="cg-name">Industry</span><button type="button" class="select-all-btn" id="selAllIndustries" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Industry<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllIndustries" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="industryChips"></div>
+          <div class="inline-err" id="industriesErr">Select at least one industry.</div>
         </div>
         <div class="cond-group" data-group="banks">
-          <div class="cg-label"><span class="cg-name">Bank</span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Bank<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
           <div class="chip-row" id="bankChips"></div>
+          <div class="inline-err" id="banksErr">Select at least one bank.</div>
         </div>
         <div class="cond-group" data-group="modules">
           <div class="cg-label"><span class="cg-name">Settlement type</span></div>
@@ -435,6 +439,7 @@
       btn.title = allSelected ? 'Unselect all' : 'Select all';
       btn.setAttribute('aria-label', btn.title);
     });
+    clearConditionErrors();
   }
   function toggleSelectAll(key) {
     const meta = SELECT_ALL_GROUPS[key];
@@ -446,6 +451,15 @@
   Object.entries(SELECT_ALL_GROUPS).forEach(([key, meta]) => {
     $(meta.btn).addEventListener('click', () => toggleSelectAll(key));
   });
+
+  /* Every condition group that needs at least one pick. Service has its own
+     single-select rule, and Settlement type is the one group left optional. */
+  const REQUIRED_CONDITIONS = ['entities', 'owners', 'industries', 'banks'];
+  function clearConditionErrors() {
+    REQUIRED_CONDITIONS.forEach(key => {
+      if (draft[key].length) $(key + 'Err').classList.remove('show');
+    });
+  }
 
   function renderForm() {
     renderChipGroup('docChips', DOC_TYPES, 'docs', draft.docs);
@@ -489,6 +503,10 @@
     if (!name) { $('ruleName').classList.add('invalid'); $('nameErr').classList.add('show'); ok = false; }
     else { $('ruleName').classList.remove('invalid'); $('nameErr').classList.remove('show'); }
     if (!draft.services.length) { $('serviceErr').classList.add('show'); ok = false; }
+    /* Settlement type stays optional; every other condition group needs a pick. */
+    REQUIRED_CONDITIONS.forEach(key => {
+      if (!draft[key].length) { $(key + 'Err').classList.add('show'); ok = false; }
+    });
     if (!draft.docs.length) { $('docErr').classList.add('show'); ok = false; }
     if (!ok) return;
 
