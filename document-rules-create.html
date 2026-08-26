@@ -240,7 +240,7 @@
           <div class="chip-row" id="bankChips"></div>
         </div>
         <div class="cond-group" data-group="modules">
-          <div class="cg-label"><span class="cg-name">Merchant Type</span><button type="button" class="select-all-btn" id="selAllModules" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Settlement type</span></div>
           <div class="chip-row" id="moduleChips"></div>
         </div>
 
@@ -356,6 +356,24 @@
     options.forEach(opt => c.appendChild(chipEl(opt, group, arr)));
   }
 
+  /* Single-select condition group. Stored as a 0-or-1-element array so the saved rule
+     keeps the same shape as the multi-select groups; empty still means "any". */
+  function renderSingleChipGroup(containerId, options, key) {
+    const c = $(containerId);
+    c.innerHTML = '';
+    options.forEach(opt => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'toggle-chip' + (draft[key][0] === opt ? ' on' : '');
+      b.textContent = opt;
+      b.addEventListener('click', () => {
+        draft[key] = draft[key][0] === opt ? [] : [opt];
+        renderSingleChipGroup(containerId, options, key);
+      });
+      c.appendChild(b);
+    });
+  }
+
   function updateDocHint() {
     $('docHint').textContent = draft.docs.length + ' selected';
     if (draft.docs.length) $('docErr').classList.remove('show');
@@ -405,7 +423,6 @@
     owners:     { options: OWNER_NATIONALITIES,  container: 'ownerChips',    btn: 'selAllOwners' },
     industries: { options: INDUSTRIES,           container: 'industryChips', btn: 'selAllIndustries' },
     banks:      { options: BANKS,                container: 'bankChips',    btn: 'selAllBanks' },
-    modules:    { options: MODULES,              container: 'moduleChips',  btn: 'selAllModules' },
     docs:       { options: DOC_TYPES,            container: 'docChips',     btn: 'selAllDocs' },
   };
   const SELECT_ALL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
@@ -436,7 +453,7 @@
     renderChipGroup('ownerChips', OWNER_NATIONALITIES, 'owners', draft.owners);
     renderChipGroup('industryChips', INDUSTRIES, 'industries', draft.industries);
     renderChipGroup('bankChips', BANKS, 'banks', draft.banks);
-    renderChipGroup('moduleChips', MODULES, 'modules', draft.modules);
+    renderSingleChipGroup('moduleChips', MODULES, 'modules');
     renderServiceChips();
     updateServiceHint();
     updateDocHint();
@@ -457,8 +474,10 @@
     $('ruleName').value = rule.name;
     draft.docs = [...rule.docs];
     CONDITION_KEYS.forEach(k => draft[k] = [...rule[k]]);
-    /* Rules saved before the one-service-per-rule change may carry several — keep the first. */
+    /* Rules saved before service and settlement type became single-select may carry
+       several of each — keep the first. */
     draft.services = draft.services.slice(0, 1);
+    draft.modules = draft.modules.slice(0, 1);
     renderForm();
   })();
 

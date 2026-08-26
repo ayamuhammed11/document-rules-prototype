@@ -52,8 +52,8 @@ there is currently empty, so that layer isn't reproduced here.
 ## Other conditions
 
 Entity Type (Individual Seller / Registered Business / Professional Business), Business
-Owner Nationality, Industry, Bank, and Merchant Type (PF / PSP) — used to narrow a rule
-beyond its service.
+Owner Nationality, Industry, Bank, and Settlement type (PF / PSP) — used to narrow a rule
+beyond its service. Settlement type takes a single option; the rest allow several.
 
 ## Matching semantics
 
