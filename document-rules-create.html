@@ -91,6 +91,11 @@
   .tab.active{color:var(--primary);border-bottom-color:var(--primary);}
   .tab:hover:not(.active){color:var(--foreground);}
 
+  /* ---------- Back link ---------- */
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted-foreground);font-size:13px;font-weight:500;margin-bottom:14px;background:none;border:none;padding:0;cursor:pointer;}
+  .back-link svg{width:15px;height:15px;}
+  .back-link:hover{color:var(--primary);}
+
   /* ---------- Card ---------- */
   .card{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius);overflow:hidden;}
   .card-pad{padding:22px;}
@@ -106,13 +111,19 @@
   .inline-err{display:none;font-size:12px;color:var(--destructive);margin-top:6px;}
   .inline-err.show{display:block;}
 
-  /* ---------- Toggle chips (condition / document pickers) ---------- */
+  /* ---------- Toggle chips (condition / document pickers) — outline + check, matching
+     the Pricing Rules criteria chips ---------- */
   .chip-row{display:flex;flex-wrap:wrap;gap:8px;}
-  .toggle-chip{border:1px solid var(--border);background:#fff;color:var(--cadet-base);border-radius:var(--radius);
+  .toggle-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);background:#fff;color:var(--cadet-base);border-radius:2px;
     font-size:12.5px;font-weight:600;padding:7px 12px;cursor:pointer;transition:all .1s ease;}
+  .toggle-chip svg{width:11px;height:11px;flex-shrink:0;}
   .toggle-chip:hover{border-color:var(--primary);color:var(--primary);}
-  .toggle-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .toggle-chip.on{border-color:var(--primary);color:var(--primary);box-shadow:0 1px 2px rgba(0,20,60,.08);}
   .chip-hint{font-size:12px;color:var(--muted-foreground);margin-top:8px;}
+
+  /* ---------- Per-group selection status, matching Pricing Rules' criteria blocks ---------- */
+  .crit-toolbar{display:flex;justify-content:flex-end;margin-bottom:8px;}
+  .crit-status{font-size:12px;color:var(--muted-foreground);white-space:nowrap;}
   /* The service a rule is built on — the rule's primary, single-valued driver. */
   .service-field{border:1px solid var(--border);border-radius:var(--radius);
     padding:15px 15px 13px;background:var(--muted);margin-bottom:22px;}
@@ -208,6 +219,11 @@
         <button class="tab active">Create Rule</button>
       </div>
 
+      <button type="button" class="back-link" id="backLink">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
+        <span id="backLinkLabel">Back to All Rules</span>
+      </button>
+
       <div class="card card-pad">
         <h2 class="card-title" id="cardTitle">New Document Rule</h2>
 
@@ -229,21 +245,25 @@
 
         <div class="cond-group" data-group="entities">
           <div class="cg-label"><span class="cg-name">Entity Type<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
+          <div class="crit-toolbar"><span class="crit-status" id="entityStatus"></span></div>
           <div class="chip-row" id="entityChips"></div>
           <div class="inline-err" id="entitiesErr">Select at least one entity type.</div>
         </div>
         <div class="cond-group" data-group="owners">
           <div class="cg-label"><span class="cg-name">Business Owner Nationality<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
+          <div class="crit-toolbar"><span class="crit-status" id="ownerStatus"></span></div>
           <div class="chip-row" id="ownerChips"></div>
           <div class="inline-err" id="ownersErr">Select at least one owner nationality.</div>
         </div>
         <div class="cond-group" data-group="industries">
           <div class="cg-label"><span class="cg-name">Industry<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllIndustries" title="Select all" aria-label="Select all"></button></div>
+          <div class="crit-toolbar"><span class="crit-status" id="industryStatus"></span></div>
           <div class="chip-row" id="industryChips"></div>
           <div class="inline-err" id="industriesErr">Select at least one industry.</div>
         </div>
         <div class="cond-group" data-group="banks">
           <div class="cg-label"><span class="cg-name">Bank<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
+          <div class="crit-toolbar"><span class="crit-status" id="bankStatus"></span></div>
           <div class="chip-row" id="bankChips"></div>
           <div class="inline-err" id="banksErr">Select at least one bank.</div>
         </div>
@@ -345,24 +365,46 @@
   const draft = { docs: [], entities: [], owners: [], industries: [], banks: [], modules: [], services: [] };
   let editingId = null;
 
-  function chipEl(label, group, arr) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'toggle-chip' + (arr.includes(label) ? ' on' : '');
-    b.textContent = label;
-    b.addEventListener('click', () => {
-      const i = arr.indexOf(label);
-      if (i >= 0) arr.splice(i, 1); else arr.push(label);
-      b.classList.toggle('on');
-      if (group === 'docs') updateDocHint(); else updateSelectAllLabels();
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const CHECK_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75"/></svg>';
+
+  /* Every multi-select chip group gets the same criteria-block treatment as Pricing Rules'
+     — a live "N of M selected" status line — minus its search box, which wasn't wanted here. */
+  const MULTI_GROUPS = {
+    entities:   { options: ENTITIES,            container: 'entityChips',   btn: 'selAllEntities',   status: 'entityStatus' },
+    owners:     { options: OWNER_NATIONALITIES, container: 'ownerChips',    btn: 'selAllOwners',     status: 'ownerStatus' },
+    industries: { options: INDUSTRIES,          container: 'industryChips', btn: 'selAllIndustries', status: 'industryStatus' },
+    banks:      { options: BANKS,               container: 'bankChips',    btn: 'selAllBanks',      status: 'bankStatus' },
+    docs:       { options: DOC_TYPES,           container: 'docChips',     btn: 'selAllDocs',       status: null },
+  };
+
+  function renderMultiGroup(key) {
+    const meta = MULTI_GROUPS[key];
+    const c = $(meta.container);
+    c.innerHTML = '';
+    meta.options.forEach(opt => {
+      const on = draft[key].includes(opt);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'toggle-chip' + (on ? ' on' : '');
+      b.innerHTML = (on ? CHECK_SM : '') + esc(opt);
+      b.addEventListener('click', () => {
+        const i = draft[key].indexOf(opt);
+        if (i >= 0) draft[key].splice(i, 1); else draft[key].push(opt);
+        renderMultiGroup(key);
+        if (key === 'docs') updateDocHint(); else updateGroupStatus(key);
+        clearConditionErrors();
+      });
+      c.appendChild(b);
     });
-    return b;
   }
 
-  function renderChipGroup(containerId, options, group, arr) {
-    const c = $(containerId);
-    c.innerHTML = '';
-    options.forEach(opt => c.appendChild(chipEl(opt, group, arr)));
+  function updateGroupStatus(key) {
+    const meta = MULTI_GROUPS[key];
+    updateSelectAllLabel(key);
+    if (!meta.status) return;
+    const n = draft[key].length, total = meta.options.length;
+    $(meta.status).textContent = total ? (n === total ? 'All ' + total + ' selected' : n + ' of ' + total + ' selected') : '';
   }
 
   /* Single-select condition group. Stored as a 0-or-1-element array so the saved rule
@@ -371,12 +413,13 @@
     const c = $(containerId);
     c.innerHTML = '';
     options.forEach(opt => {
+      const on = draft[key][0] === opt;
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'toggle-chip' + (draft[key][0] === opt ? ' on' : '');
-      b.textContent = opt;
+      b.className = 'toggle-chip' + (on ? ' on' : '');
+      b.innerHTML = (on ? CHECK_SM : '') + esc(opt);
       b.addEventListener('click', () => {
-        draft[key] = draft[key][0] === opt ? [] : [opt];
+        draft[key] = on ? [] : [opt];
         renderSingleChipGroup(containerId, options, key);
         clearConditionErrors();
       });
@@ -387,27 +430,15 @@
   function updateDocHint() {
     $('docHint').textContent = draft.docs.length + ' selected';
     if (draft.docs.length) $('docErr').classList.remove('show');
-    updateSelectAllLabels();
+    updateSelectAllLabel('docs');
   }
 
   /* ══════════ Service — single-select, the rule's primary driver ══════════ */
-  function serviceChip(name) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'toggle-chip' + (draft.services[0] === name ? ' on' : '');
-    b.textContent = name;
-    b.addEventListener('click', () => {
-      draft.services = draft.services[0] === name ? [] : [name];
-      renderServiceChips();
-      updateServiceHint();
-    });
-    return b;
-  }
-
   function renderServiceChips() {
     const root = $('serviceCatalog');
     root.innerHTML = '';
     SERVICE_CATALOG.forEach(tier => {
+      const services = tier.services;
       const group = document.createElement('div');
       group.className = 'svc-group';
       const label = document.createElement('div');
@@ -416,7 +447,19 @@
       group.appendChild(label);
       const row = document.createElement('div');
       row.className = 'chip-row';
-      tier.services.forEach(name => row.appendChild(serviceChip(name)));
+      services.forEach(name => {
+        const on = draft.services[0] === name;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'toggle-chip' + (on ? ' on' : '');
+        b.innerHTML = (on ? CHECK_SM : '') + esc(name);
+        b.addEventListener('click', () => {
+          draft.services = on ? [] : [name];
+          renderServiceChips();
+          updateServiceHint();
+        });
+        row.appendChild(b);
+      });
       group.appendChild(row);
       root.appendChild(group);
     });
@@ -428,33 +471,28 @@
   }
 
   /* ══════════ Select all / Unselect all — one toggle button per chip group ══════════ */
-  const SELECT_ALL_GROUPS = {
-    entities:   { options: ENTITIES,             container: 'entityChips',   btn: 'selAllEntities' },
-    owners:     { options: OWNER_NATIONALITIES,  container: 'ownerChips',    btn: 'selAllOwners' },
-    industries: { options: INDUSTRIES,           container: 'industryChips', btn: 'selAllIndustries' },
-    banks:      { options: BANKS,                container: 'bankChips',    btn: 'selAllBanks' },
-    docs:       { options: DOC_TYPES,            container: 'docChips',     btn: 'selAllDocs' },
-  };
   const SELECT_ALL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
   const UNSELECT_ALL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
-  function updateSelectAllLabels() {
-    Object.entries(SELECT_ALL_GROUPS).forEach(([key, meta]) => {
-      const allSelected = draft[key].length === meta.options.length;
-      const btn = $(meta.btn);
-      btn.innerHTML = allSelected ? UNSELECT_ALL_ICON : SELECT_ALL_ICON;
-      btn.title = allSelected ? 'Unselect all' : 'Select all';
-      btn.setAttribute('aria-label', btn.title);
-    });
+  function updateSelectAllLabel(key) {
+    const meta = MULTI_GROUPS[key];
+    const allSelected = draft[key].length === meta.options.length;
+    const btn = $(meta.btn);
+    btn.innerHTML = allSelected ? UNSELECT_ALL_ICON : SELECT_ALL_ICON;
+    btn.title = allSelected ? 'Unselect all' : 'Select all';
+    btn.setAttribute('aria-label', btn.title);
     clearConditionErrors();
   }
+  function updateSelectAllLabels() {
+    Object.keys(MULTI_GROUPS).forEach(updateSelectAllLabel);
+  }
   function toggleSelectAll(key) {
-    const meta = SELECT_ALL_GROUPS[key];
+    const meta = MULTI_GROUPS[key];
     const allSelected = draft[key].length === meta.options.length;
     draft[key] = allSelected ? [] : [...meta.options];
-    renderChipGroup(meta.container, meta.options, key, draft[key]);
-    if (key === 'docs') updateDocHint(); else updateSelectAllLabels();
+    renderMultiGroup(key);
+    if (key === 'docs') updateDocHint(); else updateGroupStatus(key);
   }
-  Object.entries(SELECT_ALL_GROUPS).forEach(([key, meta]) => {
+  Object.entries(MULTI_GROUPS).forEach(([key, meta]) => {
     $(meta.btn).addEventListener('click', () => toggleSelectAll(key));
   });
 
@@ -468,15 +506,12 @@
   }
 
   function renderForm() {
-    renderChipGroup('docChips', DOC_TYPES, 'docs', draft.docs);
-    renderChipGroup('entityChips', ENTITIES, 'entities', draft.entities);
-    renderChipGroup('ownerChips', OWNER_NATIONALITIES, 'owners', draft.owners);
-    renderChipGroup('industryChips', INDUSTRIES, 'industries', draft.industries);
-    renderChipGroup('bankChips', BANKS, 'banks', draft.banks);
+    Object.keys(MULTI_GROUPS).forEach(renderMultiGroup);
     renderSingleChipGroup('moduleChips', MODULES, 'modules');
     renderServiceChips();
     updateServiceHint();
     updateDocHint();
+    Object.keys(MULTI_GROUPS).forEach(key => { if (key !== 'docs') updateGroupStatus(key); });
     updateSelectAllLabels();
   }
 
@@ -509,6 +544,7 @@
     editingId = rule.id;
     $('cardTitle').textContent = 'Edit Document Rule';
     $('saveRuleLabel').textContent = 'Save Changes';
+    $('backLinkLabel').textContent = 'Cancel editing rule';
     $('ruleName').value = rule.name;
     draft.docs = [...rule.docs];
     CONDITION_KEYS.forEach(k => draft[k] = [...rule[k]]);
@@ -520,6 +556,7 @@
   })();
 
   $('cancelRuleBtn').addEventListener('click', () => { location.href = 'document-rules.html'; });
+  $('backLink').addEventListener('click', () => { location.href = 'document-rules.html'; });
 
   $('saveRuleBtn').addEventListener('click', () => {
     const name = $('ruleName').value.trim();
@@ -527,7 +564,8 @@
     if (!name) { $('ruleName').classList.add('invalid'); $('nameErr').classList.add('show'); ok = false; }
     else { $('ruleName').classList.remove('invalid'); $('nameErr').classList.remove('show'); }
     if (!draft.services.length) { $('serviceErr').classList.add('show'); ok = false; }
-    /* Settlement type stays optional; every other condition group needs a pick. */
+    /* Service and Settlement type are validated separately above/below — every other
+       condition group also needs at least one pick. */
     REQUIRED_CONDITIONS.forEach(key => {
       if (!draft[key].length) { $(key + 'Err').classList.add('show'); ok = false; }
     });

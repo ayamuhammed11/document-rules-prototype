@@ -105,24 +105,29 @@
   .card-title{font-size:16px;margin:0 0 4px;}
   .card-desc{font-size:13px;color:var(--muted-foreground);margin:0 0 18px;max-width:680px;line-height:1.5;}
 
-  /* ---------- Filters ---------- */
-  .filters-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 18px;margin-bottom:18px;}
-  .field{margin-bottom:0;}
-  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--cadet-base);margin-bottom:6px;}
-  .field select{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;color:var(--foreground);outline:none;background:#fff;}
-  .field select:focus{border-color:var(--primary);}
-  .match-count{font-size:13px;color:var(--muted-foreground);margin:0 0 14px;}
+  /* ---------- Search + filters ---------- */
+  .search-wrap{position:relative;max-width:280px;margin-bottom:12px;}
+  .search-wrap svg{position:absolute;left:11px;top:9px;color:var(--muted-foreground);width:15px;height:15px;}
+  .search-wrap input{width:100%;padding-inline-start:32px;border:1px solid var(--border);border-radius:var(--radius);padding-block:9px;padding-inline-end:11px;color:var(--foreground);outline:none;background:#fff;}
+  .search-wrap input:focus{border-color:var(--primary);}
+  .filters-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .filters-row select{border:1px solid var(--border);border-radius:var(--radius);padding:7px 9px;background:#fff;font-size:12.5px;color:var(--foreground);outline:none;}
+  .filters-row select:focus{border-color:var(--primary);}
 
-  /* ---------- Rule list (record cards) ---------- */
-  .rule-list{display:flex;flex-direction:column;}
-  .record-card{display:flex;align-items:flex-start;gap:14px;padding:16px;border:1px solid var(--border-subtle);border-radius:var(--radius);background:#fff;margin-bottom:10px;}
-  .record-icon{width:36px;height:36px;border-radius:var(--radius);background:var(--primary-10);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .record-icon svg{width:18px;height:18px;}
-  .record-body{flex:1;min-width:0;}
+  /* ---------- Rule tables (grouped by service) ---------- */
+  .section-title{font-family:'Outfit',sans-serif;font-weight:600;font-size:14.5px;margin:28px 0 12px;}
+  .section-title:first-child{margin-top:0;}
+  .section-title .n{font-weight:400;color:var(--muted-foreground);text-transform:none;font-size:12px;}
+  table{width:100%;border-collapse:collapse;}
+  thead th{text-align:start;font-size:11px;font-weight:600;color:var(--cadet-base);text-transform:uppercase;letter-spacing:.03em;background:var(--muted);padding:11px 16px;border-bottom:1px solid var(--border);}
+  tbody td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13.5px;}
+  tbody tr:last-child td{border-bottom:none;}
+  .row-click{cursor:pointer;}
+  .row-click:hover{background:var(--primary-10);}
   .svc-name{font-weight:600;color:var(--foreground);font-size:13.5px;}
   .svc-desc{color:var(--muted-foreground);font-size:12.5px;margin-top:3px;line-height:1.5;}
-  .rc-conds{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;}
-  .record-actions{display:flex;gap:4px;flex-shrink:0;}
+  .chevron-affordance{color:var(--muted-foreground);width:24px;}
+  .chevron-affordance svg{width:16px;height:16px;transform:rotate(-90deg);}
 
   /* ---------- Chips (status pills) ---------- */
   .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:2px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
@@ -166,18 +171,18 @@
   .confirm-text b{color:var(--foreground);}
 
   /* Rule details (read-only) */
-  .ro-note{display:flex;align-items:center;gap:8px;background:var(--primary-10);color:var(--primary);border-radius:var(--radius);padding:10px 12px;font-size:13px;margin-bottom:18px;}
-  .ro-note svg{width:18px;height:18px;flex-shrink:0;}
+  .detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
+  .detail-actions{display:flex;gap:8px;align-items:center;}
   .vd-section{margin-bottom:18px;}
   .vd-section:last-child{margin-bottom:0;}
   .vd-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:9px;}
-  .vd-name{font-size:15px;font-weight:700;color:var(--foreground);}
   .vd-doc{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--foreground);padding:7px 0;border-bottom:1px solid var(--border-subtle);}
   .vd-doc:last-child{border-bottom:none;}
   .vd-doc svg{width:15px;height:15px;color:var(--success);flex-shrink:0;}
-  .vd-cond{display:flex;gap:10px;padding:7px 0;}
-  .vd-cond-key{font-size:12.5px;color:var(--cadet-base);min-width:150px;flex-shrink:0;}
-  .vd-cond-val{display:flex;gap:6px;flex-wrap:wrap;}
+  .kv-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle);font-size:13px;}
+  .kv-row:last-child{border-bottom:none;}
+  .kv-row .k{color:var(--muted-foreground);flex-shrink:0;}
+  .kv-row .v{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
 
   #toast{position:fixed;bottom:24px;inset-inline-end:24px;background:var(--foreground);color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:200;display:flex;align-items:center;gap:8px;}
   #toast.show{opacity:1;transform:translateY(0);}
@@ -189,11 +194,13 @@
     .nav-item{justify-content:center;}
     .main{margin-inline-start:64px;}
     .page{padding:8px 14px 40px;}
-    .filters-row{grid-template-columns:repeat(2,1fr);}
   }
   @media (max-width:640px){
-    .filters-row{grid-template-columns:1fr;}
     .page-header{flex-direction:column;}
+    table thead{display:none;}
+    table,tbody,tr,td{display:block;width:100%;}
+    tbody tr{border-bottom:1px solid var(--border);padding:12px 16px;}
+    tbody td{border:none;padding:4px 0;}
   }
 </style>
 </head>
@@ -242,7 +249,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Document Rules</h1>
-          <p class="page-subtitle">Create customized rules that decide which documents a merchant must submit to proceed with the onboarding application — driven by conditions such as entity type, owner nationality, industry, bank, merchant type, and service. A rule with no conditions applies to every applicant.</p>
+          <p class="page-subtitle">Each rule targets a specific service, plus entity type, owner nationality, industry, bank and settlement type, to decide which documents a merchant must submit to proceed with onboarding.</p>
         </div>
         <a class="btn btn-primary" href="document-rules-create.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
@@ -255,43 +262,28 @@
         <a class="tab" href="document-rules-create.html" style="text-decoration:none;display:inline-block">Create Rule</a>
       </div>
 
-      <!-- ══════════ Requirement Rules ══════════ -->
-      <div class="card card-pad" style="margin-bottom:22px;">
-        <h2 class="card-title">Requirement Rules</h2>
-        <p class="card-desc">Each rule links one or more document types to conditions. When the merchant or salesperson's selections during onboarding match the conditions, the documents are displayed and required to proceed. Empty conditions = required for everyone.</p>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+        <input type="text" id="ruleSearch" placeholder="Search by rule name…">
+      </div>
+      <div class="filters-row">
+        <select id="fEntity"><option value="">All entities</option></select>
+        <select id="fBank"><option value="">All banks</option></select>
+        <select id="fModule"><option value="">All settlement types</option></select>
+        <select id="fService"><option value="">All services</option></select>
+      </div>
 
-        <!-- Filters -->
-        <div class="filters-row">
-          <div class="field">
-            <label for="fEntity">Filter by Entity</label>
-            <select id="fEntity"><option value="">All</option></select>
-          </div>
-          <div class="field">
-            <label for="fBank">Filter by Bank</label>
-            <select id="fBank"><option value="">All</option></select>
-          </div>
-          <div class="field">
-            <label for="fModule">Filter by Settlement type</label>
-            <select id="fModule"><option value="">All</option></select>
-          </div>
-          <div class="field">
-            <label for="fService">Filter by Service</label>
-            <select id="fService"><option value="">All</option></select>
-          </div>
-        </div>
+      <div id="ruleGroups"></div>
 
-        <p class="match-count" id="matchCount">— rules matching filters</p>
-
-        <div class="rule-list" id="ruleList"></div>
-
-        <div class="empty-state" id="rulesEmpty">
+      <div class="card" id="rulesEmpty">
+        <div class="empty-state">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
           <p id="emptyText" style="margin-bottom:0;">No documents rules yet — create your first one.</p>
         </div>
       </div>
 
       <!-- ══════════ Events ══════════ -->
-      <div class="card card-pad">
+      <div class="card card-pad" style="margin-top:32px;">
         <h2 class="card-title">Events</h2>
         <p class="card-desc">Full audit trail of this module — every rule that is created, updated, or deleted is recorded here with who did it and when.</p>
         <div id="eventsList"></div>
@@ -311,10 +303,6 @@
       <button class="btn-icon" id="viewClose" aria-label="Close">&#10005;</button>
     </div>
     <div class="modal-body">
-      <div class="ro-note">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-        View only — this rule cannot be changed from here.
-      </div>
       <div id="viewContent"></div>
     </div>
     <div class="modal-footer">
@@ -422,6 +410,7 @@
   fillSelect('fModule', MODULES);
   fillSelect('fService', SERVICES);
   ['fEntity', 'fBank', 'fModule', 'fService'].forEach(id => $(id).addEventListener('change', renderRules));
+  $('ruleSearch').addEventListener('input', renderRules);
 
   function ruleVisible(r) {
     const fe = $('fEntity').value, fb = $('fBank').value, fm = $('fModule').value, fs = $('fService').value;
@@ -429,91 +418,105 @@
     if (fb && r.banks.length && !r.banks.includes(fb)) return false;
     if (fm && r.modules.length && !r.modules.includes(fm)) return false;
     if (fs && r.services.length && !r.services.includes(fs)) return false;
+    const q = $('ruleSearch').value.trim().toLowerCase();
+    if (q && !r.name.toLowerCase().includes(q)) return false;
     return true;
   }
 
-  /* ══════════ Rule list ══════════ */
-  const DOC_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>';
-  const PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>';
-  const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>';
-  const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
+  /* ══════════ Rule list — grouped by service, one table per group ══════════
+     Matches the Pricing Rules page: rows carry no inline actions, a chevron
+     affordance opens the read-only detail (here, a modal instead of a full
+     page), where Edit and Delete live. */
+  const CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>';
   const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const joinOr = vals => vals.length ? vals.map(esc).join(', ') : '—';
 
   function renderRules() {
-    const list = $('ruleList');
+    const groupsEl = $('ruleGroups');
     const visible = rules.filter(ruleVisible);
-    $('matchCount').textContent = visible.length + (visible.length === 1 ? ' rule' : ' rules') + ' matching filters';
+    groupsEl.innerHTML = '';
     $('rulesEmpty').style.display = visible.length === 0 ? 'block' : 'none';
     $('emptyText').textContent = rules.length === 0
       ? 'No documents rules yet — create your first one.'
       : 'No rules match your filters — try clearing them, or add a new rule.';
-    list.innerHTML = '';
+    if (visible.length === 0) return;
 
-    visible.forEach(r => {
+    SERVICES.forEach(service => {
+      const groupRules = visible.filter(r => r.services[0] === service);
+      if (!groupRules.length) return;
+
+      const section = document.createElement('div');
+      section.className = 'section-title';
+      section.innerHTML = esc(service) + ' <span class="n">— ' + groupRules.length + (groupRules.length === 1 ? ' rule' : ' rules') + '</span>';
+      groupsEl.appendChild(section);
+
       const card = document.createElement('div');
-      card.className = 'record-card';
-
-      const pill = (v, isEntity) => '<span class="chip ' + (isEntity ? 'chip-accent' : 'chip-muted') + '">' + esc(v) + '</span>';
-      let conds = r.entities.map(v => pill(v, true)).join('');
-      conds += r.owners.map(v => pill(v)).join('');
-      conds += r.industries.map(v => pill(v)).join('');
-      conds += r.banks.map(v => pill(v)).join('');
-      conds += r.modules.map(v => pill(v)).join('');
-      conds += r.services.map(v => pill(v)).join('');
-
+      card.className = 'card';
+      card.style.marginBottom = '4px';
       card.innerHTML =
-        '<div class="record-icon">' + DOC_ICON + '</div>' +
-        '<div class="record-body">' +
-          '<div class="svc-name">' + esc(r.name) + '</div>' +
-          '<div class="svc-desc">' + r.docs.map(esc).join(' &nbsp;·&nbsp; ') +
-            (r.docs.length > 1 ? ' <span style="color:var(--muted-foreground)">(' + r.docs.length + ' docs)</span>' : '') +
-          '</div>' +
-          '<div class="rc-conds">' + conds + '</div>' +
-        '</div>' +
-        '<div class="record-actions">' +
-          '<button class="btn-icon" data-act="view" title="View rule details">' + EYE + '</button>' +
-          '<button class="btn-icon" data-act="edit" title="Edit rule">' + PENCIL + '</button>' +
-          '<button class="btn-icon" data-act="delete" title="Delete rule">' + TRASH + '</button>' +
-        '</div>';
+        '<table><thead><tr>' +
+          '<th>Rule name</th><th>Entity Type</th><th>Owner Nationality</th><th>Industry</th>' +
+          '<th>Bank</th><th>Settlement Type</th><th>Documents</th><th></th>' +
+        '</tr></thead><tbody></tbody></table>';
+      const tbody = card.querySelector('tbody');
 
-      card.querySelector('[data-act="view"]').addEventListener('click', () => openView(r));
-      card.querySelector('[data-act="edit"]').addEventListener('click', () => {
-        location.href = 'document-rules-create.html?edit=' + encodeURIComponent(r.id);
+      groupRules.forEach(r => {
+        const row = document.createElement('tr');
+        row.className = 'row-click';
+        row.innerHTML =
+          '<td class="svc-name">' + esc(r.name) + '</td>' +
+          '<td>' + joinOr(r.entities) + '</td>' +
+          '<td>' + joinOr(r.owners) + '</td>' +
+          '<td>' + joinOr(r.industries) + '</td>' +
+          '<td>' + joinOr(r.banks) + '</td>' +
+          '<td>' + joinOr(r.modules) + '</td>' +
+          '<td>' + r.docs.length + (r.docs.length === 1 ? ' doc' : ' docs') + '</td>' +
+          '<td class="chevron-affordance">' + CHEVRON + '</td>';
+        row.addEventListener('click', () => openView(r));
+        tbody.appendChild(row);
       });
-      card.querySelector('[data-act="delete"]').addEventListener('click', () => openDelete(r));
-      list.appendChild(card);
+
+      groupsEl.appendChild(card);
     });
   }
 
   /* ══════════ View rule (read-only) ══════════ */
+  const PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>';
+  const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
+
   const COND_LABELS = [
+    ['services',   'Service'],
     ['entities',   'Entity Type'],
     ['owners',     'Business Owner Nationality'],
     ['industries', 'Industry'],
     ['banks',      'Bank'],
     ['modules',    'Settlement type'],
-    ['services',   'Service'],
   ];
 
   function openView(r) {
     const docs = r.docs.map(d => '<div class="vd-doc">' + CHECK_ICON + esc(d) + '</div>').join('');
 
-    const conds = COND_LABELS.map(([key, label]) => {
+    const kvRows = COND_LABELS.map(([key, label]) => {
       const vals = r[key];
-      if (!vals.length) return '';
-      const pillClass = key === 'entities' ? 'chip-accent' : 'chip-muted';
+      const pillClass = key === 'entities' || key === 'services' ? 'chip-accent' : 'chip-muted';
       const body = vals.map(v => '<span class="chip ' + pillClass + '">' + esc(v) + '</span>').join('');
-      return '<div class="vd-cond"><div class="vd-cond-key">' + label + '</div>' +
-             '<div class="vd-cond-val">' + body + '</div></div>';
+      return '<div class="kv-row"><span class="k">' + label + '</span><span class="v">' + body + '</span></div>';
     }).join('');
 
     $('viewContent').innerHTML =
-      '<div class="vd-section"><div class="vd-label">Rule Name</div>' +
-        '<div class="vd-name">' + esc(r.name) + '</div></div>' +
-      '<div class="vd-section"><div class="vd-label">Required Documents (' + r.docs.length + ')</div>' +
-        docs + '</div>' +
-      '<div class="vd-section"><div class="vd-label">Conditions — when is this document required?</div>' +
-        conds + '</div>';
+      '<div class="detail-head"><h2 style="font-size:16px;margin:0;">' + esc(r.name) + '</h2>' +
+        '<div class="detail-actions">' +
+          '<button class="btn btn-destructive-outline btn-sm" id="viewDeleteBtn">' + TRASH + 'Delete</button>' +
+          '<button class="btn btn-primary btn-sm" id="viewEditBtn">' + PENCIL + 'Edit rule</button>' +
+        '</div></div>' +
+      kvRows +
+      '<div class="vd-section" style="margin-top:18px;"><div class="vd-label">Required Documents (' + r.docs.length + ')</div>' +
+        docs + '</div>';
+
+    $('viewEditBtn').addEventListener('click', () => {
+      location.href = 'document-rules-create.html?edit=' + encodeURIComponent(r.id);
+    });
+    $('viewDeleteBtn').addEventListener('click', () => { closeView(); openDelete(r); });
 
     $('viewBackdrop').classList.add('open');
   }
