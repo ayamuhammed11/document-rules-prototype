@@ -8,9 +8,10 @@ collapsible **Documents** module.
 
 ## Pages
 
-- **[document-rules.html](document-rules.html)** — **All Rules.** The agent-portal list of
-  requirement rules, with filters by entity, bank, settlement type, and service, an Events
-  audit trail, and view/edit/delete actions on each rule.
+- **[document-rules.html](document-rules.html)** — **All Rules.** Rules grouped into a table
+  per service, with a rule-name search box, filters by entity, bank, settlement type, and
+  service, and an Events audit trail. Clicking a row opens its detail view, with Edit and
+  Delete actions there.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
   builder, reached from All Rules' tab bar or "Add Rule" — also handles editing an existing
