@@ -15,12 +15,13 @@ collapsible **Documents** module.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
   builder, reached from All Rules' tab bar or "Create Rule" — also handles editing an existing
-  rule via `?edit=<id>`. Every rule targets a single **channel** (Step 1) and a single
-  **service** within it (Step 2), then is narrowed with any additional conditions (merchant
-  type, owner nationality, industry, financial institution, settlement type) before choosing
-  which document types become required. Rules, ids, and events are shared with the list page
-  through `localStorage`, so actions on either page are reflected on the other without a
-  backend.
+  rule via `?edit=<id>`. Fields follow the Pricing Rules wizard's own order: Rule Name, then
+  a single **channel** (Step 1) and a single **service** within it (Step 2), then merchant
+  type, owner nationality, industry, settlement type, and financial institution, before
+  choosing which document types become required — all as one flat, identically-styled
+  sequence, with no divider between the primary fields and the rest. Rules, ids, and events
+  are shared with the list page through `localStorage`, so actions on either page are
+  reflected on the other without a backend.
 
 - **[document-types.html](document-types.html)** — **Document Types.** The catalogue the
   rules draw on: each document type's name (English and Arabic), description, required
