@@ -250,7 +250,7 @@
           <div class="inline-err" id="entitiesErr">Select at least one merchant type.</div>
         </div>
         <div class="cond-group" data-group="owners">
-          <div class="cg-label"><span class="cg-name">Business Owner Nationality<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
           <div class="crit-toolbar"><span class="crit-status" id="ownerStatus"></span></div>
           <div class="chip-row" id="ownerChips"></div>
           <div class="inline-err" id="ownersErr">Select at least one owner nationality.</div>
@@ -285,7 +285,7 @@
         <div class="form-actions">
           <button class="btn btn-primary" id="saveRuleBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-            <span id="saveRuleLabel">Add Rule</span>
+            <span id="saveRuleLabel">Create Rule</span>
           </button>
           <button class="btn btn-outline" id="cancelRuleBtn">Cancel</button>
         </div>
@@ -314,7 +314,7 @@
   const INDUSTRIES = ['Retail & E-commerce', 'Food & Beverage', 'Healthcare / Pharmacy', 'Education',
     'Travel & Tourism', 'Professional Services', 'Technology / SaaS', 'Real Estate', 'Automotive',
     'Fashion & Beauty', 'Entertainment & Media', 'Non-profit / NGO', 'Government', 'Financial Services',
-    'Insurance', 'Marketplace', 'Logistics & Delivery', 'Other'];
+    'Insurance', 'Marketplace', 'Logistics & Delivery'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
   /* Service catalog — matches the Pricing Rules module's own service list: every
@@ -503,9 +503,10 @@
     $(meta.btn).addEventListener('click', () => toggleSelectAll(key));
   });
 
-  /* Every condition group needs a pick. Service and Settlement type are single-select,
-     so for them that means exactly one. */
-  const REQUIRED_CONDITIONS = ['entities', 'owners', 'industries', 'banks', 'modules'];
+  /* Every condition group needs a pick, except Business Owner Nationality, which stays
+     optional. Service and Settlement type are single-select, so for them that means
+     exactly one. */
+  const REQUIRED_CONDITIONS = ['entities', 'industries', 'banks', 'modules'];
   function clearConditionErrors() {
     REQUIRED_CONDITIONS.forEach(key => {
       if (draft[key].length) $(key + 'Err').classList.remove('show');
@@ -571,8 +572,8 @@
     if (!name) { $('ruleName').classList.add('invalid'); $('nameErr').classList.add('show'); ok = false; }
     else { $('ruleName').classList.remove('invalid'); $('nameErr').classList.remove('show'); }
     if (!draft.services.length) { $('serviceErr').classList.add('show'); ok = false; }
-    /* Service and Settlement type are validated separately above/below — every other
-       condition group also needs at least one pick. */
+    /* Service is validated separately above — every other required condition group
+       needs at least one pick too (Business Owner Nationality is the one exception). */
     REQUIRED_CONDITIONS.forEach(key => {
       if (!draft[key].length) { $(key + 'Err').classList.add('show'); ok = false; }
     });

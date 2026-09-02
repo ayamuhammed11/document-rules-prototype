@@ -253,7 +253,7 @@
         </div>
         <a class="btn btn-primary" href="document-rules-create.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Rule
+          Create Rule
         </a>
       </div>
 
@@ -498,8 +498,11 @@
   function openView(r) {
     const docs = r.docs.map(d => '<div class="vd-doc">' + CHECK_ICON + esc(d) + '</div>').join('');
 
+    /* Business Owner Nationality is the one optional condition group — omit its row
+       rather than show a label with nothing next to it when a rule leaves it unset. */
     const kvRows = COND_LABELS.map(([key, label]) => {
       const vals = r[key];
+      if (!vals.length) return '';
       const pillClass = key === 'entities' || key === 'services' ? 'chip-accent' : 'chip-muted';
       const body = vals.map(v => '<span class="chip ' + pillClass + '">' + esc(v) + '</span>').join('');
       return '<div class="kv-row"><span class="k">' + label + '</span><span class="v">' + body + '</span></div>';

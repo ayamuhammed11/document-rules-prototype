@@ -14,7 +14,7 @@ collapsible **Documents** module.
   view, with Edit and Delete actions there.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
-  builder, reached from All Rules' tab bar or "Add Rule" — also handles editing an existing
+  builder, reached from All Rules' tab bar or "Create Rule" — also handles editing an existing
   rule via `?edit=<id>`. Every rule is built on a **single service**, picked first, and then
   narrowed with any additional conditions (merchant type, owner nationality, industry,
   financial institution, settlement type) before choosing which document types become
@@ -70,15 +70,16 @@ catalog either.
 Merchant Type (Individual Seller / Registered Business / Professional Business), Business
 Owner Nationality, Industry, Financial Institution, and Settlement type (PF / PSP) — used to
 narrow a rule beyond its service. Settlement type takes a single option; the rest allow
-several.
+several. Business Owner Nationality is the one optional condition — every other group needs
+at least one pick.
 
 ## Matching semantics
 
 Within a condition group: OR. Across groups: AND.
 
-Every condition group needs at least one option, so a rule can no longer be left open on a
-dimension. Service and Settlement type are single-select, so for them that means exactly
-one.
+Every condition group needs at least one option, except Business Owner Nationality, which
+stays optional and simply omits from the rule when left unset. Service and Settlement type
+are single-select, so for them "at least one" means exactly one.
 
 On load, both Document Rules pages prune stale saved rules — those written before the
 catalog shrank or before every condition became required. A rule keeps whatever services
