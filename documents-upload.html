@@ -321,7 +321,7 @@
           <p class="card-hint">Tell us about your business and the services you need. This determines which documents are required — the same rules your account manager configures in Document Rules.</p>
           <div class="crit-grid">
             <div class="crit-group">
-              <div class="crit-label">Entity Type<span class="req">*</span></div>
+              <div class="crit-label">Merchant Type<span class="req">*</span></div>
               <div class="crit-chips" id="critEntity"></div>
             </div>
             <div class="crit-group">
@@ -333,7 +333,7 @@
               <select class="crit-select" id="critIndustry"><option value="">Select industry…</option></select>
             </div>
             <div class="crit-group">
-              <div class="crit-label">Bank<span class="req">*</span></div>
+              <div class="crit-label">Financial Institution<span class="req">*</span></div>
               <select class="crit-select" id="critBank"><option value="">Select bank…</option></select>
             </div>
             <div class="crit-group">
@@ -407,17 +407,19 @@
     'Insurance', 'Marketplace', 'Logistics & Delivery', 'Other'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  /* Service catalog — mirrors the Kashier Services operations portal: services split
-     into Basic / Add-on tiers. Channel is part of the service name itself
-     (Online Card / POS Card). */
+  /* Service catalog — matches the Pricing Rules module's own service list: every
+     method Pricing Rules can target, available both Online and POS. Channel is part
+     of the service name itself (Online Card / POS Card). */
   const SERVICE_CATALOG = [
-    { tier: 'Basic Services', services: ['Online Card', 'Online Wallet', 'Online Auth n Cap',
-      'POS Card', 'POS Wallet', 'POS Auth n Cap'] },
-    { tier: 'Add-on Services', services: ['Branches', 'Currency Conversion', 'Instant Settlement'] },
+    { tier: 'Online', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online OCTO', 'Online Souhoola',
+      'Online Contact', 'Online Basata', 'Online Mogo', 'Online Tru', 'Online Forsa', 'Online Aman',
+      'Online Bank Installments', 'Online Transfer', 'Online Instapay'] },
+    { tier: 'POS', services: ['POS Card', 'POS Wallet', 'POS Valu', 'POS OCTO', 'POS Souhoola',
+      'POS Contact', 'POS Basata', 'POS Mogo', 'POS Tru', 'POS Forsa', 'POS Aman',
+      'POS Bank Installments', 'POS Transfer', 'POS Instapay'] },
   ];
-  const BASIC_SERVICES = SERVICE_CATALOG[0].services;
-  const ADDON_SERVICES = SERVICE_CATALOG[1].services;
-  const SERVICES = [...BASIC_SERVICES, ...ADDON_SERVICES];
+  const SERVICES = SERVICE_CATALOG[0].services.concat(SERVICE_CATALOG[1].services);
+  const BASIC_SERVICES = SERVICES;
 
   /* ══════════ Document metadata — presentation details per document type ══════════ */
   const DOC_META = {
@@ -460,7 +462,6 @@
     { name: 'Commercial Registration', docs: ['Commercial Registration (CR)'],                                entities: ['Registered Business'], owners: [], industries: [], banks: [], modules: [], services: [] },
     { name: 'Foreign owner KYC',       docs: ["Owner's Passport", "Owner's Residence Card"],                  entities: [], owners: ['Foreign Owner'], industries: [], banks: [], modules: [], services: [] },
     { name: 'Bank Misr PSP annex',     docs: ['BM PSP Agreement Annex'],                                      entities: [], owners: [], industries: [], banks: ['Bank Misr'], modules: ['PSP'], services: [] },
-    { name: 'Payouts contract',        docs: ['Signed Payout Contract', 'Disbursement Authorization Letter'], entities: [], owners: [], industries: [], banks: [], modules: [], services: ['Instant Settlement'] },
     { name: 'Online services',         docs: ['Brand Authorization Letter'],                                  entities: [], owners: [], industries: [], banks: [], modules: [], services: BASIC_SERVICES.filter(s => s.startsWith('Online ')) },
     { name: 'POS services',            docs: ['Store Lease / Location Proof'],                                entities: [], owners: [], industries: [], banks: [], modules: [], services: BASIC_SERVICES.filter(s => s.startsWith('POS ')) },
   ];
@@ -597,7 +598,10 @@
     });
   }
 
-  /* Services picker mirrors the Kashier Services portal: Basic / Add-on tiers. */
+  /* Services picker mirrors the Pricing Rules module: grouped by channel (Online / POS).
+     The group header already supplies the channel, so each chip's own label only needs
+     the method name — the stored value keeps the full "Online Card" / "POS Card" form. */
+  const stripChannel = name => name.replace(/^(Online|POS) /, '');
   function renderServiceCatalogChips() {
     const c = $('critService'); c.innerHTML = '';
     SERVICE_CATALOG.forEach(tier => {
@@ -613,7 +617,7 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'crit-chip' + (criteria.services.includes(name) ? ' on' : '');
-        b.textContent = name;
+        b.textContent = stripChannel(name);
         b.addEventListener('click', () => {
           const i = criteria.services.indexOf(name);
           if (i >= 0) criteria.services.splice(i, 1); else criteria.services.push(name);

@@ -249,7 +249,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Document Rules</h1>
-          <p class="page-subtitle">Each rule targets a specific service, plus entity type, owner nationality, industry, bank and settlement type, to decide which documents a merchant must submit to proceed with onboarding.</p>
+          <p class="page-subtitle">Each rule targets a specific service, plus merchant type, owner nationality, industry, financial institution and settlement type, to decide which documents a merchant must submit to proceed with onboarding.</p>
         </div>
         <a class="btn btn-primary" href="document-rules-create.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
@@ -267,8 +267,8 @@
         <input type="text" id="ruleSearch" placeholder="Search by rule name…">
       </div>
       <div class="filters-row">
-        <select id="fEntity"><option value="">All entities</option></select>
-        <select id="fBank"><option value="">All banks</option></select>
+        <select id="fEntity"><option value="">All merchant types</option></select>
+        <select id="fBank"><option value="">All financial institutions</option></select>
         <select id="fModule"><option value="">All settlement types</option></select>
         <select id="fService"><option value="">All services</option></select>
       </div>
@@ -337,17 +337,19 @@
   const ENTITIES = ['Individual Seller', 'Registered Business', 'Professional Business'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  /* Service catalog — mirrors the Kashier Services operations portal: services split
-     into Basic / Add-on tiers. Channel is part of the service name itself
-     (Online Card / POS Card). */
+  /* Service catalog — matches the Pricing Rules module's own service list: every
+     method Pricing Rules can target, available both Online and POS. Channel is part
+     of the service name itself (Online Card / POS Card). */
   const SERVICE_CATALOG = [
-    { tier: 'Basic Services', services: ['Online Card', 'Online Wallet', 'Online Auth n Cap',
-      'POS Card', 'POS Wallet', 'POS Auth n Cap'] },
-    { tier: 'Add-on Services', services: ['Branches', 'Currency Conversion', 'Instant Settlement'] },
+    { tier: 'Online', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online OCTO', 'Online Souhoola',
+      'Online Contact', 'Online Basata', 'Online Mogo', 'Online Tru', 'Online Forsa', 'Online Aman',
+      'Online Bank Installments', 'Online Transfer', 'Online Instapay'] },
+    { tier: 'POS', services: ['POS Card', 'POS Wallet', 'POS Valu', 'POS OCTO', 'POS Souhoola',
+      'POS Contact', 'POS Basata', 'POS Mogo', 'POS Tru', 'POS Forsa', 'POS Aman',
+      'POS Bank Installments', 'POS Transfer', 'POS Instapay'] },
   ];
-  const BASIC_SERVICES = SERVICE_CATALOG[0].services;
-  const ADDON_SERVICES = SERVICE_CATALOG[1].services;
-  const SERVICES = [...BASIC_SERVICES, ...ADDON_SERVICES];
+  const SERVICES = SERVICE_CATALOG[0].services.concat(SERVICE_CATALOG[1].services);
+  const BASIC_SERVICES = SERVICES;
 
   const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services'];
   /* ══════════ Shared storage — rules, ids, and events are read/written here and on
@@ -455,8 +457,8 @@
       card.style.marginBottom = '4px';
       card.innerHTML =
         '<table><thead><tr>' +
-          '<th>Rule name</th><th>Entity Type</th><th>Owner Nationality</th><th>Industry</th>' +
-          '<th>Bank</th><th>Settlement Type</th><th>Documents</th><th></th>' +
+          '<th>Rule name</th><th>Merchant Type</th><th>Owner Nationality</th><th>Industry</th>' +
+          '<th>Financial Institution</th><th>Settlement Type</th><th>Documents</th><th></th>' +
         '</tr></thead><tbody></tbody></table>';
       const tbody = card.querySelector('tbody');
 
@@ -486,10 +488,10 @@
 
   const COND_LABELS = [
     ['services',   'Service'],
-    ['entities',   'Entity Type'],
+    ['entities',   'Merchant Type'],
     ['owners',     'Business Owner Nationality'],
     ['industries', 'Industry'],
-    ['banks',      'Bank'],
+    ['banks',      'Financial Institution'],
     ['modules',    'Settlement type'],
   ];
 

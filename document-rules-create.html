@@ -244,10 +244,10 @@
         <div class="cond-title">Conditions — when does this rule apply?</div>
 
         <div class="cond-group" data-group="entities">
-          <div class="cg-label"><span class="cg-name">Entity Type<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Merchant Type<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
           <div class="crit-toolbar"><span class="crit-status" id="entityStatus"></span></div>
           <div class="chip-row" id="entityChips"></div>
-          <div class="inline-err" id="entitiesErr">Select at least one entity type.</div>
+          <div class="inline-err" id="entitiesErr">Select at least one merchant type.</div>
         </div>
         <div class="cond-group" data-group="owners">
           <div class="cg-label"><span class="cg-name">Business Owner Nationality<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
@@ -262,10 +262,10 @@
           <div class="inline-err" id="industriesErr">Select at least one industry.</div>
         </div>
         <div class="cond-group" data-group="banks">
-          <div class="cg-label"><span class="cg-name">Bank<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Financial Institution<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
           <div class="crit-toolbar"><span class="crit-status" id="bankStatus"></span></div>
           <div class="chip-row" id="bankChips"></div>
-          <div class="inline-err" id="banksErr">Select at least one bank.</div>
+          <div class="inline-err" id="banksErr">Select at least one financial institution.</div>
         </div>
         <div class="cond-group" data-group="modules">
           <div class="cg-label"><span class="cg-name">Settlement type<span class="req">*</span></span></div>
@@ -317,17 +317,19 @@
     'Insurance', 'Marketplace', 'Logistics & Delivery', 'Other'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  /* Service catalog — mirrors the Kashier Services operations portal: services split
-     into Basic / Add-on tiers. Channel is part of the service name itself
-     (Online Card / POS Card). */
+  /* Service catalog — matches the Pricing Rules module's own service list: every
+     method Pricing Rules can target, available both Online and POS. Channel is part
+     of the service name itself (Online Card / POS Card). */
   const SERVICE_CATALOG = [
-    { tier: 'Basic Services', services: ['Online Card', 'Online Wallet', 'Online Auth n Cap',
-      'POS Card', 'POS Wallet', 'POS Auth n Cap'] },
-    { tier: 'Add-on Services', services: ['Branches', 'Currency Conversion', 'Instant Settlement'] },
+    { tier: 'Online', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online OCTO', 'Online Souhoola',
+      'Online Contact', 'Online Basata', 'Online Mogo', 'Online Tru', 'Online Forsa', 'Online Aman',
+      'Online Bank Installments', 'Online Transfer', 'Online Instapay'] },
+    { tier: 'POS', services: ['POS Card', 'POS Wallet', 'POS Valu', 'POS OCTO', 'POS Souhoola',
+      'POS Contact', 'POS Basata', 'POS Mogo', 'POS Tru', 'POS Forsa', 'POS Aman',
+      'POS Bank Installments', 'POS Transfer', 'POS Instapay'] },
   ];
-  const BASIC_SERVICES = SERVICE_CATALOG[0].services;
-  const ADDON_SERVICES = SERVICE_CATALOG[1].services;
-  const SERVICES = [...BASIC_SERVICES, ...ADDON_SERVICES];
+  const SERVICES = SERVICE_CATALOG[0].services.concat(SERVICE_CATALOG[1].services);
+  const BASIC_SERVICES = SERVICES;
 
   const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services'];
 
@@ -434,6 +436,11 @@
   }
 
   /* ══════════ Service — single-select, the rule's primary driver ══════════ */
+  /* Chips sit under an Online / POS group header already, so the header supplies the
+     channel — the chip's own label only needs the method name. The stored value keeps
+     the full "Online Card" / "POS Card" form; only the rendered text is stripped. */
+  const stripChannel = name => name.replace(/^(Online|POS) /, '');
+
   function renderServiceChips() {
     const root = $('serviceCatalog');
     root.innerHTML = '';
@@ -452,7 +459,7 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'toggle-chip' + (on ? ' on' : '');
-        b.innerHTML = (on ? CHECK_SM : '') + esc(name);
+        b.innerHTML = (on ? CHECK_SM : '') + esc(stripChannel(name));
         b.addEventListener('click', () => {
           draft.services = on ? [] : [name];
           renderServiceChips();

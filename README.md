@@ -9,17 +9,17 @@ collapsible **Documents** module.
 ## Pages
 
 - **[document-rules.html](document-rules.html)** — **All Rules.** Rules grouped into a table
-  per service, with a rule-name search box, filters by entity, bank, settlement type, and
-  service, and an Events audit trail. Clicking a row opens its detail view, with Edit and
-  Delete actions there.
+  per service, with a rule-name search box, filters by merchant type, financial institution,
+  settlement type, and service, and an Events audit trail. Clicking a row opens its detail
+  view, with Edit and Delete actions there.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
   builder, reached from All Rules' tab bar or "Add Rule" — also handles editing an existing
   rule via `?edit=<id>`. Every rule is built on a **single service**, picked first, and then
-  narrowed with any additional conditions (entity type, owner nationality, industry, bank,
-  settlement type) before choosing which document types become required. Rules, ids, and
-  events are shared with the list page through `localStorage`, so actions on either page are
-  reflected on the other without a backend.
+  narrowed with any additional conditions (merchant type, owner nationality, industry,
+  financial institution, settlement type) before choosing which document types become
+  required. Rules, ids, and events are shared with the list page through `localStorage`, so
+  actions on either page are reflected on the other without a backend.
 
 - **[document-types.html](document-types.html)** — **Document Types.** The catalogue the
   rules draw on: each document type's name (English and Arabic), description, required
@@ -46,23 +46,31 @@ a given set of criteria produces the same checklist everywhere.
 
 ## Services
 
-The service catalog mirrors the Kashier Services operations portal, split into **Basic**
-and **Add-on** tiers:
+The service catalog matches the Pricing Rules module's own service list exactly: 14 payment
+methods, each available **Online** and **POS** — 28 services in total.
 
-| Tier | Services |
+| Channel | Methods |
 | --- | --- |
-| Basic | Online Card, Online Wallet, Online Auth n Cap, POS Card, POS Wallet, POS Auth n Cap |
-| Add-on | Branches, Currency Conversion, Instant Settlement |
+| Online | Card, Wallet, Valu, OCTO, Souhoola, Contact, Basata, Mogo, Tru, Forsa, Aman, Bank Installments, Transfer, Instapay |
+| POS | same 14 methods |
 
-Channel is part of the service name itself (`Online Card` / `POS Card`) rather than a
-separate condition. The source portal also groups services by category, but every category
-there is currently empty, so that layer isn't reproduced here.
+Channel is part of the stored service value (`Online Card` / `POS Card`) rather than a
+separate condition, but each picker groups its chips under an Online / POS header, so the
+chip itself only shows the method name — the channel comes from the header it sits under.
+Every other display (the list table, filters, the view modal, the selected-service hint)
+shows the full `Online Card` / `POS Card` form, since those have no grouping header to
+supply the channel.
+
+Pricing Rules never prices Add-on services (Branches, Currency Conversion, Instant
+Settlement) — they're enabled by their own toggle, not a rule — so they aren't part of this
+catalog either.
 
 ## Other conditions
 
-Entity Type (Individual Seller / Registered Business / Professional Business), Business
-Owner Nationality, Industry, Bank, and Settlement type (PF / PSP) — used to narrow a rule
-beyond its service. Settlement type takes a single option; the rest allow several.
+Merchant Type (Individual Seller / Registered Business / Professional Business), Business
+Owner Nationality, Industry, Financial Institution, and Settlement type (PF / PSP) — used to
+narrow a rule beyond its service. Settlement type takes a single option; the rest allow
+several.
 
 ## Matching semantics
 
