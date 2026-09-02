@@ -139,13 +139,14 @@
     text-transform:uppercase;margin:26px 0 14px;}
   .cond-group{margin-bottom:18px;}
   .cond-group:last-of-type{margin-bottom:4px;}
-  .cond-group .cg-label{display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .cg-label{display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;}
   .cond-group .cg-name{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);}
-  .select-all-btn{background:none;border:1px solid transparent;padding:3px;margin-inline-start:8px;
-    border-radius:var(--radius);color:var(--muted-foreground);cursor:pointer;display:inline-flex;
-    align-items:center;justify-content:center;vertical-align:middle;}
-  .select-all-btn svg{width:15px;height:15px;}
-  .select-all-btn:hover{background:var(--muted);color:var(--primary);}
+  /* Checkbox + label, matching the Pricing Rules criteria block's own "Select all".
+     Overrides .field label's display:block/margin so it sits inline next to the
+     field's own label instead of wrapping to its own line. */
+  .field label.select-all-label{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 8px;
+    font-size:12.5px;font-weight:600;color:var(--cadet-base);cursor:pointer;vertical-align:middle;}
+  .select-all-label input{width:15px;height:15px;margin:0;cursor:pointer;accent-color:var(--primary);}
   .cond-cols{display:flex;gap:32px;flex-wrap:wrap;}
   .cond-cols .cond-group{margin-bottom:0;flex:1;min-width:200px;}
 
@@ -228,8 +229,15 @@
         <h2 class="card-title" id="cardTitle">New Document Rule</h2>
 
         <div class="field service-field">
+          <label>Channel<span class="req">*</span></label>
+          <p class="field-hint">Step 1 — every document rule targets a single channel first.</p>
+          <div class="chip-row" id="channelChips"></div>
+          <div class="inline-err" id="channelsErr">Select the channel this rule applies to.</div>
+        </div>
+
+        <div class="field service-field">
           <label>Service<span class="req">*</span></label>
-          <p class="field-hint">Every document rule is built on a single service — pick the one this rule applies to.</p>
+          <p class="field-hint" id="serviceFieldHint">Step 2 — pick the service within that channel this rule applies to.</p>
           <div id="serviceCatalog"></div>
           <div class="chip-hint" id="serviceHint">No service selected</div>
           <div class="inline-err" id="serviceErr">Select the service this rule applies to.</div>
@@ -244,25 +252,25 @@
         <div class="cond-title">Conditions — when does this rule apply?</div>
 
         <div class="cond-group" data-group="entities">
-          <div class="cg-label"><span class="cg-name">Merchant Type<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllEntities" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Merchant Type<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllEntities">Select all</label></div>
           <div class="crit-toolbar"><span class="crit-status" id="entityStatus"></span></div>
           <div class="chip-row" id="entityChips"></div>
           <div class="inline-err" id="entitiesErr">Select at least one merchant type.</div>
         </div>
         <div class="cond-group" data-group="owners">
-          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><button type="button" class="select-all-btn" id="selAllOwners" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><label class="select-all-label"><input type="checkbox" id="selAllOwners">Select all</label></div>
           <div class="crit-toolbar"><span class="crit-status" id="ownerStatus"></span></div>
           <div class="chip-row" id="ownerChips"></div>
           <div class="inline-err" id="ownersErr">Select at least one owner nationality.</div>
         </div>
         <div class="cond-group" data-group="industries">
-          <div class="cg-label"><span class="cg-name">Industry<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllIndustries" title="Select all" aria-label="Select all"></button></div>
+          <div class="cg-label"><span class="cg-name">Industry<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllIndustries">Select all</label></div>
           <div class="crit-toolbar"><span class="crit-status" id="industryStatus"></span></div>
           <div class="chip-row" id="industryChips"></div>
           <div class="inline-err" id="industriesErr">Select at least one industry.</div>
         </div>
-        <div class="cond-group" data-group="banks">
-          <div class="cg-label"><span class="cg-name">Financial Institution<span class="req">*</span></span><button type="button" class="select-all-btn" id="selAllBanks" title="Select all" aria-label="Select all"></button></div>
+        <div class="cond-group" data-group="banks" id="banksGroup">
+          <div class="cg-label"><span class="cg-name">Financial Institution<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllBanks">Select all</label></div>
           <div class="crit-toolbar"><span class="crit-status" id="bankStatus"></span></div>
           <div class="chip-row" id="bankChips"></div>
           <div class="inline-err" id="banksErr">Select at least one financial institution.</div>
@@ -276,7 +284,7 @@
         <div class="cond-title" style="margin-top:26px;">Required Documents — based on the criteria above</div>
 
         <div class="field">
-          <label>Document Types<span class="req">*</span><button type="button" class="select-all-btn" id="selAllDocs" title="Select all" aria-label="Select all"></button></label>
+          <div class="cg-label"><label>Document Types<span class="req">*</span></label><label class="select-all-label"><input type="checkbox" id="selAllDocs">Select all</label></div>
           <div class="chip-row" id="docChips"></div>
           <div class="chip-hint" id="docHint">0 selected</div>
           <div class="inline-err" id="docErr">Select at least one document type.</div>
@@ -317,21 +325,14 @@
     'Insurance', 'Marketplace', 'Logistics & Delivery'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  /* Service catalog — matches the Pricing Rules module's own service list: every
-     method Pricing Rules can target, available both Online and POS. Channel is part
-     of the service name itself (Online Card / POS Card). */
-  const SERVICE_CATALOG = [
-    { tier: 'Online', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online OCTO', 'Online Souhoola',
-      'Online Contact', 'Online Basata', 'Online Mogo', 'Online Tru', 'Online Forsa', 'Online Aman',
-      'Online Bank Installments', 'Online Transfer', 'Online Instapay'] },
-    { tier: 'POS', services: ['POS Card', 'POS Wallet', 'POS Valu', 'POS OCTO', 'POS Souhoola',
-      'POS Contact', 'POS Basata', 'POS Mogo', 'POS Tru', 'POS Forsa', 'POS Aman',
-      'POS Bank Installments', 'POS Transfer', 'POS Instapay'] },
-  ];
-  const SERVICES = SERVICE_CATALOG[0].services.concat(SERVICE_CATALOG[1].services);
-  const BASIC_SERVICES = SERVICES;
+  /* Channel and Service are separate fields, matching the Pricing Rules module exactly:
+     its wizard picks a channel first, then a service from within it, and the service
+     list itself is just the 14 payment methods with no channel folded into the name. */
+  const CHANNELS = ['Online', 'POS'];
+  const SERVICES = ['Card', 'Wallet', 'Valu', 'OCTO', 'Souhoola', 'Contact', 'Basata', 'Mogo', 'Tru', 'Forsa',
+    'Aman', 'Bank Installments', 'Transfer', 'Instapay'];
 
-  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services'];
+  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services', 'channels'];
 
   /* ══════════ Shared storage — same keys as document-rules.html ══════════ */
   const RULES_KEY = 'kashier_document_rules_v1';
@@ -364,7 +365,7 @@
   }
 
   /* ══════════ Form state ══════════ */
-  const draft = { docs: [], entities: [], owners: [], industries: [], banks: [], modules: [], services: [] };
+  const draft = { docs: [], entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] };
   let editingId = null;
 
   const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -435,58 +436,86 @@
     updateSelectAllLabel('docs');
   }
 
-  /* ══════════ Service — single-select, the rule's primary driver ══════════ */
-  /* Chips sit under an Online / POS group header already, so the header supplies the
-     channel — the chip's own label only needs the method name. The stored value keeps
-     the full "Online Card" / "POS Card" form; only the rendered text is stripped. */
-  const stripChannel = name => name.replace(/^(Online|POS) /, '');
+  /* ══════════ Channel and Service — both single-select. Channel comes first, matching
+     the Pricing Rules wizard (Step 1 channel, Step 2 service); switching channel clears
+     any service already picked, since the two are chosen in that order. ══════════ */
+  function renderChannelChips() {
+    const root = $('channelChips');
+    root.innerHTML = '';
+    CHANNELS.forEach(name => {
+      const on = draft.channels[0] === name;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'toggle-chip' + (on ? ' on' : '');
+      b.innerHTML = (on ? CHECK_SM : '') + esc(name);
+      b.addEventListener('click', () => {
+        draft.channels = on ? [] : [name];
+        draft.services = [];
+        if (draft.channels.length) $('channelsErr').classList.remove('show');
+        renderChannelChips();
+        renderServiceChips();
+        updateServiceHint();
+      });
+      root.appendChild(b);
+    });
+  }
 
   function renderServiceChips() {
     const root = $('serviceCatalog');
     root.innerHTML = '';
-    SERVICE_CATALOG.forEach(tier => {
-      const services = tier.services;
-      const group = document.createElement('div');
-      group.className = 'svc-group';
-      const label = document.createElement('div');
-      label.className = 'svc-group-label';
-      label.textContent = tier.tier;
-      group.appendChild(label);
-      const row = document.createElement('div');
-      row.className = 'chip-row';
-      services.forEach(name => {
-        const on = draft.services[0] === name;
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'toggle-chip' + (on ? ' on' : '');
-        b.innerHTML = (on ? CHECK_SM : '') + esc(stripChannel(name));
-        b.addEventListener('click', () => {
-          draft.services = on ? [] : [name];
-          renderServiceChips();
-          updateServiceHint();
-        });
-        row.appendChild(b);
+    if (!draft.channels.length) {
+      $('serviceFieldHint').textContent = 'Select a channel above to choose its service.';
+      return;
+    }
+    $('serviceFieldHint').textContent = 'Step 2 — pick the service within that channel this rule applies to.';
+    const row = document.createElement('div');
+    row.className = 'chip-row';
+    SERVICES.forEach(name => {
+      const on = draft.services[0] === name;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'toggle-chip' + (on ? ' on' : '');
+      b.innerHTML = (on ? CHECK_SM : '') + esc(name);
+      b.addEventListener('click', () => {
+        draft.services = on ? [] : [name];
+        renderServiceChips();
+        updateServiceHint();
       });
-      group.appendChild(row);
-      root.appendChild(group);
+      row.appendChild(b);
     });
+    root.appendChild(row);
   }
 
   function updateServiceHint() {
     $('serviceHint').textContent = draft.services[0] || 'No service selected';
     if (draft.services.length) $('serviceErr').classList.remove('show');
+    updateBanksVisibility();
   }
 
-  /* ══════════ Select all / Unselect all — one toggle button per chip group ══════════ */
-  const SELECT_ALL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
-  const UNSELECT_ALL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
+  /* These installment providers have no financial institution of their own to pick —
+     Financial Institution only makes sense for a service that settles through one. */
+  const NO_FI_SERVICES = ['Souhoola', 'Valu', 'OCTO', 'Basata', 'Mogo', 'Tru', 'Forsa', 'Aman'];
+  function serviceHasFI() {
+    const service = draft.services[0];
+    return !service || !NO_FI_SERVICES.includes(service);
+  }
+  function updateBanksVisibility() {
+    const show = serviceHasFI();
+    $('banksGroup').style.display = show ? '' : 'none';
+    if (!show && draft.banks.length) {
+      draft.banks = [];
+      renderMultiGroup('banks');
+      updateGroupStatus('banks');
+    }
+  }
+
+  /* ══════════ Select all — one checkbox per chip group, matching Pricing Rules' own
+     criteria-block checkbox exactly. Checked = every option in the group is selected;
+     clicking it toggles between select-all and deselect-all. ══════════ */
   function updateSelectAllLabel(key) {
     const meta = MULTI_GROUPS[key];
     const allSelected = draft[key].length === meta.options.length;
-    const btn = $(meta.btn);
-    btn.innerHTML = allSelected ? UNSELECT_ALL_ICON : SELECT_ALL_ICON;
-    btn.title = allSelected ? 'Unselect all' : 'Select all';
-    btn.setAttribute('aria-label', btn.title);
+    $(meta.btn).checked = allSelected;
     clearConditionErrors();
   }
   function updateSelectAllLabels() {
@@ -516,6 +545,7 @@
   function renderForm() {
     Object.keys(MULTI_GROUPS).forEach(renderMultiGroup);
     renderSingleChipGroup('moduleChips', MODULES, 'modules');
+    renderChannelChips();
     renderServiceChips();
     updateServiceHint();
     updateDocHint();
@@ -525,17 +555,26 @@
 
   /* ══════════ Migration — stale saved rules ══════════
      Mirrors document-rules.html, so landing straight on this page with ?edit=<id> sees the
-     same pruned data. A rule left without a valid service — retired, or never set on an old
-     "universal" rule — is removed, and the edit lookup below falls through to the list. */
+     same pruned data. A rule left without a valid service, or without a valid channel —
+     retired, never set on an old "universal" rule, or saved before Channel and Service
+     split into separate fields — is removed, and the edit lookup below falls through to
+     the list. */
   function pruneStaleRules() {
-    const known = new Set(SERVICES);
+    const knownServices = new Set(SERVICES);
+    const knownChannels = new Set(CHANNELS);
     const kept = [];
     let changed = false;
     loadRules().forEach(r => {
-      const before = r.services || [];
-      const valid = before.filter(s => known.has(s));
-      if (valid.length !== before.length) changed = true;
-      if (valid.length) { r.services = valid; kept.push(r); }
+      const beforeServices = r.services || [];
+      const validServices = beforeServices.filter(s => knownServices.has(s));
+      const beforeChannels = r.channels || [];
+      const validChannels = beforeChannels.filter(c => knownChannels.has(c));
+      if (validServices.length !== beforeServices.length || validChannels.length !== beforeChannels.length) changed = true;
+      if (validServices.length && validChannels.length) {
+        r.services = validServices;
+        r.channels = validChannels;
+        kept.push(r);
+      }
     });
     if (changed) saveRules(kept);
   }
@@ -555,10 +594,11 @@
     $('backLinkLabel').textContent = 'Cancel editing rule';
     $('ruleName').value = rule.name;
     draft.docs = [...rule.docs];
-    CONDITION_KEYS.forEach(k => draft[k] = [...rule[k]]);
-    /* Rules saved before service and settlement type became single-select may carry
-       several of each — keep the first. */
+    CONDITION_KEYS.forEach(k => draft[k] = [...(rule[k] || [])]);
+    /* Rules saved before service, channel, and settlement type became single-select may
+       carry several of each — keep the first. */
     draft.services = draft.services.slice(0, 1);
+    draft.channels = draft.channels.slice(0, 1);
     draft.modules = draft.modules.slice(0, 1);
     renderForm();
   })();
@@ -571,10 +611,13 @@
     let ok = true;
     if (!name) { $('ruleName').classList.add('invalid'); $('nameErr').classList.add('show'); ok = false; }
     else { $('ruleName').classList.remove('invalid'); $('nameErr').classList.remove('show'); }
+    if (!draft.channels.length) { $('channelsErr').classList.add('show'); ok = false; }
     if (!draft.services.length) { $('serviceErr').classList.add('show'); ok = false; }
-    /* Service is validated separately above — every other required condition group
-       needs at least one pick too (Business Owner Nationality is the one exception). */
+    /* Channel and Service are validated separately above — every other required condition
+       group needs at least one pick too (Business Owner Nationality is the one exception,
+       and Financial Institution drops out entirely for services that have none). */
     REQUIRED_CONDITIONS.forEach(key => {
+      if (key === 'banks' && !serviceHasFI()) return;
       if (!draft[key].length) { $(key + 'Err').classList.add('show'); ok = false; }
     });
     if (!draft.docs.length) { $('docErr').classList.add('show'); ok = false; }

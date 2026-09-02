@@ -9,17 +9,18 @@ collapsible **Documents** module.
 ## Pages
 
 - **[document-rules.html](document-rules.html)** — **All Rules.** Rules grouped into a table
-  per service, with a rule-name search box, filters by merchant type, financial institution,
-  settlement type, and service, and an Events audit trail. Clicking a row opens its detail
-  view, with Edit and Delete actions there.
+  per service and channel, with a rule-name search box, filters by channel, service, merchant
+  type, financial institution, and settlement type, and an Events audit trail. Clicking a row
+  opens its detail view, with Edit and Delete actions there.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
   builder, reached from All Rules' tab bar or "Create Rule" — also handles editing an existing
-  rule via `?edit=<id>`. Every rule is built on a **single service**, picked first, and then
-  narrowed with any additional conditions (merchant type, owner nationality, industry,
-  financial institution, settlement type) before choosing which document types become
-  required. Rules, ids, and events are shared with the list page through `localStorage`, so
-  actions on either page are reflected on the other without a backend.
+  rule via `?edit=<id>`. Every rule targets a single **channel** (Step 1) and a single
+  **service** within it (Step 2), then is narrowed with any additional conditions (merchant
+  type, owner nationality, industry, financial institution, settlement type) before choosing
+  which document types become required. Rules, ids, and events are shared with the list page
+  through `localStorage`, so actions on either page are reflected on the other without a
+  backend.
 
 - **[document-types.html](document-types.html)** — **Document Types.** The catalogue the
   rules draw on: each document type's name (English and Arabic), description, required
@@ -44,46 +45,54 @@ collapsible **Documents** module.
 The rules and onboarding pages use the **identical rule-matching logic and document set**, so
 a given set of criteria produces the same checklist everywhere.
 
-## Services
+## Channel and Service
 
-The service catalog matches the Pricing Rules module's own service list exactly: 14 payment
-methods, each available **Online** and **POS** — 28 services in total.
+These are two separate fields, matching how the Pricing Rules module itself works: its
+wizard picks a channel first, then a service from within it, rather than folding channel
+into the service name. A rule is built the same way here — Step 1 picks **Channel**
+(Online / POS), Step 2 picks **Service** from a plain 14-method list that only appears once
+a channel is chosen; switching the channel clears whatever service was picked, since the two
+are chosen in that order.
 
-| Channel | Methods |
+| Field | Options |
 | --- | --- |
-| Online | Card, Wallet, Valu, OCTO, Souhoola, Contact, Basata, Mogo, Tru, Forsa, Aman, Bank Installments, Transfer, Instapay |
-| POS | same 14 methods |
-
-Channel is part of the stored service value (`Online Card` / `POS Card`) rather than a
-separate condition, but each picker groups its chips under an Online / POS header, so the
-chip itself only shows the method name — the channel comes from the header it sits under.
-Every other display (the list table, filters, the view modal, the selected-service hint)
-shows the full `Online Card` / `POS Card` form, since those have no grouping header to
-supply the channel.
+| Channel | Online, POS |
+| Service | Card, Wallet, Valu, OCTO, Souhoola, Contact, Basata, Mogo, Tru, Forsa, Aman, Bank Installments, Transfer, Instapay |
 
 Pricing Rules never prices Add-on services (Branches, Currency Conversion, Instant
 Settlement) — they're enabled by their own toggle, not a rule — so they aren't part of this
 catalog either.
 
+**Financial Institution** hides itself whenever the selected service is one of the
+installment-only methods with no financial institution of its own: Souhoola, Valu, OCTO,
+Basata, Mogo, Tru, Forsa, or Aman. Switching to or from one of these clears any financial
+institution already picked, and it isn't required while hidden.
+
 ## Other conditions
 
 Merchant Type (Individual Seller / Registered Business / Professional Business), Business
 Owner Nationality, Industry, Financial Institution, and Settlement type (PF / PSP) — used to
-narrow a rule beyond its service. Settlement type takes a single option; the rest allow
-several. Business Owner Nationality is the one optional condition — every other group needs
-at least one pick.
+narrow a rule beyond its channel and service. Settlement type takes a single option; the
+rest allow several. Business Owner Nationality is the one optional condition — every other
+group needs at least one pick (Financial Institution included, except where it doesn't
+apply at all — see above).
+
+Every multi-select condition has a **Select all** checkbox — checked means every option in
+that group is picked; unchecking it clears the group — matching the checkbox Pricing Rules
+uses in its own criteria blocks.
 
 ## Matching semantics
 
 Within a condition group: OR. Across groups: AND.
 
-Every condition group needs at least one option, except Business Owner Nationality, which
-stays optional and simply omits from the rule when left unset. Service and Settlement type
-are single-select, so for them "at least one" means exactly one.
+Every condition group needs at least one option, except Business Owner Nationality (always
+optional) and Financial Institution (optional only for the services that have none). Channel,
+Service, and Settlement type are single-select, so for them "at least one" means exactly one.
 
 On load, both Document Rules pages prune stale saved rules — those written before the
-catalog shrank or before every condition became required. A rule keeps whatever services
-remain valid; one left with none can never match anything, so it is removed and logged to
+catalog shrank, before every condition became required, or before Channel and Service split
+into separate fields. A rule keeps whatever services and channels remain valid; one left
+without a valid service or channel can never match anything, so it is removed and logged to
 the Events trail as either `service retired` or `no service set`.
 
 (The built-in universal requirements on the onboarding pages — National ID, bank proof —

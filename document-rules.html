@@ -267,10 +267,11 @@
         <input type="text" id="ruleSearch" placeholder="Search by rule name…">
       </div>
       <div class="filters-row">
+        <select id="fChannel"><option value="">All channels</option></select>
+        <select id="fService"><option value="">All services</option></select>
         <select id="fEntity"><option value="">All merchant types</option></select>
         <select id="fBank"><option value="">All financial institutions</option></select>
         <select id="fModule"><option value="">All settlement types</option></select>
-        <select id="fService"><option value="">All services</option></select>
       </div>
 
       <div id="ruleGroups"></div>
@@ -337,21 +338,14 @@
   const ENTITIES = ['Individual Seller', 'Registered Business', 'Professional Business'];
   const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
   const MODULES = ['PF', 'PSP'];
-  /* Service catalog — matches the Pricing Rules module's own service list: every
-     method Pricing Rules can target, available both Online and POS. Channel is part
-     of the service name itself (Online Card / POS Card). */
-  const SERVICE_CATALOG = [
-    { tier: 'Online', services: ['Online Card', 'Online Wallet', 'Online Valu', 'Online OCTO', 'Online Souhoola',
-      'Online Contact', 'Online Basata', 'Online Mogo', 'Online Tru', 'Online Forsa', 'Online Aman',
-      'Online Bank Installments', 'Online Transfer', 'Online Instapay'] },
-    { tier: 'POS', services: ['POS Card', 'POS Wallet', 'POS Valu', 'POS OCTO', 'POS Souhoola',
-      'POS Contact', 'POS Basata', 'POS Mogo', 'POS Tru', 'POS Forsa', 'POS Aman',
-      'POS Bank Installments', 'POS Transfer', 'POS Instapay'] },
-  ];
-  const SERVICES = SERVICE_CATALOG[0].services.concat(SERVICE_CATALOG[1].services);
-  const BASIC_SERVICES = SERVICES;
+  /* Channel and Service are separate fields, matching the Pricing Rules module exactly:
+     its wizard picks a channel first, then a service from within it, and the service
+     list itself is just the 14 payment methods with no channel folded into the name. */
+  const CHANNELS = ['Online', 'POS'];
+  const SERVICES = ['Card', 'Wallet', 'Valu', 'OCTO', 'Souhoola', 'Contact', 'Basata', 'Mogo', 'Tru', 'Forsa',
+    'Aman', 'Bank Installments', 'Transfer', 'Instapay'];
 
-  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services'];
+  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services', 'channels'];
   /* ══════════ Shared storage — rules, ids, and events are read/written here and on
      document-rules-create.html, so actions on either page are reflected on the other. ══════════ */
   const RULES_KEY = 'kashier_document_rules_v1';
@@ -365,20 +359,29 @@
   function saveEvents(list) { localStorage.setItem(EVENTS_KEY, JSON.stringify(list.map(e => ({ ...e, ts: e.ts.toISOString() })))); }
 
   /* ══════════ Migration — stale saved rules ══════════
-     Rules saved before the catalog shrank, or before every condition became required, can
-     point at services that no longer exist or carry no service at all (the old "universal"
-     rule that applied to everyone). Prune retired service names; a rule left without a
-     service can never match anything, so it is removed. Returns what was dropped and why. */
+     Rules saved before the catalog shrank, before every condition became required, or
+     before Channel and Service split into separate fields, can point at services that no
+     longer exist or carry no service/channel at all (including the old "universal" rule
+     that applied to everyone). Prune retired names; a rule left without a valid service or
+     channel can never match anything, so it is removed. Returns what was dropped and why. */
   function pruneStaleRules() {
-    const known = new Set(SERVICES);
+    const knownServices = new Set(SERVICES);
+    const knownChannels = new Set(CHANNELS);
     const kept = [], dropped = [];
     let pruned = false;
     loadRules().forEach(r => {
-      const before = r.services || [];
-      const valid = before.filter(s => known.has(s));
-      if (valid.length !== before.length) pruned = true;
-      if (valid.length) { r.services = valid; kept.push(r); }
-      else dropped.push({ rule: r, reason: before.length ? 'service retired' : 'no service set' });
+      const beforeServices = r.services || [];
+      const validServices = beforeServices.filter(s => knownServices.has(s));
+      const beforeChannels = r.channels || [];
+      const validChannels = beforeChannels.filter(c => knownChannels.has(c));
+      if (validServices.length !== beforeServices.length || validChannels.length !== beforeChannels.length) pruned = true;
+      if (validServices.length && validChannels.length) {
+        r.services = validServices;
+        r.channels = validChannels;
+        kept.push(r);
+      } else {
+        dropped.push({ rule: r, reason: !beforeServices.length && !beforeChannels.length ? 'no service set' : 'service retired' });
+      }
     });
     if (pruned || dropped.length) saveRules(kept);
     return dropped;
@@ -407,15 +410,17 @@
       s.appendChild(opt);
     });
   }
+  fillSelect('fChannel', CHANNELS);
+  fillSelect('fService', SERVICES);
   fillSelect('fEntity', ENTITIES);
   fillSelect('fBank', BANKS);
   fillSelect('fModule', MODULES);
-  fillSelect('fService', SERVICES);
-  ['fEntity', 'fBank', 'fModule', 'fService'].forEach(id => $(id).addEventListener('change', renderRules));
+  ['fChannel', 'fEntity', 'fBank', 'fModule', 'fService'].forEach(id => $(id).addEventListener('change', renderRules));
   $('ruleSearch').addEventListener('input', renderRules);
 
   function ruleVisible(r) {
-    const fe = $('fEntity').value, fb = $('fBank').value, fm = $('fModule').value, fs = $('fService').value;
+    const fc = $('fChannel').value, fe = $('fEntity').value, fb = $('fBank').value, fm = $('fModule').value, fs = $('fService').value;
+    if (fc && r.channels.length && !r.channels.includes(fc)) return false;
     if (fe && r.entities.length && !r.entities.includes(fe)) return false;
     if (fb && r.banks.length && !r.banks.includes(fb)) return false;
     if (fm && r.modules.length && !r.modules.includes(fm)) return false;
@@ -443,42 +448,49 @@
       : 'No rules match your filters — try clearing them, or add a new rule.';
     if (visible.length === 0) return;
 
+    /* Grouped by service, same as Pricing Rules' own list — each group's header names
+       the channel too (a rule targets exactly one of each), matching its "Card — Online"
+       header pattern, since Document Rules has no multi-service rule to need a separate
+       "Applies to" column for. */
     SERVICES.forEach(service => {
-      const groupRules = visible.filter(r => r.services[0] === service);
-      if (!groupRules.length) return;
+      CHANNELS.forEach(channel => {
+        const groupRules = visible.filter(r => r.services[0] === service && r.channels[0] === channel);
+        if (!groupRules.length) return;
 
-      const section = document.createElement('div');
-      section.className = 'section-title';
-      section.innerHTML = esc(service) + ' <span class="n">— ' + groupRules.length + (groupRules.length === 1 ? ' rule' : ' rules') + '</span>';
-      groupsEl.appendChild(section);
+        const section = document.createElement('div');
+        section.className = 'section-title';
+        section.innerHTML = esc(service) + ' <span class="n">— ' + esc(channel) + ' · ' + groupRules.length + (groupRules.length === 1 ? ' rule' : ' rules') + '</span>';
+        groupsEl.appendChild(section);
 
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.marginBottom = '4px';
-      card.innerHTML =
-        '<table><thead><tr>' +
-          '<th>Rule name</th><th>Merchant Type</th><th>Owner Nationality</th><th>Industry</th>' +
-          '<th>Financial Institution</th><th>Settlement Type</th><th>Documents</th><th></th>' +
-        '</tr></thead><tbody></tbody></table>';
-      const tbody = card.querySelector('tbody');
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.marginBottom = '4px';
+        card.innerHTML =
+          '<table><thead><tr>' +
+            '<th>Rule name</th><th>Channel</th><th>Merchant Type</th><th>Owner Nationality</th><th>Industry</th>' +
+            '<th>Financial Institution</th><th>Settlement Type</th><th>Documents</th><th></th>' +
+          '</tr></thead><tbody></tbody></table>';
+        const tbody = card.querySelector('tbody');
 
-      groupRules.forEach(r => {
-        const row = document.createElement('tr');
-        row.className = 'row-click';
-        row.innerHTML =
-          '<td class="svc-name">' + esc(r.name) + '</td>' +
-          '<td>' + joinOr(r.entities) + '</td>' +
-          '<td>' + joinOr(r.owners) + '</td>' +
-          '<td>' + joinOr(r.industries) + '</td>' +
-          '<td>' + joinOr(r.banks) + '</td>' +
-          '<td>' + joinOr(r.modules) + '</td>' +
-          '<td>' + r.docs.length + (r.docs.length === 1 ? ' doc' : ' docs') + '</td>' +
-          '<td class="chevron-affordance">' + CHEVRON + '</td>';
-        row.addEventListener('click', () => openView(r));
-        tbody.appendChild(row);
+        groupRules.forEach(r => {
+          const row = document.createElement('tr');
+          row.className = 'row-click';
+          row.innerHTML =
+            '<td class="svc-name">' + esc(r.name) + '</td>' +
+            '<td>' + joinOr(r.channels) + '</td>' +
+            '<td>' + joinOr(r.entities) + '</td>' +
+            '<td>' + joinOr(r.owners) + '</td>' +
+            '<td>' + joinOr(r.industries) + '</td>' +
+            '<td>' + joinOr(r.banks) + '</td>' +
+            '<td>' + joinOr(r.modules) + '</td>' +
+            '<td>' + r.docs.length + (r.docs.length === 1 ? ' doc' : ' docs') + '</td>' +
+            '<td class="chevron-affordance">' + CHEVRON + '</td>';
+          row.addEventListener('click', () => openView(r));
+          tbody.appendChild(row);
+        });
+
+        groupsEl.appendChild(card);
       });
-
-      groupsEl.appendChild(card);
     });
   }
 
@@ -487,6 +499,7 @@
   const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
 
   const COND_LABELS = [
+    ['channels',   'Channel'],
     ['services',   'Service'],
     ['entities',   'Merchant Type'],
     ['owners',     'Business Owner Nationality'],
