@@ -10,7 +10,7 @@ collapsible **Documents** module.
 
 - **[document-rules.html](document-rules.html)** — **All Rules.** Rules grouped into a table
   per service and channel, with a rule-name search box, filters by channel, service, merchant
-  type, financial institution, and settlement type, and an Events audit trail. Clicking a row
+  type, industry, financial institution, and settlement type, and an Events audit trail. Clicking a row
   opens its detail view, with Edit and Delete actions there.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
