@@ -73,12 +73,12 @@ institution already picked, and it isn't required while hidden.
 
 Merchant Type (Individual Seller / Registered Business / Professional Business), Business
 Owner Nationality, Industry, Financial Institution, and Settlement type (PF / PSP) — used to
-narrow a rule beyond its channel and service. Settlement type takes a single option; the
-rest allow several. Business Owner Nationality is the one optional condition — every other
+narrow a rule beyond its channel and service. Merchant Type, Business Owner Nationality, and
+Settlement type each take a single option; Industry and Financial Institution allow several. Business Owner Nationality is the one optional condition — every other
 group needs at least one pick (Financial Institution included, except where it doesn't
 apply at all — see above).
 
-Every multi-select condition has a **Select all** checkbox — checked means every option in
+Every multi-select condition (Industry, Financial Institution, and Document Types) has a **Select all** checkbox — checked means every option in
 that group is picked; unchecking it clears the group — matching the checkbox Pricing Rules
 uses in its own criteria blocks.
 
@@ -88,7 +88,7 @@ Within a condition group: OR. Across groups: AND.
 
 Every condition group needs at least one option, except Business Owner Nationality (always
 optional) and Financial Institution (optional only for the services that have none). Channel,
-Service, and Settlement type are single-select, so for them "at least one" means exactly one.
+Service, Merchant Type, Business Owner Nationality, and Settlement type are single-select, so for them "at least one" means exactly one.
 
 On load, both Document Rules pages prune stale saved rules — those written before the
 catalog shrank, before every condition became required, or before Channel and Service split
