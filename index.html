@@ -782,14 +782,16 @@
     const line = (verb, names) => names.length ? '<li><span class="f">' + verb + '</span>: ' + esc(names.join(', ')) + '</li>' : '';
     if (ev.details && ev.details.length) return '<ul class="log-lines">' + line('Created', ev.details.map(d => d.field)) + '</ul>';
     if (ev.changes && ev.changes.length) {
-      const added = [], removed = [], updated = [];
-      ev.changes.forEach(c => {
+      /* An update shows each section it touched, with what changed in it. */
+      return '<ul class="log-lines">' + ev.changes.map(c => {
         if (c.added || c.removed) {
-          const a = c.added && c.added.length, r = c.removed && c.removed.length;
-          (a && r ? updated : a ? added : removed).push(c.field);
-        } else updated.push(c.field);
-      });
-      return '<ul class="log-lines">' + line('Added', added) + line('Updated', updated) + line('Removed', removed) + '</ul>';
+          const parts = [];
+          if (c.added && c.added.length) parts.push('added ' + c.added.join(', '));
+          if (c.removed && c.removed.length) parts.push('removed ' + c.removed.join(', '));
+          return '<li><span class="f">' + esc(c.field) + '</span>: ' + esc(parts.join('; ')) + '</li>';
+        }
+        return '<li><span class="f">' + esc(c.field) + '</span>: ' + esc(c.from) + ' → ' + esc(c.to) + '</li>';
+      }).join('') + '</ul>';
     }
     return '';
   }

@@ -16,7 +16,7 @@ collapsible **Documents** module.
   rule by name, newest first, sortable and paginated, with a row menu (Details / Edit / Delete).
   *History* is the module-wide audit trail of every rule created, updated or deleted. Clicking
   a row opens a right-hand **Rule Details** drawer with two sub-tabs: **Details**, and **Logs** —
-  that one rule's timeline, naming the sections each entry created, added to, updated or removed.
+  that one rule's timeline, naming the sections each entry created, and for updates what changed in each (added, removed, or old → new).
   Edit and Delete live in the drawer.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Add document rule.** The
