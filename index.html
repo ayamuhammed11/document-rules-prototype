@@ -731,9 +731,10 @@
 
   function eventSentence(ev) {
     const kind = eventKind(ev);
-    const scope = ev.service ? '<span class="ev-scope">· ' + esc(ev.service) + ' · ' + esc(ev.channel) + '</span>' : '';
+    /* The general history is one plain sentence — who did what to which rule. Channel, service and
+       what changed live in the rule's own Logs. */
     const why = kind === 'removed' ? ' <span class="ev-scope">(' + esc(ev.action.replace(/^Removed — /, '')) + ')</span>' : '';
-    return esc(ev.actor) + ' ' + EVENT_PHRASE[kind] + ' ' + esc(ev.ruleName) + scope + why;
+    return esc(ev.actor) + ' ' + EVENT_PHRASE[kind] + ' ' + esc(ev.ruleName) + why;
   }
 
   function renderEvents() {
