@@ -71,7 +71,7 @@
   .topbar-user svg{width:18px;height:18px;color:var(--cadet-base);}
 
   /* ---------- Page content ---------- */
-  .page{max-width:1200px;margin:0 auto;padding:8px 28px 48px;width:100%;}
+  .page{max-width:1600px;margin:0 auto;padding:8px 28px 48px;width:100%;}
   .page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
   .page-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:28px;margin:0 0 4px;color:#000;}
   .page-subtitle{color:var(--muted-foreground);font-size:13.5px;margin:0;max-width:640px;}
@@ -105,84 +105,116 @@
   .card-title{font-size:16px;margin:0 0 4px;}
   .card-desc{font-size:13px;color:var(--muted-foreground);margin:0 0 18px;max-width:680px;line-height:1.5;}
 
-  /* ---------- Search + filters ---------- */
-  .search-wrap{position:relative;max-width:280px;margin-bottom:12px;}
-  .search-wrap svg{position:absolute;left:11px;top:9px;color:var(--muted-foreground);width:15px;height:15px;}
-  .search-wrap input{width:100%;padding-inline-start:32px;border:1px solid var(--border);border-radius:var(--radius);padding-block:9px;padding-inline-end:11px;color:var(--foreground);outline:none;background:#fff;}
-  .search-wrap input:focus{border-color:var(--primary);}
-  .filters-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
-  .filters-row select{border:1px solid var(--border);border-radius:var(--radius);padding:7px 9px;background:#fff;font-size:12.5px;color:var(--foreground);outline:none;}
-  .filters-row select:focus{border-color:var(--primary);}
+  /* ---------- Breadcrumb ---------- */
+  .breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted-foreground);margin:0 0 4px;}
+  .breadcrumb a{color:var(--muted-foreground);}
+  .breadcrumb a:hover{color:var(--primary);}
+  .breadcrumb svg{width:10px;height:10px;stroke-width:2;}
+  .breadcrumb .cur{color:var(--foreground);}
 
-  /* ---------- Rule tables (grouped by service) ---------- */
-  .section-title{font-family:'Outfit',sans-serif;font-weight:600;font-size:14.5px;margin:28px 0 12px;}
-  .section-title:first-child{margin-top:0;}
-  .section-title .n{font-weight:400;color:var(--muted-foreground);text-transform:none;font-size:12px;}
+  /* ---------- All Rules card: title + search + filter, then one table per service/channel ---------- */
+  .rules-card{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius);padding:20px 22px 22px;}
+  .rules-head{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .rules-title{font-family:'Outfit',sans-serif;font-weight:600;font-size:17px;color:var(--cadet-base);margin:0;white-space:nowrap;}
+  .search-wrap{position:relative;flex:1;min-width:180px;max-width:380px;}
+  .search-wrap svg{position:absolute;inset-inline-start:10px;top:50%;transform:translateY(-50%);color:var(--muted-foreground);width:15px;height:15px;pointer-events:none;}
+  .search-wrap input{width:100%;padding:8px 10px;padding-inline-start:34px;border:1px solid transparent;border-radius:var(--radius);color:var(--foreground);outline:none;background:transparent;}
+  .search-wrap input:hover{background:var(--muted);}
+  .search-wrap input:focus{border-color:var(--primary);background:#fff;}
+  .filter-wrap{position:relative;margin-inline-start:auto;}
+  .filter-count{background:var(--primary);color:#fff;border-radius:9px;font-size:10.5px;font-weight:700;padding:0 6px;line-height:17px;}
+  .filter-panel{display:none;position:absolute;inset-inline-end:0;top:calc(100% + 6px);width:300px;max-width:calc(100vw - 32px);background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 10px 30px rgba(0,20,60,.14);padding:6px 16px 16px;z-index:30;}
+  .filter-panel.open{display:block;}
+  .filter-panel label{display:block;font-size:11px;font-weight:700;color:var(--cadet-base);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 5px;}
+  .filter-panel select{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:8px 9px;background:#fff;color:var(--foreground);outline:none;}
+  .filter-panel select:focus{border-color:var(--primary);}
+  .filter-clear{margin-top:14px;background:none;border:none;color:var(--link);font-weight:600;font-size:12.5px;padding:0;text-decoration:underline;}
+
+  .rule-group{margin-top:24px;}
+  .rg-title{margin:0 0 10px;font-size:12.5px;color:var(--muted-foreground);font-weight:400;font-family:'Noto Sans',sans-serif;}
+  .rg-title b{font-family:'Outfit',sans-serif;font-weight:700;font-size:14.5px;color:var(--foreground);margin-inline-end:6px;}
+  .rg-table{background:#FAFBFB;border:1px solid var(--border-subtle);border-radius:6px;overflow-x:auto;}
   table{width:100%;border-collapse:collapse;}
-  thead th{text-align:start;font-size:11px;font-weight:600;color:var(--cadet-base);text-transform:uppercase;letter-spacing:.03em;background:var(--muted);padding:11px 16px;border-bottom:1px solid var(--border);}
-  tbody td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13.5px;}
-  tbody tr:last-child td{border-bottom:none;}
+  thead th{text-align:start;font-size:11px;font-weight:700;color:var(--cadet-base);text-transform:uppercase;letter-spacing:.04em;padding:14px 12px;white-space:nowrap;}
+  tbody td{padding:14px 12px;border-top:1px solid var(--border-subtle);vertical-align:middle;font-size:13px;}
   .row-click{cursor:pointer;}
   .row-click:hover{background:var(--primary-10);}
-  .svc-name{font-weight:600;color:var(--foreground);font-size:13.5px;}
-  .svc-desc{color:var(--muted-foreground);font-size:12.5px;margin-top:3px;line-height:1.5;}
+  .row-click:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+  .svc-name{font-weight:700;color:var(--foreground);min-width:170px;max-width:260px;overflow-wrap:anywhere;}
   .chevron-affordance{color:var(--muted-foreground);width:24px;}
-  .chevron-affordance svg{width:16px;height:16px;transform:rotate(-90deg);}
+  .chevron-affordance svg{width:16px;height:16px;}
 
-  /* ---------- Chips (status pills) ---------- */
-  .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:2px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
-  .chip svg{width:11px;height:11px;}
-  .chip-success{background:var(--success-10);color:var(--success);}
-  .chip-destructive{background:var(--destructive-10);color:var(--destructive);}
-  .chip-warning{background:var(--warning-10);color:#8a6100;}
-  .chip-muted{background:var(--muted);color:var(--muted-foreground);}
-  .chip-accent{background:#E6FBFA;color:#00857F;}
+  /* ---------- Pills (industry / document values) ---------- */
+  .pill-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .pill{display:inline-block;background:#F1F3F3;color:var(--foreground);font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;white-space:nowrap;}
+  .pill-more{color:var(--muted-foreground);font-weight:700;letter-spacing:1px;cursor:default;}
 
   /* ---------- Empty state ---------- */
   .empty-state{padding:56px 24px;text-align:center;color:var(--muted-foreground);}
   .empty-state svg{width:36px;height:36px;margin:0 auto 12px;color:var(--border);}
   .empty-state p{margin:0 0 14px;font-size:13.5px;}
 
-  /* ---------- Events (audit trail) ---------- */
-  .event-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border-subtle);}
-  .event-item:last-child{border-bottom:none;}
+  /* ---------- History (audit trail) ---------- */
+  .hist-head{display:flex;align-items:center;gap:10px;margin:2px 0 4px;}
+  .hist-head svg{width:20px;height:20px;color:var(--muted-foreground);}
+  .hist-head h2{font-family:'Outfit',sans-serif;font-weight:600;font-size:20px;color:var(--cadet-base);margin:0;}
+  .hist-sub{font-size:12px;color:var(--muted-foreground);margin:0 0 14px;}
+  .event-item{display:flex;align-items:flex-start;gap:14px;padding:9px 6px;}
   .ev-icon{width:34px;height:34px;border-radius:50%;background:var(--muted);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .ev-icon svg{width:15px;height:15px;}
-  .ev-icon.created{background:var(--success-10);color:var(--success);}
-  .ev-icon.updated{background:var(--warning-10);color:#8a6100;}
-  .ev-icon.deleted{background:var(--destructive-10);color:var(--destructive);}
-  .ev-body{min-width:0;padding-top:2px;}
-  .ev-ts{font-size:12.5px;color:var(--muted-foreground);}
-  .ev-sentence{font-size:13.5px;color:var(--cadet-base);margin-top:5px;line-height:1.45;}
-  .ev-sentence b{font-weight:700;color:var(--foreground);}
-  .events-empty{display:none;}
-  .events-empty.show{display:block;}
+  .ev-icon svg{width:15px;height:15px;stroke-width:2;}
+  .ev-icon.created{background:var(--success);color:#fff;}
+  .ev-icon.updated{background:#E6E8E8;color:var(--muted-foreground);}
+  .ev-icon.deleted,.ev-icon.removed{background:var(--destructive);color:#fff;}
+  .ev-body{min-width:0;}
+  .ev-ts{font-size:13.5px;color:var(--foreground);}
+  .ev-sentence{font-size:13.5px;color:var(--foreground);line-height:1.45;overflow-wrap:anywhere;}
+  .ev-scope{color:var(--muted-foreground);font-size:12px;margin-inline-start:4px;}
+  .ev-changes{margin:6px 0 2px;padding:0;list-style:none;font-size:12.5px;color:var(--muted-foreground);}
+  .ev-changes li{margin-top:3px;overflow-wrap:anywhere;}
+  .ev-changes .f{font-weight:600;color:var(--cadet-base);}
+  .ev-changes .from{text-decoration:line-through;}
+  .ev-changes .to{color:var(--foreground);}
+  .pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;font-size:12px;color:var(--muted-foreground);flex-wrap:wrap;}
+  .pager-right{display:flex;align-items:center;gap:12px;}
+  .pager select{border:none;background:transparent;font-weight:600;color:var(--foreground);font-size:12px;padding:2px;}
+  .pager .pg-btn{border:none;background:none;padding:4px;color:var(--foreground);display:inline-flex;border-radius:var(--radius);}
+  .pager .pg-btn:hover:not(:disabled){background:var(--muted);}
+  .pager .pg-btn:disabled{color:var(--border);cursor:default;}
+  .pager .pg-btn svg{width:14px;height:14px;stroke-width:2;}
 
-  /* ---------- Modal ---------- */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,10,30,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  /* ---------- Delete confirmation modal ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,10,30,.45);display:none;align-items:center;justify-content:center;z-index:110;padding:20px;}
   .modal-overlay.open{display:flex;}
-  .modal{background:#fff;border-radius:var(--radius);width:100%;max-width:560px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,20,60,.25);}
-  .modal-sm{max-width:420px;}
+  .modal{background:#fff;border-radius:var(--radius);width:100%;max-width:420px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,20,60,.25);}
   .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border-subtle);}
   .modal-header h3{margin:0;font-size:16px;color:var(--primary);}
   .modal-body{padding:20px 22px;overflow-y:auto;}
   .modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--border-subtle);}
-  .confirm-text{font-size:13.5px;color:var(--foreground);line-height:1.55;margin:0;}
-  .confirm-text b{color:var(--foreground);}
+  .confirm-text{font-size:13.5px;color:var(--foreground);line-height:1.55;margin:0;overflow-wrap:anywhere;}
 
-  /* Rule details (read-only) */
-  .detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
-  .detail-actions{display:flex;gap:8px;align-items:center;}
-  .vd-section{margin-bottom:18px;}
-  .vd-section:last-child{margin-bottom:0;}
-  .vd-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:9px;}
-  .vd-doc{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--foreground);padding:7px 0;border-bottom:1px solid var(--border-subtle);}
-  .vd-doc:last-child{border-bottom:none;}
-  .vd-doc svg{width:15px;height:15px;color:var(--success);flex-shrink:0;}
-  .kv-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle);font-size:13px;}
-  .kv-row:last-child{border-bottom:none;}
+  /* ---------- Rule details drawer ---------- */
+  .drawer-overlay{position:fixed;inset:0;background:rgba(0,10,30,.4);opacity:0;pointer-events:none;transition:opacity .2s;z-index:100;}
+  .drawer-overlay.open{opacity:1;pointer-events:auto;}
+  .drawer{position:fixed;top:0;bottom:0;inset-inline-end:0;width:min(480px,100vw);background:#fff;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;z-index:101;box-shadow:-8px 0 30px rgba(0,20,60,.15);visibility:hidden;}
+  .drawer.open{transform:none;visibility:visible;}
+  .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-subtle);}
+  .drawer-head h3{font-family:'Outfit',sans-serif;font-weight:600;font-size:18px;margin:0;color:var(--foreground);}
+  .drawer-body{flex:1;overflow-y:auto;padding:22px 24px;}
+  .drawer-foot{display:flex;gap:12px;padding:16px 24px;border-top:1px solid var(--border-subtle);}
+  .drawer-foot .btn{flex:1;justify-content:center;padding:11px 16px;}
+  .dr-name{font-family:'Outfit',sans-serif;font-weight:600;font-size:16px;margin:0 0 14px;overflow-wrap:anywhere;}
+  .sub-tabs{display:flex;gap:22px;border-bottom:1px solid var(--border-subtle);margin:0 0 18px;}
+  .sub-tab{padding:8px 2px;font-size:13.5px;font-weight:600;color:var(--muted-foreground);background:none;border:none;border-bottom:2px solid transparent;position:relative;top:1px;}
+  .sub-tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+  .sub-tab:hover:not(.active){color:var(--foreground);}
+  .kv-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:9px 0;font-size:13.5px;}
   .kv-row .k{color:var(--muted-foreground);flex-shrink:0;}
-  .kv-row .v{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .kv-row .v{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;text-align:end;font-weight:500;overflow-wrap:anywhere;}
+  .vd-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-foreground);margin:18px 0 8px;}
+  .vd-doc{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--foreground);padding:6px 0;overflow-wrap:anywhere;}
+  .vd-doc svg{width:16px;height:16px;color:var(--success);flex-shrink:0;}
+  .vd-sep{border-top:1px solid var(--border-subtle);margin:12px 0 6px;}
+  .logs-empty{color:var(--muted-foreground);font-size:13px;padding:8px 0;}
 
   #toast{position:fixed;bottom:24px;inset-inline-end:24px;background:var(--foreground);color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:200;display:flex;align-items:center;gap:8px;}
   #toast.show{opacity:1;transform:translateY(0);}
@@ -194,13 +226,12 @@
     .nav-item{justify-content:center;}
     .main{margin-inline-start:64px;}
     .page{padding:8px 14px 40px;}
+    .rules-card{padding:16px 14px;}
   }
   @media (max-width:640px){
     .page-header{flex-direction:column;}
-    table thead{display:none;}
-    table,tbody,tr,td{display:block;width:100%;}
-    tbody tr{border-bottom:1px solid var(--border);padding:12px 16px;}
-    tbody td{border:none;padding:4px 0;}
+    .rules-head{gap:10px;}
+    .filter-wrap{margin-inline-start:0;}
   }
 </style>
 </head>
@@ -245,80 +276,122 @@
     </header>
 
     <main class="page">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="home.html">Home</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+        <span class="cur">Document Rules</span>
+      </nav>
       <div class="page-header">
         <div>
           <h1 class="page-title">Document Rules</h1>
-          <p class="page-subtitle">Each rule targets a specific service, plus merchant type, owner nationality, industry, financial institution and settlement type, to decide which documents a merchant must submit to proceed with onboarding.</p>
-        </div>
-      </div>
-
-      <div class="tabs">
-        <button class="tab active">All Rules</button>
-        <a class="tab" href="document-rules-create.html" style="text-decoration:none;display:inline-block">Create Rule</a>
-      </div>
-
-      <div class="page-header" style="margin-bottom:10px;">
-        <div class="search-wrap" style="margin-bottom:0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-          <input type="text" id="ruleSearch" placeholder="Search by rule name…">
+          <p class="page-subtitle">Define which documents merchants must submit based on channel, service, merchant type, owner nationality, industry, financial institution and settlement type.</p>
         </div>
         <a class="btn btn-primary" href="document-rules-create.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Create Rule
+          Add Document Rule
         </a>
       </div>
-      <div class="filters-row">
-        <select id="fChannel"><option value="">All channels</option></select>
-        <select id="fService"><option value="">All services</option></select>
-        <select id="fEntity"><option value="">All merchant types</option></select>
-        <select id="fIndustry"><option value="">All industries</option></select>
-        <select id="fBank"><option value="">All financial institutions</option></select>
-        <select id="fModule"><option value="">All settlement types</option></select>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tabRules" role="tab" aria-selected="true" aria-controls="panelRules">All Rules</button>
+        <button class="tab" id="tabHistory" role="tab" aria-selected="false" aria-controls="panelHistory">History</button>
       </div>
 
-      <div id="ruleGroups"></div>
+      <!-- ══════════ All Rules ══════════ -->
+      <section id="panelRules" role="tabpanel" aria-labelledby="tabRules">
+        <div class="rules-card">
+          <div class="rules-head">
+            <h2 class="rules-title">All document rules</h2>
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+              <input type="text" id="ruleSearch" placeholder="Search by rule name..." aria-label="Search by rule name">
+            </div>
+            <div class="filter-wrap">
+              <button class="btn btn-outline" id="filterBtn" aria-expanded="false" aria-controls="filterPanel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/></svg>
+                Filter <span class="filter-count" id="filterCount" hidden></span>
+              </button>
+              <div class="filter-panel" id="filterPanel">
+                <label for="fChannel">Channel</label><select id="fChannel"><option value="">All channels</option></select>
+                <label for="fService">Service</label><select id="fService"><option value="">All services</option></select>
+                <label for="fEntity">Merchant type</label><select id="fEntity"><option value="">All merchant types</option></select>
+                <label for="fOwner">Owner nationality</label><select id="fOwner"><option value="">All owner nationalities</option></select>
+                <label for="fIndustry">Industry</label><select id="fIndustry"><option value="">All industries</option></select>
+                <label for="fBank">Financial institution</label><select id="fBank"><option value="">All financial institutions</option></select>
+                <label for="fModule">Settlement type</label><select id="fModule"><option value="">All settlement types</option></select>
+                <button type="button" class="filter-clear" id="filterClear">Clear all filters</button>
+              </div>
+            </div>
+          </div>
 
-      <div class="card" id="rulesEmpty">
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
-          <p id="emptyText" style="margin-bottom:0;">No documents rules yet — create your first one.</p>
+          <div id="ruleGroups"></div>
+
+          <div class="empty-state" id="rulesEmpty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
+            <p id="emptyText" style="margin-bottom:0;"></p>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <!-- ══════════ Events ══════════ -->
-      <div class="card card-pad" style="margin-top:32px;">
-        <h2 class="card-title">Events</h2>
-        <p class="card-desc">Full audit trail of this module — every rule that is created, updated, or deleted is recorded here with who did it and when.</p>
+      <!-- ══════════ History ══════════ -->
+      <section id="panelHistory" role="tabpanel" aria-labelledby="tabHistory" hidden>
+        <div class="hist-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
+          <h2>Events</h2>
+        </div>
+        <p class="hist-sub">Full audit trail of this module. Every rule that is created, updated or deleted is recorded here with who did it and when.</p>
         <div id="eventsList"></div>
-        <div class="empty-state events-empty" id="eventsEmpty" style="padding:24px 0 4px;">
-          <p style="margin:0;">No events recorded yet — actions on rules will appear here.</p>
+        <div class="empty-state" id="eventsEmpty" style="display:none;padding:32px 0;"><p style="margin:0;">No events recorded yet — actions on rules will appear here.</p></div>
+        <div class="pager" id="pager">
+          <span id="pagerCount"></span>
+          <div class="pager-right">
+            <label for="pagerSize">Rows per page</label>
+            <select id="pagerSize"><option>10</option><option>20</option><option>50</option></select>
+            <button class="pg-btn" id="pagerPrev" aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg></button>
+            <span id="pagerPos"></span>
+            <button class="pg-btn" id="pagerNext" aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
+          </div>
         </div>
-      </div>
+      </section>
     </main>
   </div>
 </div>
 
-<!-- Rule details — read-only -->
-<div class="modal-overlay" id="viewBackdrop">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>Rule Details</h3>
-      <button class="btn-icon" id="viewClose" aria-label="Close">&#10005;</button>
-    </div>
-    <div class="modal-body">
-      <div id="viewContent"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" id="viewCloseBtn">Close</button>
-    </div>
+<!-- Rule details drawer — Details / Logs -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
+  <div class="drawer-head">
+    <h3 id="drawerTitle">Rule Details</h3>
+    <button class="btn-icon" id="drawerClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+    </button>
   </div>
-</div>
+  <div class="drawer-body">
+    <h4 class="dr-name" id="drName"></h4>
+    <div class="sub-tabs" role="tablist">
+      <button class="sub-tab active" id="subDetails" role="tab" aria-selected="true">Details</button>
+      <button class="sub-tab" id="subLogs" role="tab" aria-selected="false">Logs</button>
+    </div>
+    <div id="drDetails" role="tabpanel"></div>
+    <div id="drLogs" role="tabpanel" hidden></div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-destructive-outline" id="drDelete">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+      Delete
+    </button>
+    <button class="btn btn-primary" id="drEdit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
+      Edit Rule
+    </button>
+  </div>
+</aside>
 
 <!-- Delete confirm modal -->
 <div class="modal-overlay" id="deleteBackdrop">
-  <div class="modal modal-sm">
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="deleteTitle">
     <div class="modal-header">
-      <h3>Delete Rule</h3>
+      <h3 id="deleteTitle">Delete Rule</h3>
       <button class="btn-icon" id="deleteClose" aria-label="Close">&#10005;</button>
     </div>
     <div class="modal-body">
@@ -333,71 +406,27 @@
 
 <div id="toast"></div>
 
+<script src="document-rules-core.js"></script>
 <script>
   const $ = id => document.getElementById(id);
 
-  /* ══════════ Reference data (used by the filter dropdowns) ══════════ */
-  const ENTITIES = ['Individual Seller', 'Registered Business', 'Professional Business'];
-  const INDUSTRIES = ['Retail & E-commerce', 'Food & Beverage', 'Healthcare / Pharmacy', 'Education',
-    'Travel & Tourism', 'Professional Services', 'Technology / SaaS', 'Real Estate', 'Automotive',
-    'Fashion & Beauty', 'Entertainment & Media', 'Non-profit / NGO', 'Government', 'Financial Services',
-    'Insurance', 'Marketplace', 'Logistics & Delivery'];
-  const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
-  const MODULES = ['PF', 'PSP'];
-  /* Channel and Service are separate fields, matching the Pricing Rules module exactly:
-     its wizard picks a channel first, then a service from within it, and the service
-     list itself is just the 14 payment methods with no channel folded into the name. */
-  const CHANNELS = ['Online', 'POS'];
-  const SERVICES = ['Card', 'Wallet', 'Valu', 'OCTO', 'Souhoola', 'Contact', 'Basata', 'Mogo', 'Tru', 'Forsa',
-    'Aman', 'Bank Installments', 'Transfer', 'Instapay'];
-
-  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services', 'channels'];
-  /* ══════════ Shared storage — rules, ids, and events are read/written here and on
-     document-rules-create.html, so actions on either page are reflected on the other. ══════════ */
-  const RULES_KEY = 'kashier_document_rules_v1';
-  const EVENTS_KEY = 'kashier_document_rules_events_v1';
-  function loadRules() { try { return JSON.parse(localStorage.getItem(RULES_KEY)) || []; } catch (e) { return []; } }
-  function saveRules(list) { localStorage.setItem(RULES_KEY, JSON.stringify(list)); }
-  function loadEvents() {
-    try { return (JSON.parse(localStorage.getItem(EVENTS_KEY)) || []).map(e => ({ ...e, ts: new Date(e.ts) })); }
-    catch (e) { return []; }
-  }
-  function saveEvents(list) { localStorage.setItem(EVENTS_KEY, JSON.stringify(list.map(e => ({ ...e, ts: e.ts.toISOString() })))); }
-
-  /* ══════════ Migration — stale saved rules ══════════
-     Rules saved before the catalog shrank, before every condition became required, or
-     before Channel and Service split into separate fields, can point at services that no
-     longer exist or carry no service/channel at all (including the old "universal" rule
-     that applied to everyone). Prune retired names; a rule left without a valid service or
-     channel can never match anything, so it is removed. Returns what was dropped and why. */
-  function pruneStaleRules() {
-    const knownServices = new Set(SERVICES);
-    const knownChannels = new Set(CHANNELS);
-    const kept = [], dropped = [];
-    let pruned = false;
-    loadRules().forEach(r => {
-      const beforeServices = r.services || [];
-      const validServices = beforeServices.filter(s => knownServices.has(s));
-      const beforeChannels = r.channels || [];
-      const validChannels = beforeChannels.filter(c => knownChannels.has(c));
-      if (validServices.length !== beforeServices.length || validChannels.length !== beforeChannels.length) pruned = true;
-      if (validServices.length && validChannels.length) {
-        r.services = validServices;
-        r.channels = validChannels;
-        kept.push(r);
-      } else {
-        dropped.push({ rule: r, reason: !beforeServices.length && !beforeChannels.length ? 'no service set' : 'service retired' });
-      }
-    });
-    if (pruned || dropped.length) saveRules(kept);
-    return dropped;
-  }
-  const staleRules = pruneStaleRules();
+  /* One-off setup: first-visit demo data, then bring any older stored rules up to date. */
+  seedDemoData();
+  const staleRules = normalizeStore();
 
   let rules = loadRules();
+  let events = loadEvents();   // newest first
+
+  /* ══════════ Icons ══════════ */
+  const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
+  const CHEVRON_RIGHT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>';
+  const PLUS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>';
+  const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>';
+  const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
+  const EVENT_ICON = { created: PLUS_ICON, updated: PENCIL_ICON, deleted: TRASH_ICON, removed: TRASH_ICON };
+  const EVENT_PHRASE = { created: 'created rule', updated: 'updated rule', deleted: 'deleted rule', removed: 'removed outdated rule' };
 
   /* ══════════ Toast ══════════ */
-  const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
   let toastTimer;
   function toast(msg) {
     const t = $('toast');
@@ -407,157 +436,250 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
   }
 
+  /* ══════════ Tabs — All Rules / History ══════════ */
+  function showTab(name) {
+    const hist = name === 'history';
+    $('tabRules').classList.toggle('active', !hist);
+    $('tabHistory').classList.toggle('active', hist);
+    $('tabRules').setAttribute('aria-selected', String(!hist));
+    $('tabHistory').setAttribute('aria-selected', String(hist));
+    $('panelRules').hidden = hist;
+    $('panelHistory').hidden = !hist;
+    history.replaceState({}, '', location.pathname + location.search + (hist ? '#history' : ''));
+  }
+  $('tabRules').addEventListener('click', () => showTab('rules'));
+  $('tabHistory').addEventListener('click', () => showTab('history'));
+
   /* ══════════ Filters ══════════ */
-  function fillSelect(id, options) {
-    const s = $(id);
+  const FILTERS = [
+    ['fChannel', 'channels', CHANNELS], ['fService', 'services', SERVICES], ['fEntity', 'entities', ENTITIES],
+    ['fOwner', 'owners', OWNER_NATIONALITIES], ['fIndustry', 'industries', INDUSTRIES], ['fBank', 'banks', BANKS],
+    ['fModule', 'modules', MODULES],
+  ];
+  FILTERS.forEach(([id, key, options]) => {
     options.forEach(o => {
       const opt = document.createElement('option');
-      opt.value = o; opt.textContent = o;
-      s.appendChild(opt);
+      opt.value = o; opt.textContent = optionLabel(key, o);
+      $(id).appendChild(opt);
     });
-  }
-  fillSelect('fChannel', CHANNELS);
-  fillSelect('fService', SERVICES);
-  fillSelect('fEntity', ENTITIES);
-  fillSelect('fIndustry', INDUSTRIES);
-  fillSelect('fBank', BANKS);
-  fillSelect('fModule', MODULES);
-  ['fChannel', 'fEntity', 'fIndustry', 'fBank', 'fModule', 'fService'].forEach(id => $(id).addEventListener('change', renderRules));
+    $(id).addEventListener('change', renderRules);
+  });
   $('ruleSearch').addEventListener('input', renderRules);
 
+  function setFilterPanel(open) {
+    $('filterPanel').classList.toggle('open', open);
+    $('filterBtn').setAttribute('aria-expanded', String(open));
+  }
+  $('filterBtn').addEventListener('click', e => { e.stopPropagation(); setFilterPanel(!$('filterPanel').classList.contains('open')); });
+  $('filterPanel').addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', () => setFilterPanel(false));
+  $('filterClear').addEventListener('click', () => { FILTERS.forEach(([id]) => { $(id).value = ''; }); renderRules(); });
+
   function ruleVisible(r) {
-    const fc = $('fChannel').value, fe = $('fEntity').value, fi = $('fIndustry').value, fb = $('fBank').value, fm = $('fModule').value, fs = $('fService').value;
-    if (fc && r.channels.length && !r.channels.includes(fc)) return false;
-    if (fe && r.entities.length && !r.entities.includes(fe)) return false;
-    if (fi && r.industries.length && !r.industries.includes(fi)) return false;
-    if (fb && r.banks.length && !r.banks.includes(fb)) return false;
-    if (fm && r.modules.length && !r.modules.includes(fm)) return false;
-    if (fs && r.services.length && !r.services.includes(fs)) return false;
+    const ok = FILTERS.every(([id, key]) => {
+      const v = $(id).value;
+      return !v || coversAll(key, r[key]) || r[key].includes(v);
+    });
+    if (!ok) return false;
     const q = $('ruleSearch').value.trim().toLowerCase();
-    if (q && !r.name.toLowerCase().includes(q)) return false;
-    return true;
+    return !q || r.name.toLowerCase().includes(q);
   }
 
-  /* ══════════ Rule list — grouped by service, one table per group ══════════
-     Matches the Pricing Rules page: rows carry no inline actions, a chevron
-     affordance opens the read-only detail (here, a modal instead of a full
-     page), where Edit and Delete live. */
-  const CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>';
-  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const joinOr = vals => vals.length ? vals.map(esc).join(', ') : '—';
+  /* ══════════ Rule list — one table per service and channel ══════════
+     A rule belongs to exactly one of each, so groups read "Tru  POS - 2 rules". Newest rules
+     (and the groups they sit in) come first. */
+  const MAX_PILLS = 3;
+  function pills(values) {
+    const shown = values.slice(0, MAX_PILLS).map(v => '<span class="pill">' + esc(v) + '</span>').join('');
+    const more = values.length > MAX_PILLS ? '<span class="pill-more" title="' + esc(values.slice(MAX_PILLS).join(', ')) + '">…</span>' : '';
+    return '<div class="pill-row">' + shown + more + '</div>';
+  }
 
   function renderRules() {
     const groupsEl = $('ruleGroups');
-    const visible = rules.filter(ruleVisible);
+    const visible = rules.filter(ruleVisible).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     groupsEl.innerHTML = '';
+
+    const active = FILTERS.filter(([id]) => $(id).value).length;
+    $('filterCount').textContent = active;
+    $('filterCount').hidden = !active;
+
     $('rulesEmpty').style.display = visible.length === 0 ? 'block' : 'none';
     $('emptyText').textContent = rules.length === 0
-      ? 'No documents rules yet — create your first one.'
-      : 'No rules match your filters — try clearing them, or add a new rule.';
+      ? 'No document rules yet — add your first one.'
+      : 'No rules match your search or filters — try clearing them.';
     if (visible.length === 0) return;
 
-    /* Grouped by service, same as Pricing Rules' own list. A rule can cover several
-       services (and channels), so it appears under each service it applies to; the
-       Channel column says which channels. Filtering by service shows only that group. */
-    const onlyService = $('fService').value;
-    SERVICES.forEach(service => {
-      if (onlyService && service !== onlyService) return;
-      const groupRules = visible.filter(r => r.services.includes(service));
-      if (!groupRules.length) return;
+    const groups = new Map();   // insertion order = newest group first
+    visible.forEach(r => {
+      const k = r.services[0] + '\u0000' + r.channels[0];
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(r);
+    });
 
-      const section = document.createElement('div');
-      section.className = 'section-title';
-      section.innerHTML = esc(service) + ' <span class="n">· ' + groupRules.length + (groupRules.length === 1 ? ' rule' : ' rules') + '</span>';
-      groupsEl.appendChild(section);
+    groups.forEach(list => {
+      const service = list[0].services[0], channel = list[0].channels[0];
+      const wrap = document.createElement('div');
+      wrap.className = 'rule-group';
+      wrap.innerHTML =
+        '<h3 class="rg-title"><b>' + esc(service) + '</b>' + esc(channel) + ' - ' + list.length + (list.length === 1 ? ' rule' : ' rules') + '</h3>' +
+        '<div class="rg-table"><table><thead><tr>' +
+          '<th>Rule name</th><th>Channel</th><th>Merchant type</th><th>Owner nationality</th><th>Industry</th>' +
+          '<th>Financial institution</th><th>Settlement type</th><th>Documents</th><th></th>' +
+        '</tr></thead><tbody></tbody></table></div>';
+      const tbody = wrap.querySelector('tbody');
 
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.marginBottom = '4px';
-      card.innerHTML =
-        '<table><thead><tr>' +
-          '<th>Rule name</th><th>Channel</th><th>Merchant Type</th><th>Owner Nationality</th><th>Industry</th>' +
-          '<th>Financial Institution</th><th>Settlement Type</th><th>Documents</th><th></th>' +
-        '</tr></thead><tbody></tbody></table>';
-      const tbody = card.querySelector('tbody');
-
-      groupRules.forEach(r => {
+      list.forEach(r => {
         const row = document.createElement('tr');
         row.className = 'row-click';
+        row.tabIndex = 0;
         row.innerHTML =
           '<td class="svc-name">' + esc(r.name) + '</td>' +
-          '<td>' + joinOr(r.channels) + '</td>' +
-          '<td>' + joinOr(r.entities) + '</td>' +
-          '<td>' + joinOr(r.owners) + '</td>' +
-          '<td>' + joinOr(r.industries) + '</td>' +
-          '<td>' + joinOr(r.banks) + '</td>' +
-          '<td>' + joinOr(r.modules) + '</td>' +
-          '<td>' + r.docs.length + (r.docs.length === 1 ? ' doc' : ' docs') + '</td>' +
-          '<td class="chevron-affordance">' + CHEVRON + '</td>';
-        row.addEventListener('click', () => openView(r));
+          '<td>' + esc(r.channels[0]) + '</td>' +
+          '<td>' + esc(describe('entities', r.entities)) + '</td>' +
+          '<td>' + esc(describe('owners', r.owners)) + '</td>' +
+          '<td>' + (coversAll('industries', r.industries) ? esc(ALL_LABELS.industries) : pills(r.industries)) + '</td>' +
+          '<td>' + esc(describe('banks', r.banks)) + '</td>' +
+          '<td>' + esc(describe('modules', r.modules)) + '</td>' +
+          '<td>' + pills(r.docs) + '</td>' +
+          '<td class="chevron-affordance">' + CHEVRON_RIGHT + '</td>';
+        row.addEventListener('click', () => openDrawer(r, row));
+        row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrawer(r, row); } });
         tbody.appendChild(row);
       });
-
-      groupsEl.appendChild(card);
+      groupsEl.appendChild(wrap);
     });
   }
 
-  /* ══════════ View rule (read-only) ══════════ */
-  const PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>';
-  const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
+  /* ══════════ History — the module-wide audit trail, paginated ══════════ */
+  let histPage = 1, histSize = 10;
 
-  const COND_LABELS = [
-    ['channels',   'Channel'],
-    ['services',   'Service'],
-    ['entities',   'Merchant Type'],
-    ['owners',     'Business Owner Nationality'],
-    ['industries', 'Industry'],
-    ['banks',      'Financial Institution'],
-    ['modules',    'Settlement type'],
-  ];
+  function eventKind(ev) { return ev.action.startsWith('Removed') ? 'removed' : ev.action.toLowerCase(); }
 
-  function openView(r) {
-    const docs = r.docs.map(d => '<div class="vd-doc">' + CHECK_ICON + esc(d) + '</div>').join('');
+  function eventSentence(ev) {
+    const kind = eventKind(ev);
+    const scope = ev.service ? '<span class="ev-scope">· ' + esc(ev.service) + ' · ' + esc(ev.channel) + '</span>' : '';
+    const why = kind === 'removed' ? ' <span class="ev-scope">(' + esc(ev.action.replace(/^Removed — /, '')) + ')</span>' : '';
+    return esc(ev.actor) + ' ' + EVENT_PHRASE[kind] + ' ' + esc(ev.ruleName) + scope + why;
+  }
 
-    /* Business Owner Nationality is the one optional condition group — omit its row
-       rather than show a label with nothing next to it when a rule leaves it unset. */
-    const kvRows = COND_LABELS.map(([key, label]) => {
-      const vals = r[key];
-      if (!vals.length) return '';
-      const pillClass = key === 'entities' || key === 'services' ? 'chip-accent' : 'chip-muted';
-      const body = vals.map(v => '<span class="chip ' + pillClass + '">' + esc(v) + '</span>').join('');
-      return '<div class="kv-row"><span class="k">' + label + '</span><span class="v">' + body + '</span></div>';
+  function renderEvents() {
+    const total = events.length;
+    const pages = Math.max(1, Math.ceil(total / histSize));
+    histPage = Math.min(histPage, pages);
+    const start = (histPage - 1) * histSize;
+    const slice = events.slice(start, start + histSize);
+
+    $('eventsEmpty').style.display = total === 0 ? 'block' : 'none';
+    $('pager').style.display = total === 0 ? 'none' : 'flex';
+    $('eventsList').innerHTML = slice.map(ev => {
+      const kind = eventKind(ev);
+      return '<div class="event-item"><div class="ev-icon ' + kind + '">' + EVENT_ICON[kind] + '</div>' +
+        '<div class="ev-body"><div class="ev-ts">' + formatEventTime(ev.ts) + '</div>' +
+        '<div class="ev-sentence">' + eventSentence(ev) + '</div></div></div>';
     }).join('');
+    $('pagerCount').textContent = total ? (start + 1) + ' - ' + (start + slice.length) + ' Of ' + total : '';
+    $('pagerPos').textContent = histPage + ' / ' + pages;
+    $('pagerPrev').disabled = histPage <= 1;
+    $('pagerNext').disabled = histPage >= pages;
+  }
+  $('pagerPrev').addEventListener('click', () => { histPage--; renderEvents(); });
+  $('pagerNext').addEventListener('click', () => { histPage++; renderEvents(); });
+  $('pagerSize').addEventListener('change', () => { histSize = parseInt($('pagerSize').value, 10); histPage = 1; renderEvents(); });
 
-    $('viewContent').innerHTML =
-      '<div class="detail-head"><h2 style="font-size:16px;margin:0;">' + esc(r.name) + '</h2>' +
-        '<div class="detail-actions">' +
-          '<button class="btn btn-destructive-outline btn-sm" id="viewDeleteBtn">' + TRASH + 'Delete</button>' +
-          '<button class="btn btn-primary btn-sm" id="viewEditBtn">' + PENCIL + 'Edit rule</button>' +
-        '</div></div>' +
-      kvRows +
-      '<div class="vd-section" style="margin-top:18px;"><div class="vd-label">Required Documents (' + r.docs.length + ')</div>' +
-        docs + '</div>';
+  /* ══════════ Rule details drawer — Details / Logs ══════════ */
+  let drawerRule = null, drawerOpener = null;
 
-    $('viewEditBtn').addEventListener('click', () => {
-      location.href = 'document-rules-create.html?edit=' + encodeURIComponent(r.id);
-    });
-    $('viewDeleteBtn').addEventListener('click', () => { closeView(); openDelete(r); });
-
-    $('viewBackdrop').classList.add('open');
+  function kv(label, valueHtml) {
+    return '<div class="kv-row"><span class="k">' + label + '</span><span class="v">' + valueHtml + '</span></div>';
   }
 
-  function closeView() { $('viewBackdrop').classList.remove('open'); }
-  $('viewClose').addEventListener('click', closeView);
-  $('viewCloseBtn').addEventListener('click', closeView);
-  $('viewBackdrop').addEventListener('click', e => { if (e.target === $('viewBackdrop')) closeView(); });
+  function renderDetails(r) {
+    const service = r.services[0];
+    const industry = coversAll('industries', r.industries)
+      ? esc(ALL_LABELS.industries)
+      : r.industries.map(i => '<span class="pill">' + esc(i) + '</span>').join('');
+    const docs = r.docs.map(d => '<div class="vd-doc">' + CHECK_ICON + esc(d) + '</div>').join('');
+    return kv('Channel', esc(r.channels[0])) +
+      kv('Service', esc(service)) +
+      kv('Merchant type', esc(describe('entities', r.entities))) +
+      kv('Owner nationality', esc(describe('owners', r.owners))) +
+      kv('Industry', industry) +
+      (NO_FI_SERVICES.includes(service) ? '' : kv('Financial institution', esc(describe('banks', r.banks)))) +
+      kv('Settlement type', esc(describe('modules', r.modules))) +
+      '<div class="vd-label">Required documents (' + r.docs.length + ')</div>' + docs +
+      '<div class="vd-sep"></div>' +
+      kv('Created', esc(formatStamp(new Date(r.createdAt)))) +
+      kv('Last updated', esc(formatStamp(new Date(r.updatedAt))));
+  }
+
+  function renderLogs(r) {
+    const mine = eventsForRule(r, events);
+    if (!mine.length) return '<p class="logs-empty">No activity recorded for this rule yet.</p>';
+    return mine.map(ev => {
+      const kind = eventKind(ev);
+      const changes = ev.changes && ev.changes.length
+        ? '<ul class="ev-changes">' + ev.changes.map(c =>
+            '<li><span class="f">' + esc(c.field) + ':</span> <span class="from">' + esc(c.from) + '</span> → <span class="to">' + esc(c.to) + '</span></li>').join('') + '</ul>'
+        : '';
+      return '<div class="event-item"><div class="ev-icon ' + kind + '">' + EVENT_ICON[kind] + '</div>' +
+        '<div class="ev-body"><div class="ev-ts">' + formatEventTime(ev.ts) + '</div>' +
+        '<div class="ev-sentence">' + esc(ev.actor) + ' ' + EVENT_PHRASE[kind] + '</div>' + changes + '</div></div>';
+    }).join('');
+  }
+
+  function setSubTab(name) {
+    const logs = name === 'logs';
+    $('subDetails').classList.toggle('active', !logs);
+    $('subLogs').classList.toggle('active', logs);
+    $('subDetails').setAttribute('aria-selected', String(!logs));
+    $('subLogs').setAttribute('aria-selected', String(logs));
+    $('drDetails').hidden = logs;
+    $('drLogs').hidden = !logs;
+  }
+  $('subDetails').addEventListener('click', () => setSubTab('details'));
+  $('subLogs').addEventListener('click', () => setSubTab('logs'));
+
+  function openDrawer(r, opener) {
+    drawerRule = r;
+    drawerOpener = opener || null;
+    $('drName').textContent = r.name;
+    $('drDetails').innerHTML = renderDetails(r);
+    $('drLogs').innerHTML = renderLogs(r);
+    setSubTab('details');
+    $('drawer').classList.add('open');
+    $('drawer').setAttribute('aria-hidden', 'false');
+    $('drawerOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    $('drawerClose').focus();
+  }
+  function closeDrawer() {
+    $('drawer').classList.remove('open');
+    $('drawer').setAttribute('aria-hidden', 'true');
+    $('drawerOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    if (drawerOpener && document.contains(drawerOpener)) drawerOpener.focus();
+    drawerRule = null;
+  }
+  $('drawerClose').addEventListener('click', closeDrawer);
+  $('drawerOverlay').addEventListener('click', closeDrawer);
+  $('drEdit').addEventListener('click', () => { location.href = 'document-rules-create.html?edit=' + encodeURIComponent(drawerRule.id); });
+  $('drDelete').addEventListener('click', () => { const r = drawerRule; closeDrawer(); openDelete(r); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if ($('deleteBackdrop').classList.contains('open')) closeDelete();
+    else if ($('drawer').classList.contains('open')) closeDrawer();
+    else setFilterPanel(false);
+  });
 
   /* ══════════ Delete modal ══════════ */
   let deleteTarget = null;
   function openDelete(r) {
     deleteTarget = r;
-    $('deleteText').innerHTML = 'Are you sure you want to delete the rule <b>' + esc(r.name) + '</b>? ' +
+    $('deleteText').innerHTML = 'Are you sure you want to delete the rule <b>' + esc(r.name) + '</b> (' + esc(r.services[0]) + ' · ' + esc(r.channels[0]) + ')? ' +
       'Merchants matching its conditions will no longer be asked for: <b>' + r.docs.map(esc).join(', ') + '</b>.';
     $('deleteBackdrop').classList.add('open');
+    $('deleteCancel').focus();
   }
   function closeDelete() { $('deleteBackdrop').classList.remove('open'); deleteTarget = null; }
   $('deleteClose').addEventListener('click', closeDelete);
@@ -565,57 +687,24 @@
   $('deleteBackdrop').addEventListener('click', e => { if (e.target === $('deleteBackdrop')) closeDelete(); });
   $('deleteConfirm').addEventListener('click', () => {
     if (!deleteTarget) return;
-    rules = rules.filter(r => r.id !== deleteTarget.id);
+    const gone = deleteTarget;
+    rules = rules.filter(r => r.id !== gone.id);
     saveRules(rules);
-    toast('Rule "' + deleteTarget.name + '" deleted');
-    logEvent('Deleted', deleteTarget);
+    logEvent('Deleted', gone);
+    events = loadEvents();
+    toast('Rule "' + esc(gone.name) + '" deleted');
     closeDelete();
     renderRules();
+    renderEvents();
   });
 
-  /* ══════════ Events (audit trail) — shared with document-rules-create.html ══════════ */
-  const CURRENT_USER = 'Aya Muhammed';
-  let events = loadEvents();  // newest first
-
-  const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>';
-
-  /** "07/22/2026. 03:08:56 PM" — the portal's event timestamp format. */
-  function formatEventTime(d) {
-    const p = n => String(n).padStart(2, '0');
-    let h = d.getHours();
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    return p(d.getMonth() + 1) + '/' + p(d.getDate()) + '/' + d.getFullYear() + '. ' +
-      p(h) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()) + ' ' + ampm;
-  }
-
-  const EVENT_PHRASE = { Created: 'created rule', Updated: 'updated rule', Deleted: 'deleted rule' };
-
-  function logEvent(action, rule) {
-    events.unshift({ ts: new Date(), action, ruleName: rule.name, actor: CURRENT_USER });
-    saveEvents(events);
-    renderEvents();
-  }
-
-  function renderEvents() {
-    $('eventsEmpty').classList.toggle('show', events.length === 0);
-    $('eventsList').innerHTML = events.map(ev => `
-      <div class="event-item">
-        <div class="ev-icon ${ev.action.toLowerCase()}">${PENCIL_ICON}</div>
-        <div class="ev-body">
-          <div class="ev-ts">${formatEventTime(ev.ts)}</div>
-          <div class="ev-sentence"><b>${esc(ev.actor)}</b> ${EVENT_PHRASE[ev.action]} <b>${esc(ev.ruleName)}</b></div>
-        </div>
-      </div>`).join('');
-  }
-
-  /* ══════════ Return-trip toast — shown after coming back from Create/Edit ══════════ */
+  /* ══════════ Return-trip toast — shown after coming back from Add / Edit ══════════ */
   (function handleReturnParams() {
     const p = new URLSearchParams(location.search);
-    const created = p.get('created'), updated = p.get('updated');
-    if (created) toast('Rule "' + created + '" added');
-    else if (updated) toast('Rule "' + updated + '" updated');
-    if (created || updated) history.replaceState({}, '', location.pathname);
+    const created = p.get('created'), updated = p.get('updated'), n = parseInt(p.get('n') || '1', 10);
+    if (created) toast(n > 1 ? n + ' rules "' + esc(created) + '" added' : 'Rule "' + esc(created) + '" added');
+    else if (updated) toast('Rule "' + esc(updated) + '" updated');
+    if (created || updated) history.replaceState({}, '', location.pathname + location.hash);
   })();
 
   /* ══════════ Sidebar (collapsible groups) ══════════ */
@@ -632,13 +721,15 @@
   /* ══════════ Init ══════════ */
   renderRules();
   renderEvents();
+  if (location.hash === '#history') showTab('history');
 
   /* Report anything the migration removed. */
-  staleRules.forEach(d => logEvent('Removed — ' + d.reason, d.rule));
   if (staleRules.length) {
+    events = loadEvents();
+    renderEvents();
     toast(staleRules.length === 1
-      ? '1 outdated rule removed — see Events'
-      : staleRules.length + ' outdated rules removed — see Events');
+      ? '1 outdated rule removed — see History'
+      : staleRules.length + ' outdated rules removed — see History');
   }
 </script>
 <script>

@@ -71,81 +71,84 @@
   .topbar-user svg{width:18px;height:18px;color:var(--cadet-base);}
 
   /* ---------- Page content ---------- */
-  .page{max-width:900px;margin:0 auto;padding:8px 28px 48px;width:100%;}
-  .page-header{margin-bottom:20px;}
+  .page{max-width:1200px;margin:0 auto;padding:8px 28px 48px;width:100%;}
+  .page-header{margin-bottom:18px;}
   .page-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:28px;margin:0 0 4px;color:#000;}
   .page-subtitle{color:var(--muted-foreground);font-size:13.5px;margin:0;max-width:640px;}
+  .breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted-foreground);margin:0 0 4px;}
+  .breadcrumb a{color:var(--muted-foreground);}
+  .breadcrumb a:hover{color:var(--primary);}
+  .breadcrumb svg{width:10px;height:10px;stroke-width:2;}
+  .breadcrumb .cur{color:var(--foreground);}
 
   /* ---------- Buttons ---------- */
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius);font-size:13.5px;font-weight:600;border:1px solid transparent;white-space:nowrap;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--radius);font-size:13.5px;font-weight:600;border:1px solid transparent;white-space:nowrap;}
   .btn svg{width:16px;height:16px;}
   .btn-primary{background:var(--primary);color:#fff;}
   .btn-primary:hover{background:var(--primary-hover);}
-  .btn-outline{background:#fff;border-color:var(--border);color:var(--foreground);}
-  .btn-outline:hover{background:var(--muted);}
-  .btn:focus-visible,.nav-item:focus-visible,input:focus-visible,.btn-icon:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-
-  /* ---------- Tabs ---------- */
-  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border-subtle);margin-bottom:22px;flex-wrap:wrap;}
-  .tab{padding:10px 4px;margin-inline-end:22px;font-size:13.5px;font-weight:600;color:var(--muted-foreground);background:none;border:none;border-bottom:2px solid transparent;position:relative;top:1px;}
-  .tab.active{color:var(--primary);border-bottom-color:var(--primary);}
-  .tab:hover:not(.active){color:var(--foreground);}
-
-  /* ---------- Back link ---------- */
-  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted-foreground);font-size:13px;font-weight:500;margin-bottom:14px;background:none;border:none;padding:0;cursor:pointer;}
-  .back-link svg{width:15px;height:15px;}
-  .back-link:hover{color:var(--primary);}
+  .btn-outline{background:#fff;border-color:var(--primary);color:var(--primary);}
+  .btn-outline:hover{background:var(--primary-10);}
+  .btn:focus-visible,.nav-item:focus-visible,input:focus-visible,.btn-icon:focus-visible,.sec-all:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
   /* ---------- Card ---------- */
   .card{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius);overflow:hidden;}
-  .card-pad{padding:22px;}
-  .card-title{font-size:16px;margin:0 0 18px;}
+  .card-pad{padding:24px;}
+  .card-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;margin:0 0 4px;color:var(--foreground);}
+  .card-desc{font-size:12.5px;color:var(--muted-foreground);margin:0 0 18px;line-height:1.5;}
 
-  /* ---------- Fields ---------- */
+  /* ---------- Rule name ---------- */
   .field{margin-bottom:18px;}
-  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--cadet-base);margin-bottom:8px;}
-  .field label .req{color:var(--destructive);margin-inline-start:2px;}
-  .field input[type=text]{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;font-family:inherit;color:var(--foreground);outline:none;background:#fff;}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--foreground);margin-bottom:8px;}
+  .req{color:var(--destructive);margin-inline-start:3px;}
+  .field input[type=text]{width:100%;max-width:480px;border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-family:inherit;color:var(--foreground);outline:none;background:#fff;}
   .field input[type=text]:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-10);}
   .field input.invalid{border-color:var(--destructive);}
-  .inline-err{display:none;font-size:12px;color:var(--destructive);margin-top:6px;}
+  .inline-err{display:none;font-size:12px;color:var(--destructive);margin-top:8px;}
   .inline-err.show{display:block;}
 
-  /* ---------- Toggle chips (condition / document pickers) — outline + check, matching
-     the Pricing Rules criteria chips ---------- */
-  .chip-row{display:flex;flex-wrap:wrap;gap:8px;}
-  .toggle-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);background:#fff;color:var(--cadet-base);border-radius:2px;
-    font-size:12.5px;font-weight:600;padding:7px 12px;cursor:pointer;transition:all .1s ease;}
-  .toggle-chip svg{width:11px;height:11px;flex-shrink:0;}
-  .toggle-chip:hover{border-color:var(--primary);color:var(--primary);}
-  .toggle-chip.on{border-color:var(--primary);color:var(--primary);box-shadow:0 1px 2px rgba(0,20,60,.08);}
-  .chip-hint{font-size:12px;color:var(--muted-foreground);margin-top:8px;}
+  /* ---------- Criteria sections — one per condition, a checkbox per option ---------- */
+  .sec{border-top:1px solid var(--border-subtle);padding:16px 0 18px;}
+  .sec[hidden]{display:none;}
+  .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+  .sec-name{font-size:13px;font-weight:700;color:var(--foreground);}
+  .sec-status{margin-inline-start:auto;font-size:12px;color:var(--muted-foreground);white-space:nowrap;}
+  .sec-all{background:none;border:none;padding:0;color:var(--primary);font-weight:700;font-size:12px;text-decoration:underline;cursor:pointer;white-space:nowrap;}
+  .sec-all:hover{color:var(--primary-hover);}
+  .opt-grid{display:flex;flex-wrap:wrap;gap:12px 28px;}
+  .opt-grid.docs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px 24px;}
+  .opt{position:relative;display:inline-flex;align-items:center;gap:10px;min-width:0;font-size:13px;color:var(--foreground);cursor:pointer;}
+  .opt input{position:absolute;inset-inline-start:0;top:0;width:20px;height:20px;margin:0;opacity:0;cursor:pointer;}
+  .opt .box{width:20px;height:20px;flex-shrink:0;border:1px solid #C5CCCC;border-radius:3px;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:#fff;transition:background .1s,border-color .1s;}
+  .opt .box svg{width:13px;height:13px;stroke-width:3;opacity:0;}
+  .opt:hover .box{border-color:var(--primary);}
+  .opt input:checked + .box{background:var(--primary);border-color:var(--primary);}
+  .opt input:checked + .box svg{opacity:1;}
+  .opt input:focus-visible + .box{outline:2px solid var(--accent);outline-offset:2px;}
+  .opt .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-  /* ---------- Per-group selection status, matching Pricing Rules' criteria blocks ---------- */
-  .crit-toolbar{display:flex;justify-content:flex-end;margin-bottom:8px;}
-  .crit-status{font-size:12px;color:var(--muted-foreground);white-space:nowrap;}
-  .field-hint{font-size:12px;color:var(--muted-foreground);margin:0 0 10px;}
-  .svc-group{margin-bottom:15px;}
-  .svc-group:last-child{margin-bottom:0;}
-  .svc-group-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--muted-foreground);margin-bottom:8px;}
+  /* ---------- Service — multi-select dropdown, grouped by channel ---------- */
+  .dd{position:relative;max-width:520px;}
+  .dd-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:10px 12px;font-size:13px;color:var(--foreground);cursor:pointer;text-align:start;}
+  .dd-trigger:hover{border-color:var(--primary);}
+  .dd-trigger[aria-expanded="true"]{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-10);}
+  .dd-trigger svg{width:16px;height:16px;color:var(--muted-foreground);flex-shrink:0;stroke-width:2;transition:transform .15s;}
+  .dd-trigger[aria-expanded="true"] svg{transform:rotate(180deg);}
+  .dd-text.placeholder{color:var(--muted-foreground);}
+  .dd-panel{position:absolute;inset-inline-start:0;top:calc(100% + 4px);width:100%;max-height:340px;overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 10px 30px rgba(0,20,60,.14);padding:2px 14px 14px;z-index:20;}
+  .dd-panel[hidden]{display:none;}
+  .dd-group{padding-top:12px;}
+  .dd-group + .dd-group{border-top:1px solid var(--border-subtle);margin-top:12px;}
+  .dd-group-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:11px;font-weight:700;color:var(--cadet-base);text-transform:uppercase;letter-spacing:.04em;}
+  .dd-items{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
+  .dd-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .dd-tags:empty{display:none;}
+  .tag{display:inline-flex;align-items:center;gap:6px;background:#F1F3F3;border-radius:4px;padding:3px 4px 3px 10px;font-size:12px;}
+  .tag b{font-weight:600;}
+  .tag em{font-style:normal;color:var(--muted-foreground);font-size:11px;}
+  .tag button{border:none;background:none;color:var(--muted-foreground);font-size:15px;line-height:1;padding:0 5px;border-radius:3px;cursor:pointer;}
+  .tag button:hover{color:var(--destructive);background:var(--destructive-10);}
 
-  .cond-title{font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--muted-foreground);
-    text-transform:uppercase;margin:26px 0 14px;}
-  .cond-group{margin-bottom:18px;}
-  .cond-group:last-of-type{margin-bottom:4px;}
-  .cg-label{display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;}
-  .cond-group .cg-name{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);}
-  /* Checkbox + label, matching the Pricing Rules criteria block's own "Select all".
-     Overrides .field label's display:block/margin so it sits inline next to the
-     field's own label instead of wrapping to its own line. */
-  .field label.select-all-label{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 8px;
-    font-size:12.5px;font-weight:600;color:var(--cadet-base);cursor:pointer;vertical-align:middle;}
-  .select-all-label input{width:15px;height:15px;margin:0;cursor:pointer;accent-color:var(--primary);}
-  .cond-cols{display:flex;gap:32px;flex-wrap:wrap;}
-  .cond-cols .cond-group{margin-bottom:0;flex:1;min-width:200px;}
-
-  .form-actions{display:flex;align-items:center;gap:12px;margin-top:26px;}
+  .form-actions{display:flex;align-items:center;gap:12px;margin-top:8px;padding-top:22px;border-top:1px solid var(--border-subtle);}
 
   #toast{position:fixed;bottom:24px;inset-inline-end:24px;background:var(--foreground);color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:200;display:flex;align-items:center;gap:8px;}
   #toast.show{opacity:1;transform:translateY(0);}
@@ -157,9 +160,12 @@
     .nav-item{justify-content:center;}
     .main{margin-inline-start:64px;}
     .page{padding:8px 14px 40px;}
+    .card-pad{padding:18px 16px;}
   }
   @media (max-width:640px){
-    .cond-cols{gap:16px;}
+    .opt-grid{gap:12px 20px;}
+    .opt-grid.docs{grid-template-columns:1fr;}
+    .sec-head{flex-wrap:wrap;gap:6px 14px;}
   }
 </style>
 </head>
@@ -204,146 +210,46 @@
     </header>
 
     <main class="page">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="home.html">Home</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+        <a href="document-rules.html">Document Rules</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+        <span class="cur" id="crumbCur">Add Document Rule</span>
+      </nav>
       <div class="page-header">
-        <h1 class="page-title">Document Rules</h1>
-        <p class="page-subtitle">Define a document requirement rule — pick the service it is built on, set the conditions that trigger it, then choose which documents become required.</p>
+        <h1 class="page-title" id="pageTitle">Add document rule</h1>
       </div>
-
-      <div class="tabs">
-        <a class="tab" href="document-rules.html" style="text-decoration:none;display:inline-block">All Rules</a>
-        <button class="tab active">Create Rule</button>
-      </div>
-
-      <button type="button" class="back-link" id="backLink">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
-        <span id="backLinkLabel">Back to All Rules</span>
-      </button>
 
       <div class="card card-pad">
-        <h2 class="card-title" id="cardTitle">New Document Rule</h2>
-
-        <p class="field-hint" style="margin-top:-8px;">Select the criteria this rule applies to.</p>
+        <h2 class="card-title">Rule criteria and required documents</h2>
+        <p class="card-desc">Select the channel, then the service, then the values this rule applies to and the documents merchants must submit. Every section is required. Select all owner nationalities or settlement types to apply the rule to all of their values.</p>
 
         <div class="field">
-          <label for="ruleName">Rule Name<span class="req">*</span></label>
-          <input type="text" id="ruleName" placeholder="e.g. POS Location Proof">
+          <label for="ruleName">Rule name<span class="req">*</span></label>
+          <input type="text" id="ruleName" placeholder="Enter a rule name" autocomplete="off">
           <div class="inline-err" id="nameErr">Rule name is required.</div>
         </div>
 
-        <div class="cond-group" data-group="channels">
-          <div class="cg-label"><span class="cg-name">Channel<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllChannels">Select all</label></div>
-          <div class="crit-toolbar"><span class="crit-status" id="channelStatus"></span></div>
-          <div class="chip-row" id="channelChips"></div>
-          <div class="inline-err" id="channelsErr">Select at least one channel.</div>
-        </div>
-        <div class="cond-group" data-group="services">
-          <div class="cg-label"><span class="cg-name">Service<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllServices">Select all</label></div>
-          <div class="crit-toolbar"><span class="crit-status" id="serviceStatus"></span></div>
-          <div class="chip-row" id="serviceChips"></div>
-          <div class="inline-err" id="servicesErr">Select at least one service.</div>
-        </div>
-
-        <div class="cond-group" data-group="entities">
-          <div class="cg-label"><span class="cg-name">Merchant Type<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllEntities">Select all</label></div>
-          <div class="crit-toolbar"><span class="crit-status" id="entityStatus"></span></div>
-          <div class="chip-row" id="entityChips"></div>
-          <div class="inline-err" id="entitiesErr">Select at least one merchant type.</div>
-        </div>
-        <div class="cond-group" data-group="owners">
-          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><label class="select-all-label"><input type="checkbox" id="selAllOwners">Select all</label></div>
-          <div class="crit-toolbar"><span class="crit-status" id="ownerStatus"></span></div>
-          <div class="chip-row" id="ownerChips"></div>
-        </div>
-        <div class="cond-group" data-group="industries">
-          <div class="cg-label"><span class="cg-name">Industry<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllIndustries">Select all</label></div>
-          <div class="crit-toolbar"><span class="crit-status" id="industryStatus"></span></div>
-          <div class="chip-row" id="industryChips"></div>
-          <div class="inline-err" id="industriesErr">Select at least one industry.</div>
-        </div>
-        <div class="cond-group" data-group="modules">
-          <div class="cg-label"><span class="cg-name">Settlement type<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllModules">Select all</label></div>
-          <div class="crit-toolbar"><span class="crit-status" id="moduleStatus"></span></div>
-          <div class="chip-row" id="moduleChips"></div>
-          <div class="inline-err" id="modulesErr">Select at least one settlement type.</div>
-        </div>
-        <div class="cond-group" data-group="banks" id="banksGroup">
-          <div class="cg-label"><span class="cg-name">Financial Institution<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllBanks">Select all</label></div>
-          <div class="crit-toolbar"><span class="crit-status" id="bankStatus"></span></div>
-          <div class="chip-row" id="bankChips"></div>
-          <div class="inline-err" id="banksErr">Select at least one financial institution.</div>
-        </div>
-
-        <div class="cond-title" style="margin-top:26px;">Required Documents — based on the criteria above</div>
-
-        <div class="field">
-          <div class="cg-label"><label>Document Types<span class="req">*</span></label><label class="select-all-label"><input type="checkbox" id="selAllDocs">Select all</label></div>
-          <div class="chip-row" id="docChips"></div>
-          <div class="chip-hint" id="docHint">0 selected</div>
-          <div class="inline-err" id="docErr">Select at least one document type.</div>
-        </div>
+        <div id="sections"></div>
 
         <div class="form-actions">
-          <button class="btn btn-primary" id="saveRuleBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-            <span id="saveRuleLabel">Create Rule</span>
-          </button>
-          <button class="btn btn-outline" id="cancelRuleBtn">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveRuleBtn">Save Document Rule</button>
+          <button type="button" class="btn btn-outline" id="cancelRuleBtn">Cancel</button>
         </div>
       </div>
-
     </main>
   </div>
 </div>
 
 <div id="toast"></div>
 
+<script src="document-rules-core.js"></script>
 <script>
   const $ = id => document.getElementById(id);
 
-  /* ══════════ Reference data ══════════ */
-  const DOC_TYPES = [
-    'Commercial Registration (CR)', 'Tax Identification Card', 'National ID — Front', 'National ID — Back',
-    'Bank Account Letter / IBAN proof', 'Brand Authorization Letter', 'Store Lease / Location Proof',
-    'Visit Report', 'Signed Payout Contract', 'Disbursement Authorization Letter', 'Passport',
-    'Commercial Registration (foreign)', 'Tax ID (foreign)', 'Foreign Residence Card', "Owner's Passport",
-    "Owner's Residence Card", 'High Risk Annex (signed & stamped)', 'NGO Registration Certificate',
-    'Board Resolution', 'Government Authorization Letter', 'BM PSP Agreement Annex'
-  ];
-  const ENTITIES = ['Individual Seller', 'Registered Business', 'Professional Business'];
-  const OWNER_NATIONALITIES = ['Egyptian Owner', 'Foreign Owner'];
-  const INDUSTRIES = ['Retail & E-commerce', 'Food & Beverage', 'Healthcare / Pharmacy', 'Education',
-    'Travel & Tourism', 'Professional Services', 'Technology / SaaS', 'Real Estate', 'Automotive',
-    'Fashion & Beauty', 'Entertainment & Media', 'Non-profit / NGO', 'Government', 'Financial Services',
-    'Insurance', 'Marketplace', 'Logistics & Delivery'];
-  const BANKS = ['Bank Misr', 'National Bank of Egypt', 'QNB'];
-  const MODULES = ['PF', 'PSP'];
-  /* Channel and Service are separate fields, matching the Pricing Rules module exactly:
-     its wizard picks a channel first, then a service from within it, and the service
-     list itself is just the 14 payment methods with no channel folded into the name. */
-  const CHANNELS = ['Online', 'POS'];
-  const SERVICES = ['Card', 'Wallet', 'Valu', 'OCTO', 'Souhoola', 'Contact', 'Basata', 'Mogo', 'Tru', 'Forsa',
-    'Aman', 'Bank Installments', 'Transfer', 'Instapay'];
-
-  const CONDITION_KEYS = ['entities', 'owners', 'industries', 'banks', 'modules', 'services', 'channels'];
-
-  /* ══════════ Shared storage — same keys as document-rules.html ══════════ */
-  const RULES_KEY = 'kashier_document_rules_v1';
-  const NEXT_ID_KEY = 'kashier_document_rules_next_id_v1';
-  const EVENTS_KEY = 'kashier_document_rules_events_v1';
-  function loadRules() { try { return JSON.parse(localStorage.getItem(RULES_KEY)) || []; } catch (e) { return []; } }
-  function saveRules(list) { localStorage.setItem(RULES_KEY, JSON.stringify(list)); }
-  function loadNextId() { return parseInt(localStorage.getItem(NEXT_ID_KEY) || '1', 10); }
-  function saveNextId(n) { localStorage.setItem(NEXT_ID_KEY, String(n)); }
-  function loadEvents() {
-    try { return (JSON.parse(localStorage.getItem(EVENTS_KEY)) || []).map(e => ({ ...e, ts: new Date(e.ts) })); }
-    catch (e) { return []; }
-  }
-  function saveEvents(list) { localStorage.setItem(EVENTS_KEY, JSON.stringify(list.map(e => ({ ...e, ts: e.ts.toISOString() })))); }
-  function logEvent(action, rule) {
-    const events = loadEvents();
-    events.unshift({ ts: new Date(), action, ruleName: rule.name, actor: 'Aya Muhammed' });
-    saveEvents(events);
-  }
+  /* Bring any older stored rules up to date before this page reads them. */
+  normalizeStore();
 
   /* ══════════ Toast ══════════ */
   const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
@@ -357,199 +263,291 @@
   }
 
   /* ══════════ Form state ══════════ */
-  const draft = { docs: [], entities: [], owners: [], industries: [], banks: [], modules: [], services: [], channels: [] };
+  const draft = { channels: [], services: [], entities: [], owners: [], modules: [], industries: [], banks: [], docs: [] };
   let editingId = null;
 
-  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const CHECK_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75"/></svg>';
+  /* The sections, in the order the form shows them. Every group is multi-select and required
+     (Financial Institution only while a selected service has one). Channel and Merchant type have
+     no "Select all" — the others do. Service is a dropdown grouped by the selected channels: each
+     entry is a "Channel|Service" key, so a service is picked per channel. */
+  const SEP = '|';
+  const svcKey = (channel, service) => channel + SEP + service;
+  const SECTIONS = [
+    { key: 'channels',   title: 'Channel',               all: false, err: 'Select at least one channel.' },
+    { key: 'services',   title: 'Service',               custom: true, err: 'Select at least one service.' },
+    { key: 'entities',   title: 'Merchant type',         all: false, err: 'Select at least one merchant type.' },
+    { key: 'owners',     title: 'Owner nationality',     all: true,  err: 'Select at least one owner nationality.' },
+    { key: 'modules',    title: 'Settlement type',       all: true,  err: 'Select at least one settlement type.' },
+    { key: 'industries', title: 'Industry',              all: true,  err: 'Select at least one industry.' },
+    { key: 'banks',      title: 'Financial institution', all: true,  err: 'Select at least one financial institution.' },
+    { key: 'docs',       title: 'Required documents',    all: true,  err: 'Select at least one document type.', grid: 'docs' },
+  ];
+  const CHECK_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
 
-  /* Every multi-select chip group gets the same criteria-block treatment as Pricing Rules'
-     — a live "N of M selected" status line — minus its search box, which wasn't wanted here. */
-  const MULTI_GROUPS = {
-    channels:   { options: CHANNELS,            container: 'channelChips',  btn: 'selAllChannels',   status: 'channelStatus' },
-    services:   { options: SERVICES,            container: 'serviceChips',  btn: 'selAllServices',   status: 'serviceStatus' },
-    entities:   { options: ENTITIES,            container: 'entityChips',   btn: 'selAllEntities',   status: 'entityStatus' },
-    owners:     { options: OWNER_NATIONALITIES, container: 'ownerChips',    btn: 'selAllOwners',     status: 'ownerStatus' },
-    modules:    { options: MODULES,             container: 'moduleChips',   btn: 'selAllModules',    status: 'moduleStatus' },
-    industries: { options: INDUSTRIES,          container: 'industryChips', btn: 'selAllIndustries', status: 'industryStatus' },
-    banks:      { options: BANKS,               container: 'bankChips',    btn: 'selAllBanks',      status: 'bankStatus' },
-    docs:       { options: DOC_TYPES,           container: 'docChips',     btn: 'selAllDocs',       status: null },
-  };
+  function buildSections() {
+    const root = $('sections');
+    SECTIONS.forEach(s => {
+      if (s.custom) { buildServiceSection(root, s); return; }
+      const sec = document.createElement('div');
+      sec.className = 'sec';
+      sec.id = 'sec_' + s.key;
+      sec.innerHTML =
+        '<div class="sec-head"><span class="sec-name">' + esc(s.title) + '<span class="req">*</span></span>' +
+          '<span class="sec-status" id="status_' + s.key + '"></span>' +
+          (s.all ? '<button type="button" class="sec-all" id="all_' + s.key + '">Select all</button>' : '') +
+        '</div>' +
+        '<div class="opt-grid' + (s.grid ? ' ' + s.grid : '') + '" id="opts_' + s.key + '"></div>' +
+        '<div class="inline-err" id="err_' + s.key + '">' + esc(s.err) + '</div>';
+      root.appendChild(sec);
 
-  function renderMultiGroup(key) {
-    const meta = MULTI_GROUPS[key];
-    const c = $(meta.container);
-    c.innerHTML = '';
-    meta.options.forEach(opt => {
-      const on = draft[key].includes(opt);
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'toggle-chip' + (on ? ' on' : '');
-      b.innerHTML = (on ? CHECK_SM : '') + esc(opt);
-      b.addEventListener('click', () => {
-        const i = draft[key].indexOf(opt);
-        if (i >= 0) draft[key].splice(i, 1); else draft[key].push(opt);
-        renderMultiGroup(key);
-        if (key === 'docs') updateDocHint(); else updateGroupStatus(key);
-        clearConditionErrors();
+      const grid = sec.querySelector('.opt-grid');
+      OPTIONS[s.key].forEach(opt => {
+        const label = document.createElement('label');
+        label.className = 'opt';
+        label.innerHTML = '<input type="checkbox"><span class="box">' + CHECK_SM + '</span><span class="lbl">' + esc(optionLabel(s.key, opt)) + '</span>';
+        label.title = optionLabel(s.key, opt);
+        const input = label.querySelector('input');
+        input.addEventListener('change', () => {
+          const list = draft[s.key], i = list.indexOf(opt);
+          if (input.checked && i < 0) list.push(opt);
+          if (!input.checked && i >= 0) list.splice(i, 1);
+          onChange(s.key);
+        });
+        grid.appendChild(label);
       });
-      c.appendChild(b);
+      if (s.all) {
+        $('all_' + s.key).addEventListener('click', () => {
+          draft[s.key] = draft[s.key].length === OPTIONS[s.key].length ? [] : [...OPTIONS[s.key]];
+          onChange(s.key);
+        });
+      }
     });
   }
 
-  function updateGroupStatus(key) {
-    const meta = MULTI_GROUPS[key];
-    updateSelectAllLabel(key);
-    if (!meta.status) return;
-    const n = draft[key].length, total = meta.options.length;
-    $(meta.status).textContent = total ? (n === total ? 'All ' + total + ' selected' : n + ' of ' + total + ' selected') : '';
-    if (key === 'services') updateBanksVisibility();
-  }
+  /* ══════════ Service dropdown ══════════
+     Opens a panel with one block per selected channel, each listing that channel's own services.
+     Picking a service in a block selects it for that channel only. */
+  const CHEVRON_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>';
+  let panelSig = null;   // which channels the panel was last built for
 
-  function updateDocHint() {
-    $('docHint').textContent = draft.docs.length + ' selected';
-    if (draft.docs.length) $('docErr').classList.remove('show');
-    updateSelectAllLabel('docs');
+  function buildServiceSection(root, s) {
+    const sec = document.createElement('div');
+    sec.className = 'sec';
+    sec.id = 'sec_services';
+    sec.innerHTML =
+      '<div class="sec-head"><span class="sec-name">' + esc(s.title) + '<span class="req">*</span></span><span class="sec-status" id="status_services"></span></div>' +
+      '<div class="dd" id="svcDd">' +
+        '<button type="button" class="dd-trigger" id="svcTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="svcPanel"><span class="dd-text" id="svcText"></span>' + CHEVRON_DOWN + '</button>' +
+        '<div class="dd-panel" id="svcPanel" role="group" aria-label="Services by channel" hidden></div>' +
+      '</div>' +
+      '<div class="dd-tags" id="svcTags"></div>' +
+      '<div class="inline-err" id="err_services">' + esc(s.err) + '</div>';
+    root.appendChild(sec);
+    $('svcTrigger').addEventListener('click', () => setPanel($('svcPanel').hidden));
+    document.addEventListener('click', e => { if (!$('svcDd').contains(e.target)) setPanel(false); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('svcPanel').hidden) { setPanel(false); $('svcTrigger').focus(); }
+    });
   }
+  function setPanel(open) {
+    $('svcPanel').hidden = !open;
+    $('svcTrigger').setAttribute('aria-expanded', String(open));
+  }
+  const selectedChannelOrder = () => CHANNELS.filter(c => draft.channels.includes(c));
+  const serviceNames = () => draft.services.map(k => k.split(SEP)[1]);
+  /** Selected channels that have no service picked yet. */
+  const channelsMissingServices = () => selectedChannelOrder().filter(c => !draft.services.some(k => k.startsWith(c + SEP)));
 
-  /* These installment providers have no financial institution of their own to pick —
-     Financial Institution only makes sense for a service that settles through one. With
-     several services selected it stays visible as long as at least one of them has one. */
-  const NO_FI_SERVICES = ['Souhoola', 'Valu', 'OCTO', 'Basata', 'Mogo', 'Tru', 'Forsa', 'Aman'];
-  function serviceHasFI() {
-    return !draft.services.length || draft.services.some(s => !NO_FI_SERVICES.includes(s));
-  }
-  function updateBanksVisibility() {
-    const show = serviceHasFI();
-    $('banksGroup').style.display = show ? '' : 'none';
-    if (!show && draft.banks.length) {
-      draft.banks = [];
-      renderMultiGroup('banks');
-      updateGroupStatus('banks');
+  function renderServicePanel() {
+    const panel = $('svcPanel');
+    const sig = draft.channels.slice().sort().join(',');
+    if (sig !== panelSig) {   // channel set changed — rebuild the blocks
+      panelSig = sig;
+      panel.innerHTML = '';
+      selectedChannelOrder().forEach(ch => {
+        const group = document.createElement('div');
+        group.className = 'dd-group';
+        group.innerHTML = '<div class="dd-group-head"><span>' + esc(ch) + '</span><button type="button" class="sec-all" data-ch="' + esc(ch) + '"></button></div><div class="dd-items"></div>';
+        const items = group.querySelector('.dd-items');
+        CHANNEL_SERVICES[ch].forEach(svc => {
+          const label = document.createElement('label');
+          label.className = 'opt';
+          label.innerHTML = '<input type="checkbox"><span class="box">' + CHECK_SM + '</span><span class="lbl">' + esc(svc) + '</span>';
+          const input = label.querySelector('input');
+          input.dataset.key = svcKey(ch, svc);
+          input.addEventListener('change', () => {
+            const k = input.dataset.key, i = draft.services.indexOf(k);
+            if (input.checked && i < 0) draft.services.push(k);
+            if (!input.checked && i >= 0) draft.services.splice(i, 1);
+            onChange('services');
+          });
+          items.appendChild(label);
+        });
+        group.querySelector('.sec-all').addEventListener('click', () => {
+          const keys = CHANNEL_SERVICES[ch].map(svc => svcKey(ch, svc));
+          const all = keys.every(k => draft.services.includes(k));
+          draft.services = draft.services.filter(k => !keys.includes(k)).concat(all ? [] : keys);
+          onChange('services');
+        });
+        panel.appendChild(group);
+      });
     }
-  }
-
-  /* ══════════ Select all — one checkbox per chip group, matching Pricing Rules' own
-     criteria-block checkbox exactly. Checked = every option in the group is selected;
-     clicking it toggles between select-all and deselect-all. ══════════ */
-  function updateSelectAllLabel(key) {
-    const meta = MULTI_GROUPS[key];
-    const allSelected = draft[key].length === meta.options.length;
-    $(meta.btn).checked = allSelected;
-    clearConditionErrors();
-  }
-  function updateSelectAllLabels() {
-    Object.keys(MULTI_GROUPS).forEach(updateSelectAllLabel);
-  }
-  function toggleSelectAll(key) {
-    const meta = MULTI_GROUPS[key];
-    const allSelected = draft[key].length === meta.options.length;
-    draft[key] = allSelected ? [] : [...meta.options];
-    renderMultiGroup(key);
-    if (key === 'docs') updateDocHint(); else updateGroupStatus(key);
-  }
-  Object.entries(MULTI_GROUPS).forEach(([key, meta]) => {
-    $(meta.btn).addEventListener('click', () => toggleSelectAll(key));
-  });
-
-  /* Every condition group needs at least one pick, except Business Owner Nationality, which
-     stays optional (and Financial Institution, which drops out when no selected service has one). */
-  const REQUIRED_CONDITIONS = ['channels', 'services', 'entities', 'industries', 'banks', 'modules'];
-  function clearConditionErrors() {
-    REQUIRED_CONDITIONS.forEach(key => {
-      if (draft[key].length) $(key + 'Err').classList.remove('show');
+    panel.querySelectorAll('input').forEach(i => { i.checked = draft.services.includes(i.dataset.key); });
+    panel.querySelectorAll('.sec-all').forEach(btn => {
+      const ch = btn.dataset.ch;
+      btn.textContent = CHANNEL_SERVICES[ch].every(svc => draft.services.includes(svcKey(ch, svc))) ? 'Unselect all' : 'Select all';
     });
+  }
+
+  function renderServiceTags() {
+    const order = k => { const [ch, svc] = k.split(SEP); return CHANNELS.indexOf(ch) * 1000 + CHANNEL_SERVICES[ch].indexOf(svc); };
+    draft.services.sort((a, b) => order(a) - order(b));
+    $('svcTags').innerHTML = draft.services.map(k => {
+      const [ch, svc] = k.split(SEP);
+      return '<span class="tag"><b>' + esc(svc) + '</b><em>' + esc(ch) + '</em>' +
+        '<button type="button" data-key="' + esc(k) + '" aria-label="Remove ' + esc(svc) + ' (' + esc(ch) + ')">&times;</button></span>';
+    }).join('');
+    $('svcTags').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      draft.services = draft.services.filter(k => k !== b.dataset.key);
+      onChange('services');
+    }));
+    const n = draft.services.length;
+    $('svcText').textContent = n ? n + (n === 1 ? ' service selected' : ' services selected') : 'Select services';
+    $('svcText').classList.toggle('placeholder', !n);
+  }
+
+  /* Re-sync one group's checkboxes, "N of M selected" line, and Select all label. */
+  function syncGroup(key) {
+    if (key === 'services') {
+      renderServicePanel();
+      renderServiceTags();
+      $('status_services').textContent = draft.services.length + ' selected';
+      if (!channelsMissingServices().length) $('err_services').classList.remove('show');
+      return;
+    }
+    const total = OPTIONS[key].length, n = draft[key].length;
+    document.querySelectorAll('#opts_' + key + ' .opt').forEach((label, i) => {
+      label.querySelector('input').checked = draft[key].includes(OPTIONS[key][i]);
+    });
+    $('status_' + key).textContent = n + ' of ' + total + ' selected';
+    const all = $('all_' + key);
+    if (all) all.textContent = n === total ? 'Unselect all' : 'Select all';
+    if (n) $('err_' + key).classList.remove('show');
+  }
+
+  /* Service only appears once a channel is picked; Financial institution disappears when
+     every selected service is an installment provider with no financial institution. */
+  function serviceHasFI() {
+    return !draft.services.length || serviceNames().some(s => !NO_FI_SERVICES.includes(s));
+  }
+  function updateVisibility() {
+    const hasChannel = draft.channels.length > 0;
+    /* A channel that was unticked takes its services with it. */
+    draft.services = draft.services.filter(k => draft.channels.includes(k.split(SEP)[0]));
+    $('sec_services').hidden = !hasChannel;
+    if (!hasChannel) setPanel(false);
+    syncGroup('services');
+    const fi = serviceHasFI();
+    if (!fi && draft.banks.length) { draft.banks = []; syncGroup('banks'); }
+    $('sec_banks').hidden = !fi;
+  }
+  function onChange(key) {
+    syncGroup(key);
+    updateVisibility();
   }
 
   function renderForm() {
-    Object.keys(MULTI_GROUPS).forEach(renderMultiGroup);
-    updateDocHint();
-    Object.keys(MULTI_GROUPS).forEach(key => { if (key !== 'docs') updateGroupStatus(key); });
-    updateSelectAllLabels();
+    SECTIONS.forEach(s => syncGroup(s.key));
+    updateVisibility();
   }
-
-  /* ══════════ Migration — stale saved rules ══════════
-     Mirrors document-rules.html, so landing straight on this page with ?edit=<id> sees the
-     same pruned data. A rule left without a valid service, or without a valid channel —
-     retired, never set on an old "universal" rule, or saved before Channel and Service
-     split into separate fields — is removed, and the edit lookup below falls through to
-     the list. */
-  function pruneStaleRules() {
-    const knownServices = new Set(SERVICES);
-    const knownChannels = new Set(CHANNELS);
-    const kept = [];
-    let changed = false;
-    loadRules().forEach(r => {
-      const beforeServices = r.services || [];
-      const validServices = beforeServices.filter(s => knownServices.has(s));
-      const beforeChannels = r.channels || [];
-      const validChannels = beforeChannels.filter(c => knownChannels.has(c));
-      if (validServices.length !== beforeServices.length || validChannels.length !== beforeChannels.length) changed = true;
-      if (validServices.length && validChannels.length) {
-        r.services = validServices;
-        r.channels = validChannels;
-        kept.push(r);
-      }
-    });
-    if (changed) saveRules(kept);
-  }
-  pruneStaleRules();
 
   /* ══════════ Load an existing rule when opened as ?edit=<id> ══════════ */
+  let original = null;
   (function initEditMode() {
     const editParam = new URLSearchParams(location.search).get('edit');
-    if (!editParam) { renderForm(); return; }
-    const id = Number(editParam);
-    const rule = loadRules().find(r => r.id === id);
+    if (!editParam) return;
+    const rule = loadRules().find(r => r.id === Number(editParam));
     if (!rule) { location.href = 'document-rules.html'; return; }
 
+    original = JSON.parse(JSON.stringify(rule));
     editingId = rule.id;
-    $('cardTitle').textContent = 'Edit Document Rule';
-    $('saveRuleLabel').textContent = 'Save Changes';
-    $('backLinkLabel').textContent = 'Cancel editing rule';
+    $('pageTitle').textContent = 'Edit document rule';
+    $('crumbCur').textContent = 'Edit Document Rule';
     $('ruleName').value = rule.name;
-    draft.docs = [...rule.docs];
-    CONDITION_KEYS.forEach(k => draft[k] = [...(rule[k] || [])]);
-    renderForm();
+    SECTIONS.forEach(s => { if (!s.custom) draft[s.key] = [...(rule[s.key] || [])]; });
+    draft.services = [svcKey(rule.channels[0], rule.services[0])];
+    /* A rule with an empty group used to match everyone — show that as everything ticked. */
+    ['entities', 'owners', 'modules', 'industries'].forEach(k => { if (!draft[k].length) draft[k] = [...OPTIONS[k]]; });
+    if (serviceHasFI() && !draft.banks.length) draft.banks = [...OPTIONS.banks];
   })();
 
-  $('cancelRuleBtn').addEventListener('click', () => { location.href = 'document-rules.html'; });
-  $('backLink').addEventListener('click', () => { location.href = 'document-rules.html'; });
+  buildSections();
+  renderForm();
 
+  $('cancelRuleBtn').addEventListener('click', () => { location.href = 'document-rules.html'; });
+
+  /* ══════════ Save ══════════
+     A rule belongs to one channel and one service, so every service picked under a channel becomes
+     its own rule, all sharing the other criteria. */
   $('saveRuleBtn').addEventListener('click', () => {
     const name = $('ruleName').value.trim();
-    let ok = true;
-    if (!name) { $('ruleName').classList.add('invalid'); $('nameErr').classList.add('show'); ok = false; }
+    let first = null;
+    const fail = el => { if (!first) first = el; };
+
+    if (!name) { $('ruleName').classList.add('invalid'); $('nameErr').classList.add('show'); fail($('ruleName')); }
     else { $('ruleName').classList.remove('invalid'); $('nameErr').classList.remove('show'); }
-    /* Every condition group needs at least one pick (Business Owner Nationality is the one
-       exception, and Financial Institution drops out when no selected service has one). */
-    REQUIRED_CONDITIONS.forEach(key => {
-      if (key === 'banks' && !serviceHasFI()) return;
-      if (!draft[key].length) { $(key + 'Err').classList.add('show'); ok = false; }
+    SECTIONS.forEach(s => {
+      if (s.key === 'banks' && !serviceHasFI()) return;
+      if (s.key === 'services') {   // hidden until a channel is chosen; then every channel needs a service
+        const missing = channelsMissingServices();
+        if (draft.channels.length && missing.length) {
+          $('err_services').textContent = 'Select at least one service for ' + missing.join(' and ') + '.';
+          $('err_services').classList.add('show');
+          fail($('sec_services'));
+        }
+        return;
+      }
+      if (!draft[s.key].length) { $('err_' + s.key).classList.add('show'); fail($('sec_' + s.key)); }
     });
-    if (!draft.docs.length) { $('docErr').classList.add('show'); ok = false; }
-    if (!ok) return;
+    if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+
+    const now = new Date().toISOString();
+    const make = (channel, service) => ({
+      name, docs: [...draft.docs], channels: [channel], services: [service],
+      entities: [...draft.entities], owners: [...draft.owners], modules: [...draft.modules],
+      industries: [...draft.industries],
+      banks: NO_FI_SERVICES.includes(service) ? [] : [...draft.banks],
+    });
+    const pairs = [];
+    draft.services.forEach(k => pairs.push(k.split(SEP)));   // [channel, service], in channel order
 
     const rules = loadRules();
 
     if (editingId != null) {
-      const r = rules.find(r => r.id === editingId);
-      if (!r) { location.href = 'document-rules.html'; return; }
-      r.name = name;
-      r.docs = [...draft.docs];
-      CONDITION_KEYS.forEach(k => r[k] = [...draft[k]]);
+      /* The edited rule keeps its own channel/service if still ticked; any other combination is a new rule. */
+      let keep = pairs.findIndex(([ch, svc]) => ch === original.channels[0] && svc === original.services[0]);
+      if (keep < 0) keep = 0;
+      const target = rules.find(r => r.id === editingId);
+      if (!target) { location.href = 'document-rules.html'; return; }
+      pairs.forEach(([ch, svc], i) => {
+        const data = make(ch, svc);
+        if (i === keep) {
+          Object.assign(target, data, { updatedAt: now });
+          const changes = diffRules(original, target);
+          if (changes.length) logEvent('Updated', target, changes);
+        } else {
+          const r = { id: allocId(), ...data, createdAt: now, updatedAt: now };
+          rules.push(r); saveRules(rules); logEvent('Created', r);
+        }
+      });
       saveRules(rules);
-      logEvent('Updated', r);
       location.href = 'document-rules.html?updated=' + encodeURIComponent(name);
     } else {
-      const nextId = loadNextId();
-      const r = { id: nextId, name, docs: [...draft.docs] };
-      CONDITION_KEYS.forEach(k => r[k] = [...draft[k]]);
-      rules.push(r);
-      saveRules(rules);
-      saveNextId(nextId + 1);
-      logEvent('Created', r);
-      location.href = 'document-rules.html?created=' + encodeURIComponent(name);
+      pairs.forEach(([ch, svc]) => {
+        const r = { id: allocId(), ...make(ch, svc), createdAt: now, updatedAt: now };
+        rules.push(r); saveRules(rules); logEvent('Created', r);
+      });
+      location.href = 'document-rules.html?created=' + encodeURIComponent(name) + '&n=' + pairs.length;
     }
   });
 
