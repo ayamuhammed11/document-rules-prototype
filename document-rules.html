@@ -456,49 +456,48 @@
       : 'No rules match your filters — try clearing them, or add a new rule.';
     if (visible.length === 0) return;
 
-    /* Grouped by service, same as Pricing Rules' own list — each group's header names
-       the channel too (a rule targets exactly one of each), matching its "Card — Online"
-       header pattern, since Document Rules has no multi-service rule to need a separate
-       "Applies to" column for. */
+    /* Grouped by service, same as Pricing Rules' own list. A rule can cover several
+       services (and channels), so it appears under each service it applies to; the
+       Channel column says which channels. Filtering by service shows only that group. */
+    const onlyService = $('fService').value;
     SERVICES.forEach(service => {
-      CHANNELS.forEach(channel => {
-        const groupRules = visible.filter(r => r.services[0] === service && r.channels[0] === channel);
-        if (!groupRules.length) return;
+      if (onlyService && service !== onlyService) return;
+      const groupRules = visible.filter(r => r.services.includes(service));
+      if (!groupRules.length) return;
 
-        const section = document.createElement('div');
-        section.className = 'section-title';
-        section.innerHTML = esc(service) + ' <span class="n">— ' + esc(channel) + ' · ' + groupRules.length + (groupRules.length === 1 ? ' rule' : ' rules') + '</span>';
-        groupsEl.appendChild(section);
+      const section = document.createElement('div');
+      section.className = 'section-title';
+      section.innerHTML = esc(service) + ' <span class="n">· ' + groupRules.length + (groupRules.length === 1 ? ' rule' : ' rules') + '</span>';
+      groupsEl.appendChild(section);
 
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.style.marginBottom = '4px';
-        card.innerHTML =
-          '<table><thead><tr>' +
-            '<th>Rule name</th><th>Channel</th><th>Merchant Type</th><th>Owner Nationality</th><th>Industry</th>' +
-            '<th>Financial Institution</th><th>Settlement Type</th><th>Documents</th><th></th>' +
-          '</tr></thead><tbody></tbody></table>';
-        const tbody = card.querySelector('tbody');
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.marginBottom = '4px';
+      card.innerHTML =
+        '<table><thead><tr>' +
+          '<th>Rule name</th><th>Channel</th><th>Merchant Type</th><th>Owner Nationality</th><th>Industry</th>' +
+          '<th>Financial Institution</th><th>Settlement Type</th><th>Documents</th><th></th>' +
+        '</tr></thead><tbody></tbody></table>';
+      const tbody = card.querySelector('tbody');
 
-        groupRules.forEach(r => {
-          const row = document.createElement('tr');
-          row.className = 'row-click';
-          row.innerHTML =
-            '<td class="svc-name">' + esc(r.name) + '</td>' +
-            '<td>' + joinOr(r.channels) + '</td>' +
-            '<td>' + joinOr(r.entities) + '</td>' +
-            '<td>' + joinOr(r.owners) + '</td>' +
-            '<td>' + joinOr(r.industries) + '</td>' +
-            '<td>' + joinOr(r.banks) + '</td>' +
-            '<td>' + joinOr(r.modules) + '</td>' +
-            '<td>' + r.docs.length + (r.docs.length === 1 ? ' doc' : ' docs') + '</td>' +
-            '<td class="chevron-affordance">' + CHEVRON + '</td>';
-          row.addEventListener('click', () => openView(r));
-          tbody.appendChild(row);
-        });
-
-        groupsEl.appendChild(card);
+      groupRules.forEach(r => {
+        const row = document.createElement('tr');
+        row.className = 'row-click';
+        row.innerHTML =
+          '<td class="svc-name">' + esc(r.name) + '</td>' +
+          '<td>' + joinOr(r.channels) + '</td>' +
+          '<td>' + joinOr(r.entities) + '</td>' +
+          '<td>' + joinOr(r.owners) + '</td>' +
+          '<td>' + joinOr(r.industries) + '</td>' +
+          '<td>' + joinOr(r.banks) + '</td>' +
+          '<td>' + joinOr(r.modules) + '</td>' +
+          '<td>' + r.docs.length + (r.docs.length === 1 ? ' doc' : ' docs') + '</td>' +
+          '<td class="chevron-affordance">' + CHEVRON + '</td>';
+        row.addEventListener('click', () => openView(r));
+        tbody.appendChild(row);
       });
+
+      groupsEl.appendChild(card);
     });
   }
 

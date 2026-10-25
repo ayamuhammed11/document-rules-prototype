@@ -9,17 +9,17 @@ collapsible **Documents** module.
 ## Pages
 
 - **[document-rules.html](document-rules.html)** — **All Rules.** Rules grouped into a table
-  per service and channel, with a rule-name search box, filters by channel, service, merchant
+  per service (a rule covering several services appears under each), with a rule-name search box, filters by channel, service, merchant
   type, industry, financial institution, and settlement type, and an Events audit trail. Clicking a row
   opens its detail view, with Edit and Delete actions there.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Create Rule.** The rule
   builder, reached from All Rules' tab bar or "Create Rule" — also handles editing an existing
   rule via `?edit=<id>`. Fields follow the Pricing Rules wizard's own order: Rule Name, then
-  a single **channel** (Step 1) and a single **service** within it (Step 2), then merchant
-  type, owner nationality, industry, settlement type, and financial institution, before
-  choosing which document types become required — all as one flat, identically-styled
-  sequence, with no divider between the primary fields and the rest. Rules, ids, and events
+  **channel** and **service**, then merchant type, owner nationality, industry, settlement
+  type, and financial institution, before choosing which document types become required —
+  all multi-select, as one flat, identically-styled sequence, with no divider between the
+  primary fields and the rest. Rules, ids, and events
   are shared with the list page through `localStorage`, so actions on either page are
   reflected on the other without a backend.
 
@@ -48,12 +48,10 @@ a given set of criteria produces the same checklist everywhere.
 
 ## Channel and Service
 
-These are two separate fields, matching how the Pricing Rules module itself works: its
-wizard picks a channel first, then a service from within it, rather than folding channel
-into the service name. A rule is built the same way here — Step 1 picks **Channel**
-(Online / POS), Step 2 picks **Service** from a plain 14-method list that only appears once
-a channel is chosen; switching the channel clears whatever service was picked, since the two
-are chosen in that order.
+These are two separate fields, matching how the Pricing Rules module itself keeps them
+apart rather than folding channel into the service name. A rule picks one or more
+**Channels** (Online / POS) and one or more **Services** from a plain 14-method list; the
+two are chosen independently, in that order on the form.
 
 | Field | Options |
 | --- | --- |
@@ -64,21 +62,21 @@ Pricing Rules never prices Add-on services (Branches, Currency Conversion, Insta
 Settlement) — they're enabled by their own toggle, not a rule — so they aren't part of this
 catalog either.
 
-**Financial Institution** hides itself whenever the selected service is one of the
+**Financial Institution** hides itself when every selected service is one of the
 installment-only methods with no financial institution of its own: Souhoola, Valu, OCTO,
-Basata, Mogo, Tru, Forsa, or Aman. Switching to or from one of these clears any financial
-institution already picked, and it isn't required while hidden.
+Basata, Mogo, Tru, Forsa, or Aman. With a mix of services it stays visible, since at least
+one of them has one. Hiding it clears any financial institution already picked, and it
+isn't required while hidden.
 
 ## Other conditions
 
 Merchant Type (Individual Seller / Registered Business / Professional Business), Business
 Owner Nationality, Industry, Financial Institution, and Settlement type (PF / PSP) — used to
-narrow a rule beyond its channel and service. Merchant Type, Business Owner Nationality, and
-Settlement type each take a single option; Industry and Financial Institution allow several. Business Owner Nationality is the one optional condition — every other
-group needs at least one pick (Financial Institution included, except where it doesn't
-apply at all — see above).
+narrow a rule beyond its channel and service. Every one allows several options. Business
+Owner Nationality is the one optional condition — every other group needs at least one pick
+(Financial Institution included, except where it doesn't apply at all — see above).
 
-Every multi-select condition (Industry, Financial Institution, and Document Types) has a **Select all** checkbox — checked means every option in
+Every condition (and Document Types) has a **Select all** checkbox — checked means every option in
 that group is picked; unchecking it clears the group — matching the checkbox Pricing Rules
 uses in its own criteria blocks.
 
@@ -87,8 +85,7 @@ uses in its own criteria blocks.
 Within a condition group: OR. Across groups: AND.
 
 Every condition group needs at least one option, except Business Owner Nationality (always
-optional) and Financial Institution (optional only for the services that have none). Channel,
-Service, Merchant Type, Business Owner Nationality, and Settlement type are single-select, so for them "at least one" means exactly one.
+optional) and Financial Institution (optional only when no selected service has one).
 
 On load, both Document Rules pages prune stale saved rules — those written before the
 catalog shrank, before every condition became required, or before Channel and Service split

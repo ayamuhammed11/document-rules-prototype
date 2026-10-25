@@ -230,28 +230,28 @@
           <div class="inline-err" id="nameErr">Rule name is required.</div>
         </div>
 
-        <div class="field">
-          <label>Channel<span class="req">*</span></label>
-          <p class="field-hint">Step 1 — select a channel first, then the service within it.</p>
+        <div class="cond-group" data-group="channels">
+          <div class="cg-label"><span class="cg-name">Channel<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllChannels">Select all</label></div>
+          <div class="crit-toolbar"><span class="crit-status" id="channelStatus"></span></div>
           <div class="chip-row" id="channelChips"></div>
-          <div class="inline-err" id="channelsErr">Select the channel this rule applies to.</div>
+          <div class="inline-err" id="channelsErr">Select at least one channel.</div>
         </div>
-
-        <div class="field">
-          <label>Service<span class="req">*</span></label>
-          <p class="field-hint" id="serviceFieldHint">Step 2 — pick the service within that channel this rule applies to.</p>
-          <div id="serviceCatalog"></div>
-          <div class="chip-hint" id="serviceHint">No service selected</div>
-          <div class="inline-err" id="serviceErr">Select the service this rule applies to.</div>
+        <div class="cond-group" data-group="services">
+          <div class="cg-label"><span class="cg-name">Service<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllServices">Select all</label></div>
+          <div class="crit-toolbar"><span class="crit-status" id="serviceStatus"></span></div>
+          <div class="chip-row" id="serviceChips"></div>
+          <div class="inline-err" id="servicesErr">Select at least one service.</div>
         </div>
 
         <div class="cond-group" data-group="entities">
-          <div class="cg-label"><span class="cg-name">Merchant Type<span class="req">*</span></span></div>
+          <div class="cg-label"><span class="cg-name">Merchant Type<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllEntities">Select all</label></div>
+          <div class="crit-toolbar"><span class="crit-status" id="entityStatus"></span></div>
           <div class="chip-row" id="entityChips"></div>
-          <div class="inline-err" id="entitiesErr">Select a merchant type.</div>
+          <div class="inline-err" id="entitiesErr">Select at least one merchant type.</div>
         </div>
         <div class="cond-group" data-group="owners">
-          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span></div>
+          <div class="cg-label"><span class="cg-name">Business Owner Nationality</span><label class="select-all-label"><input type="checkbox" id="selAllOwners">Select all</label></div>
+          <div class="crit-toolbar"><span class="crit-status" id="ownerStatus"></span></div>
           <div class="chip-row" id="ownerChips"></div>
         </div>
         <div class="cond-group" data-group="industries">
@@ -261,9 +261,10 @@
           <div class="inline-err" id="industriesErr">Select at least one industry.</div>
         </div>
         <div class="cond-group" data-group="modules">
-          <div class="cg-label"><span class="cg-name">Settlement type<span class="req">*</span></span></div>
+          <div class="cg-label"><span class="cg-name">Settlement type<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllModules">Select all</label></div>
+          <div class="crit-toolbar"><span class="crit-status" id="moduleStatus"></span></div>
           <div class="chip-row" id="moduleChips"></div>
-          <div class="inline-err" id="modulesErr">Select a settlement type.</div>
+          <div class="inline-err" id="modulesErr">Select at least one settlement type.</div>
         </div>
         <div class="cond-group" data-group="banks" id="banksGroup">
           <div class="cg-label"><span class="cg-name">Financial Institution<span class="req">*</span></span><label class="select-all-label"><input type="checkbox" id="selAllBanks">Select all</label></div>
@@ -365,6 +366,11 @@
   /* Every multi-select chip group gets the same criteria-block treatment as Pricing Rules'
      — a live "N of M selected" status line — minus its search box, which wasn't wanted here. */
   const MULTI_GROUPS = {
+    channels:   { options: CHANNELS,            container: 'channelChips',  btn: 'selAllChannels',   status: 'channelStatus' },
+    services:   { options: SERVICES,            container: 'serviceChips',  btn: 'selAllServices',   status: 'serviceStatus' },
+    entities:   { options: ENTITIES,            container: 'entityChips',   btn: 'selAllEntities',   status: 'entityStatus' },
+    owners:     { options: OWNER_NATIONALITIES, container: 'ownerChips',    btn: 'selAllOwners',     status: 'ownerStatus' },
+    modules:    { options: MODULES,             container: 'moduleChips',   btn: 'selAllModules',    status: 'moduleStatus' },
     industries: { options: INDUSTRIES,          container: 'industryChips', btn: 'selAllIndustries', status: 'industryStatus' },
     banks:      { options: BANKS,               container: 'bankChips',    btn: 'selAllBanks',      status: 'bankStatus' },
     docs:       { options: DOC_TYPES,           container: 'docChips',     btn: 'selAllDocs',       status: null },
@@ -397,26 +403,7 @@
     if (!meta.status) return;
     const n = draft[key].length, total = meta.options.length;
     $(meta.status).textContent = total ? (n === total ? 'All ' + total + ' selected' : n + ' of ' + total + ' selected') : '';
-  }
-
-  /* Single-select condition group. Stored as a 0-or-1-element array so the saved rule
-     keeps the same shape as the multi-select groups; empty still means "any". */
-  function renderSingleChipGroup(containerId, options, key) {
-    const c = $(containerId);
-    c.innerHTML = '';
-    options.forEach(opt => {
-      const on = draft[key][0] === opt;
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'toggle-chip' + (on ? ' on' : '');
-      b.innerHTML = (on ? CHECK_SM : '') + esc(opt);
-      b.addEventListener('click', () => {
-        draft[key] = on ? [] : [opt];
-        renderSingleChipGroup(containerId, options, key);
-        clearConditionErrors();
-      });
-      c.appendChild(b);
-    });
+    if (key === 'services') updateBanksVisibility();
   }
 
   function updateDocHint() {
@@ -425,68 +412,12 @@
     updateSelectAllLabel('docs');
   }
 
-  /* ══════════ Channel and Service — both single-select. Channel comes first, matching
-     the Pricing Rules wizard (Step 1 channel, Step 2 service); switching channel clears
-     any service already picked, since the two are chosen in that order. ══════════ */
-  function renderChannelChips() {
-    const root = $('channelChips');
-    root.innerHTML = '';
-    CHANNELS.forEach(name => {
-      const on = draft.channels[0] === name;
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'toggle-chip' + (on ? ' on' : '');
-      b.innerHTML = (on ? CHECK_SM : '') + esc(name);
-      b.addEventListener('click', () => {
-        draft.channels = on ? [] : [name];
-        draft.services = [];
-        if (draft.channels.length) $('channelsErr').classList.remove('show');
-        renderChannelChips();
-        renderServiceChips();
-        updateServiceHint();
-      });
-      root.appendChild(b);
-    });
-  }
-
-  function renderServiceChips() {
-    const root = $('serviceCatalog');
-    root.innerHTML = '';
-    if (!draft.channels.length) {
-      $('serviceFieldHint').textContent = 'Select a channel above to choose its service.';
-      return;
-    }
-    $('serviceFieldHint').textContent = 'Step 2 — pick the service within that channel this rule applies to.';
-    const row = document.createElement('div');
-    row.className = 'chip-row';
-    SERVICES.forEach(name => {
-      const on = draft.services[0] === name;
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'toggle-chip' + (on ? ' on' : '');
-      b.innerHTML = (on ? CHECK_SM : '') + esc(name);
-      b.addEventListener('click', () => {
-        draft.services = on ? [] : [name];
-        renderServiceChips();
-        updateServiceHint();
-      });
-      row.appendChild(b);
-    });
-    root.appendChild(row);
-  }
-
-  function updateServiceHint() {
-    $('serviceHint').textContent = draft.services[0] || 'No service selected';
-    if (draft.services.length) $('serviceErr').classList.remove('show');
-    updateBanksVisibility();
-  }
-
   /* These installment providers have no financial institution of their own to pick —
-     Financial Institution only makes sense for a service that settles through one. */
+     Financial Institution only makes sense for a service that settles through one. With
+     several services selected it stays visible as long as at least one of them has one. */
   const NO_FI_SERVICES = ['Souhoola', 'Valu', 'OCTO', 'Basata', 'Mogo', 'Tru', 'Forsa', 'Aman'];
   function serviceHasFI() {
-    const service = draft.services[0];
-    return !service || !NO_FI_SERVICES.includes(service);
+    return !draft.services.length || draft.services.some(s => !NO_FI_SERVICES.includes(s));
   }
   function updateBanksVisibility() {
     const show = serviceHasFI();
@@ -521,10 +452,9 @@
     $(meta.btn).addEventListener('click', () => toggleSelectAll(key));
   });
 
-  /* Every condition group needs a pick, except Business Owner Nationality, which stays
-     optional. Service and Settlement type are single-select, so for them that means
-     exactly one. */
-  const REQUIRED_CONDITIONS = ['entities', 'industries', 'banks', 'modules'];
+  /* Every condition group needs at least one pick, except Business Owner Nationality, which
+     stays optional (and Financial Institution, which drops out when no selected service has one). */
+  const REQUIRED_CONDITIONS = ['channels', 'services', 'entities', 'industries', 'banks', 'modules'];
   function clearConditionErrors() {
     REQUIRED_CONDITIONS.forEach(key => {
       if (draft[key].length) $(key + 'Err').classList.remove('show');
@@ -533,12 +463,6 @@
 
   function renderForm() {
     Object.keys(MULTI_GROUPS).forEach(renderMultiGroup);
-    renderSingleChipGroup('entityChips', ENTITIES, 'entities');
-    renderSingleChipGroup('ownerChips', OWNER_NATIONALITIES, 'owners');
-    renderSingleChipGroup('moduleChips', MODULES, 'modules');
-    renderChannelChips();
-    renderServiceChips();
-    updateServiceHint();
     updateDocHint();
     Object.keys(MULTI_GROUPS).forEach(key => { if (key !== 'docs') updateGroupStatus(key); });
     updateSelectAllLabels();
@@ -586,9 +510,6 @@
     $('ruleName').value = rule.name;
     draft.docs = [...rule.docs];
     CONDITION_KEYS.forEach(k => draft[k] = [...(rule[k] || [])]);
-    /* Rules saved before service, channel, merchant type, owner nationality, and settlement
-       type became single-select may carry several of each — keep the first. */
-    ['services', 'channels', 'entities', 'owners', 'modules'].forEach(k => { draft[k] = draft[k].slice(0, 1); });
     renderForm();
   })();
 
@@ -600,11 +521,8 @@
     let ok = true;
     if (!name) { $('ruleName').classList.add('invalid'); $('nameErr').classList.add('show'); ok = false; }
     else { $('ruleName').classList.remove('invalid'); $('nameErr').classList.remove('show'); }
-    if (!draft.channels.length) { $('channelsErr').classList.add('show'); ok = false; }
-    if (!draft.services.length) { $('serviceErr').classList.add('show'); ok = false; }
-    /* Channel and Service are validated separately above — every other required condition
-       group needs at least one pick too (Business Owner Nationality is the one exception,
-       and Financial Institution drops out entirely for services that have none). */
+    /* Every condition group needs at least one pick (Business Owner Nationality is the one
+       exception, and Financial Institution drops out when no selected service has one). */
     REQUIRED_CONDITIONS.forEach(key => {
       if (key === 'banks' && !serviceHasFI()) return;
       if (!draft[key].length) { $(key + 'Err').classList.add('show'); ok = false; }
