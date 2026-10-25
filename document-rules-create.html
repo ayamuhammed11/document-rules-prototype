@@ -475,7 +475,7 @@
     $('crumbCur').textContent = 'Edit Document Rule';
     $('ruleName').value = rule.name;
     SECTIONS.forEach(s => { if (!s.custom) draft[s.key] = [...(rule[s.key] || [])]; });
-    draft.services = [svcKey(rule.channels[0], rule.services[0])];
+    draft.services = serviceKeys(rule);
     /* A rule with an empty group used to match everyone — show that as everything ticked. */
     ['entities', 'owners', 'modules', 'industries'].forEach(k => { if (!draft[k].length) draft[k] = [...OPTIONS[k]]; });
     if (serviceHasFI() && !draft.banks.length) draft.banks = [...OPTIONS.banks];
@@ -487,8 +487,8 @@
   $('cancelRuleBtn').addEventListener('click', () => { location.href = 'document-rules.html'; });
 
   /* ══════════ Save ══════════
-     A rule belongs to one channel and one service, so every service picked under a channel becomes
-     its own rule, all sharing the other criteria. */
+     One rule, however many channels and services were picked. Creating logs the rule as it was set
+     up; editing logs exactly what was added, removed, or changed. */
   $('saveRuleBtn').addEventListener('click', () => {
     const name = $('ruleName').value.trim();
     let first = null;
@@ -512,42 +512,34 @@
     if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
     const now = new Date().toISOString();
-    const make = (channel, service) => ({
-      name, docs: [...draft.docs], channels: [channel], services: [service],
+    /* The rule as the form describes it — one record, however many channels and services it covers. */
+    const data = applyServiceKeys({
+      name, docs: [...draft.docs],
       entities: [...draft.entities], owners: [...draft.owners], modules: [...draft.modules],
-      industries: [...draft.industries],
-      banks: NO_FI_SERVICES.includes(service) ? [] : [...draft.banks],
-    });
-    const pairs = [];
-    draft.services.forEach(k => pairs.push(k.split(SEP)));   // [channel, service], in channel order
+      industries: [...draft.industries], banks: [],
+    }, draft.services);
+    data.banks = ruleHasNoFI(data) ? [] : [...draft.banks];
 
     const rules = loadRules();
 
     if (editingId != null) {
-      /* The edited rule keeps its own channel/service if still ticked; any other combination is a new rule. */
-      let keep = pairs.findIndex(([ch, svc]) => ch === original.channels[0] && svc === original.services[0]);
-      if (keep < 0) keep = 0;
       const target = rules.find(r => r.id === editingId);
       if (!target) { location.href = 'document-rules.html'; return; }
-      pairs.forEach(([ch, svc], i) => {
-        const data = make(ch, svc);
-        if (i === keep) {
-          Object.assign(target, data, { updatedAt: now });
-          const changes = diffRules(original, target);
-          if (changes.length) logEvent('Updated', target, changes);
-        } else {
-          const r = { id: allocId(), ...data, createdAt: now, updatedAt: now };
-          rules.push(r); saveRules(rules); logEvent('Created', r);
-        }
-      });
-      saveRules(rules);
+      Object.assign(target, data);
+      const changes = diffRules(original, target);
+      /* Nothing changed — leave the rule, its timestamp, and its log alone. */
+      if (changes.length) {
+        target.updatedAt = now;
+        saveRules(rules);
+        logEvent('Updated', target, { changes });
+      }
       location.href = 'document-rules.html?updated=' + encodeURIComponent(name);
     } else {
-      pairs.forEach(([ch, svc]) => {
-        const r = { id: allocId(), ...make(ch, svc), createdAt: now, updatedAt: now };
-        rules.push(r); saveRules(rules); logEvent('Created', r);
-      });
-      location.href = 'document-rules.html?created=' + encodeURIComponent(name) + '&n=' + pairs.length;
+      const rule = { id: allocId(), ...data, createdAt: now, updatedAt: now };
+      rules.push(rule);
+      saveRules(rules);
+      logEvent('Created', rule, { details: ruleSnapshot(rule) });
+      location.href = 'document-rules.html?created=' + encodeURIComponent(name);
     }
   });
 

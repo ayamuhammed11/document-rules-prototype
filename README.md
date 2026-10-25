@@ -9,13 +9,15 @@ collapsible **Documents** module.
 ## Pages
 
 - **[document-rules.html](document-rules.html)** — **All Rules** and **History**, as tabs under a
-  breadcrumb header with an "Add Document Rule" button. *All Rules* is a card with a rule-name
-  search and a Filter panel (channel, service, merchant type, owner nationality, industry,
-  financial institution, settlement type), listing one table per service and channel
-  ("Tru POS - 2 rules"), newest first. *History* is the module-wide audit trail of every rule
-  created, updated or deleted, paginated. Clicking a row opens a right-hand **Rule Details**
-  drawer with two sub-tabs: **Details**, and **Logs** — the full log of that one rule,
-  including what each update changed field by field. Edit and Delete live in the drawer.
+  breadcrumb header with an "Add Document Rule" button. *All Rules* is one table card — an
+  "All document rules" header with a rule-name search and a Filter button that opens a strip of
+  searchable dropdowns (channel, service, merchant type, industry, financial institution,
+  settlement type; applied with Submit Filters, reset with Clear All). The table lists every
+  rule by name, newest first, sortable and paginated, with a row menu (Details / Edit / Delete).
+  *History* is the module-wide audit trail of every rule created, updated or deleted. Clicking
+  a row opens a right-hand **Rule Details** drawer with two sub-tabs: **Details**, and **Logs** —
+  that one rule's timeline, naming the sections each entry created, added to, updated or removed.
+  Edit and Delete live in the drawer.
 
 - **[document-rules-create.html](document-rules-create.html)** — **Add document rule.** The
   rule builder — also handles editing an existing rule via `?edit=<id>`. A single card: Rule
@@ -52,11 +54,12 @@ a given set of criteria produces the same checklist everywhere.
 These are two separate fields, matching how the Pricing Rules module itself keeps them
 apart rather than folding channel into the service name. Pick one or more **Channels**
 (Online / POS); the **Service** dropdown then opens a block per selected channel, each listing
-that channel's own services, so a service is chosen per channel. A rule belongs to exactly one
-channel and one service, so every service picked under a channel becomes its own rule, all
-sharing the other criteria (Online Card + Online Wallet + POS Card saves three rules). When
-editing, the rule keeps its own channel and service; anything added becomes a new rule. Every
-ticked channel needs at least one service, and unticking a channel drops its services.
+that channel's own services, so a service is chosen per channel. A rule is a single record: it
+holds every channel and the services picked under each of them: Online Card + Online
+Wallet + POS Card is one rule, listed once by its name, with "Online, POS" in the Channel column.
+Every ticked channel needs at least one service, and unticking a channel drops its services.
+Editing the rule adds or removes channels and services on that same rule, and the change shows
+up in its Logs.
 
 | Field | Options |
 | --- | --- |
@@ -88,8 +91,9 @@ A group covering every option, or left empty on an older rule, matches everyone 
 ## Audit trail
 
 Every create, update and delete is recorded with who did it and when, against the rule's id.
-The History tab shows them all; a rule's own Logs tab shows just its entries, with the changed
-fields on updates (for example `Industry: Tourism → Tourism, Government`). A deleted rule's
+The History tab shows them all; a rule's own Logs tab shows just its entries, each naming the
+sections it created, or added to, updated or removed (for example "Added: Channel, Service" or
+"Updated: Rule name"). Saving an edit that changes nothing adds no entry. A deleted rule's
 entries stay in History.
 
 The first visit with nothing stored loads a small set of demo rules and events (once — deleting
@@ -102,10 +106,10 @@ Within a condition group: OR. Across groups: AND.
 Every condition group needs at least one option, except Financial institution when no
 selected service has one.
 
-On load, both Document Rules pages migrate older saved rules: one saved with several channels
-or services is split into one rule per combination, and one left without a valid service or
-channel can never match anything, so it is removed and logged to History as either
-`service retired` or `no service set`.
+On load, both Document Rules pages migrate older saved rules: a rule saved with flat channel and
+service lists gains the per-channel service map, and one left without a valid service or channel
+can never match anything, so it is removed and logged to History as either `service retired` or
+`no service set`.
 
 (The built-in universal requirements on the onboarding pages — National ID, bank proof —
 still apply to every applicant; that is baked-in demo data, not an authored rule.)

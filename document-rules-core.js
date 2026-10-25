@@ -3,6 +3,13 @@
    Loaded by document-rules.html and document-rules-create.html, so reference data,
    storage, the audit trail, and the one-off migrations live in a single place.
    No backend: localStorage is the "database".
+
+   A rule is one record:
+     { id, name, docs[], entities[], owners[], industries[], banks[], modules[],
+       channels[]      — the channels it applies to,
+       serviceMap{}    — { Online: ['Card', …], POS: […] }: the services picked under each channel,
+       services[]      — every service named in serviceMap, de-duplicated (for filtering),
+       createdAt, updatedAt }
    ══════════════════════════════════════════════════════════════════════════ */
 
 const RULES_KEY = 'kashier_document_rules_v1';
@@ -10,6 +17,7 @@ const NEXT_ID_KEY = 'kashier_document_rules_next_id_v1';
 const EVENTS_KEY = 'kashier_document_rules_events_v1';
 const SEEDED_KEY = 'kashier_document_rules_seeded_v1';
 const CURRENT_USER = 'Aya Muhammed';
+const CURRENT_ROLE = 'Admin';
 
 /* ══════════ Reference data ══════════ */
 const DOC_TYPES = [
@@ -49,7 +57,7 @@ const ALL_LABELS = {
   banks: 'All financial institutions', modules: 'All settlement types',
 };
 const FIELD_LABELS = [
-  ['name', 'Rule name'], ['channels', 'Channel'], ['services', 'Service'], ['entities', 'Merchant type'],
+  ['channels', 'Channel'], ['services', 'Service'], ['entities', 'Merchant type'],
   ['owners', 'Owner nationality'], ['industries', 'Industry'], ['banks', 'Financial institution'],
   ['modules', 'Settlement type'], ['docs', 'Required documents'],
 ];
@@ -73,6 +81,38 @@ function describe(key, vals) {
   return (vals || []).map(v => optionLabel(key, v)).join(', ') || '—';
 }
 
+/* ══════════ Channels and services ══════════ */
+/** Every "Channel|Service" key a rule covers, in channel then service order. */
+function serviceKeys(rule) {
+  const out = [];
+  CHANNELS.forEach(ch => ((rule.serviceMap || {})[ch] || []).forEach(svc => out.push(ch + '|' + svc)));
+  return out;
+}
+/** serviceMap + the derived services / channels lists, from a set of "Channel|Service" keys. */
+function applyServiceKeys(rule, keys) {
+  const map = {};
+  CHANNELS.forEach(ch => {
+    const mine = CHANNEL_SERVICES[ch].filter(svc => keys.includes(ch + '|' + svc));
+    if (mine.length) map[ch] = mine;
+  });
+  rule.serviceMap = map;
+  rule.channels = CHANNELS.filter(ch => map[ch]);
+  rule.services = SERVICES.filter(svc => rule.channels.some(ch => map[ch].includes(svc)));
+  return rule;
+}
+/** "Card, Wallet" when every channel has the same services, else "Online: Card · POS: Wallet". */
+function describeServices(rule) {
+  const map = rule.serviceMap || {};
+  const chans = CHANNELS.filter(c => map[c] && map[c].length);
+  if (!chans.length) return '—';
+  const same = chans.every(c => map[c].join('|') === map[chans[0]].join('|'));
+  return same ? map[chans[0]].join(', ') : chans.map(c => c + ': ' + map[c].join(', ')).join(' · ');
+}
+/** True when no service on the rule has a financial institution of its own. */
+function ruleHasNoFI(rule) {
+  return !!(rule.services || []).length && rule.services.every(s => NO_FI_SERVICES.includes(s));
+}
+
 /* ══════════ Storage ══════════ */
 function loadRules() { try { return JSON.parse(localStorage.getItem(RULES_KEY)) || []; } catch (e) { return []; } }
 function saveRules(list) { localStorage.setItem(RULES_KEY, JSON.stringify(list)); }
@@ -91,31 +131,47 @@ function allocId() {
 
 /* ══════════ Audit trail ══════════
    Every create / update / delete is recorded against the rule's id, so a rule's own log is
-   just the events carrying its id. An update stores what changed, field by field. */
-function logEvent(action, rule, changes, ts) {
+   just the events carrying its id.
+     Created — carries a snapshot of the rule as it was set up (`details`).
+     Updated — carries what changed (`changes`): a renamed rule as from → to, and every list
+               (channels, services, industries, documents …) as what was added and removed. */
+function logEvent(action, rule, extra, ts) {
   const events = loadEvents();
   events.unshift({
     ts: ts || new Date(), action, ruleId: rule.id, ruleName: rule.name,
-    channel: (rule.channels || [])[0] || '', service: (rule.services || [])[0] || '',
-    actor: CURRENT_USER, changes: changes && changes.length ? changes : undefined,
+    channel: channelsText(rule), service: describeServices(rule),
+    actor: CURRENT_USER, role: CURRENT_ROLE, ...(extra || {}),
   });
   saveEvents(events);
 }
-/** Field-by-field difference between two versions of a rule, as display text. */
+function channelsText(rule) { return (rule.channels || []).join(', '); }
+
+/** The rule as a list of {field, value} lines — what a Created log entry shows. */
+function ruleSnapshot(rule) {
+  const out = [{ field: 'Channel', value: channelsText(rule) || '—' }, { field: 'Service', value: describeServices(rule) }];
+  FIELD_LABELS.forEach(([key, label]) => {
+    if (key === 'channels' || key === 'services') return;
+    if (key === 'banks' && ruleHasNoFI(rule)) return;
+    out.push({ field: label, value: describe(key, rule[key] || []) });
+  });
+  return out;
+}
+
+/** Items to compare for one field: display labels, with "nothing ticked" read as "everything". */
+function fieldItems(rule, key) {
+  if (key === 'services') return serviceKeys(rule).map(k => k.replace('|', ' · '));
+  const raw = rule[key] || [];
+  if (ALL_LABELS[key] && !raw.length && !(key === 'banks' && ruleHasNoFI(rule))) return OPTIONS[key].map(v => optionLabel(key, v));
+  return raw.map(v => optionLabel(key, v));
+}
+/** Field-by-field difference between two versions of a rule. */
 function diffRules(before, after) {
   const out = [];
+  if (before.name !== after.name) out.push({ field: 'Rule name', from: before.name, to: after.name });
   FIELD_LABELS.forEach(([key, label]) => {
-    if (key === 'name') {
-      if (before.name !== after.name) out.push({ field: label, from: before.name, to: after.name });
-      return;
-    }
-    /* Compared as displayed, so "nothing ticked" and "everything ticked" (both mean everyone)
-       aren't reported as a change. Documents are compared as a set. */
-    const from = describe(key, before[key] || []), to = describe(key, after[key] || []);
-    const same = key === 'docs'
-      ? [...(before.docs || [])].sort().join('\u0000') === [...(after.docs || [])].sort().join('\u0000')
-      : from === to;
-    if (!same) out.push({ field: label, from, to });
+    const a = fieldItems(before, key), b = fieldItems(after, key);
+    const added = b.filter(x => !a.includes(x)), removed = a.filter(x => !b.includes(x));
+    if (added.length || removed.length) out.push({ field: label, added, removed });
   });
   return out;
 }
@@ -144,11 +200,10 @@ function formatStamp(d) {
 }
 
 /* ══════════ Migration ══════════
-   Runs on every load of either page and is idempotent. A rule belongs to exactly one channel
-   and one service (the form can create several at once — one rule per combination), so rules
-   saved with several of either are split up. Rules left without a valid service/channel can
-   never match anything and are removed, with the reason logged. Missing timestamps are
-   filled in from the audit trail. Returns the rules that were removed. */
+   Runs on every load of either page and is idempotent. Older rules carried a flat channels[] and
+   services[]; they gain a serviceMap (every listed service under every listed channel). Rules
+   left without a valid service or channel can never match anything and are removed, with the
+   reason logged. Missing timestamps are filled in from the audit trail. Returns what was removed. */
 function normalizeStore() {
   const knownServices = new Set(SERVICES), knownChannels = new Set(CHANNELS);
   const events = loadEvents();
@@ -156,17 +211,28 @@ function normalizeStore() {
   let changed = false;
 
   loadRules().forEach(r => {
-    const services = (r.services || []).filter(s => knownServices.has(s));
-    const channels = (r.channels || []).filter(c => knownChannels.has(c));
-    if (!services.length || !channels.length) {
+    const before = JSON.stringify([r.channels, r.services, r.serviceMap]);
+    let keys;
+    if (r.serviceMap) {
+      keys = [];
+      Object.keys(r.serviceMap).forEach(ch => (r.serviceMap[ch] || []).forEach(svc => {
+        if (knownChannels.has(ch) && knownServices.has(svc)) keys.push(ch + '|' + svc);
+      }));
+    } else {
+      const services = (r.services || []).filter(s => knownServices.has(s));
+      const channels = (r.channels || []).filter(c => knownChannels.has(c));
+      keys = channels.flatMap(ch => services.map(svc => ch + '|' + svc));
+    }
+    if (!keys.length) {
       dropped.push({ rule: r, reason: !(r.services || []).length && !(r.channels || []).length ? 'no service set' : 'service retired' });
       changed = true;
       return;
     }
+    applyServiceKeys(r, keys);
+    if (JSON.stringify([r.channels, r.services, r.serviceMap]) !== before) changed = true;
     if (!r.createdAt) {
       const mine = eventsForRule(r, events).filter(e => e.action === 'Created');
-      const first = mine.length ? mine[mine.length - 1].ts : new Date();
-      r.createdAt = first.toISOString();
+      r.createdAt = (mine.length ? mine[mine.length - 1].ts : new Date()).toISOString();
       changed = true;
     }
     if (!r.updatedAt) {
@@ -174,22 +240,10 @@ function normalizeStore() {
       r.updatedAt = (mine.length ? mine[0].ts : new Date(r.createdAt)).toISOString();
       changed = true;
     }
-    if (services.length > 1 || channels.length > 1 || services.length !== (r.services || []).length || channels.length !== (r.channels || []).length) changed = true;
-    let first = true;
-    channels.forEach(ch => services.forEach(svc => {
-      const copy = { ...r, channels: [ch], services: [svc] };
-      if (!first) copy.id = null;   // assigned below, once the kept ids are known
-      first = false;
-      kept.push(copy);
-    }));
+    kept.push(r);
   });
 
-  if (changed) {
-    let next = kept.reduce((m, r) => Math.max(m, r.id || 0), 0) + 1;
-    kept.forEach(r => { if (r.id == null) r.id = next++; });
-    saveRules(kept);
-    localStorage.setItem(NEXT_ID_KEY, String(Math.max(next, parseInt(localStorage.getItem(NEXT_ID_KEY) || '1', 10))));
-  }
+  if (changed) saveRules(kept);
   dropped.forEach(d => logEvent('Removed — ' + d.reason, d.rule));
   return dropped;
 }
@@ -223,24 +277,40 @@ function seedDemoData() {
 
   const rules = [], events = [];
   spec.forEach(([id, name, service, channel, entities, owners, industries, banks, modules, docs, created, actor]) => {
-    rules.push({ id, name, docs, entities, owners, industries, banks, modules, services: [service], channels: [channel], createdAt: created.toISOString(), updatedAt: created.toISOString() });
-    events.push({ ts: created, action: 'Created', ruleId: id, ruleName: name, channel, service, actor });
+    const rule = applyServiceKeys({ id, name, docs, entities, owners, industries, banks, modules, createdAt: created.toISOString(), updatedAt: created.toISOString() }, [channel + '|' + service]);
+    rules.push(rule);
+    events.push({ ts: created, action: 'Created', ruleId: id, ruleName: name, channel, service, actor, role: CURRENT_ROLE, details: ruleSnapshot(rule) });
   });
+  const ev = (id, patch) => { const r = rules.find(x => x.id === id); return { ruleId: id, ruleName: r.name, channel: channelsText(r), service: describeServices(r), role: CURRENT_ROLE, ...patch }; };
 
   // "test form v2" was renamed and had its documents changed shortly after it was created.
   const v2 = rules.find(r => r.id === 7), v2At = d(20, 15, 22, 23);
   v2.updatedAt = v2At.toISOString();
-  events.push({
-    ts: v2At, action: 'Updated', ruleId: 7, ruleName: 'test form v2', channel: 'POS', service: 'Card', actor: GAMAL,
+  events.push(ev(7, {
+    ts: v2At, action: 'Updated', actor: GAMAL,
     changes: [
       { field: 'Rule name', from: 'test form', to: 'test form v2' },
-      { field: 'Required documents', from: 'Store Lease / Location Proof', to: 'Store Lease / Location Proof, Visit Report' },
+      { field: 'Required documents', added: ['Visit Report'], removed: [] },
     ],
-  });
+  }));
+  // "Document Rule 1" was widened to POS as well, and its industries changed.
+  const r4 = rules.find(r => r.id === 4), r4At = d(20, 10, 15, 41);
+  applyServiceKeys(r4, ['Online|Card', 'POS|Card']);
+  r4.industries = ['Travel & Tourism', 'Government', 'Education'];
+  r4.updatedAt = r4At.toISOString();
+  events.push(ev(4, {
+    ts: r4At, action: 'Updated', actor: AYA,
+    changes: [
+      { field: 'Channel', added: ['POS'], removed: [] },
+      { field: 'Service', added: ['POS · Card'], removed: [] },
+      { field: 'Industry', added: ['Education'], removed: [] },
+    ],
+  }));
   // Rules that were created and deleted again.
   [[13, 'ewcec', d(19, 20, 50, 9), d(19, 20, 50, 15)], [14, 'Test Updated', d(19, 19, 40, 2), d(19, 20, 49, 12)]].forEach(([id, name, c, del]) => {
-    events.push({ ts: c, action: 'Created', ruleId: id, ruleName: name, channel: 'Online', service: 'Wallet', actor: AYA });
-    events.push({ ts: del, action: 'Deleted', ruleId: id, ruleName: name, channel: 'Online', service: 'Wallet', actor: AYA });
+    const base = { ruleId: id, ruleName: name, channel: 'Online', service: 'Wallet', actor: AYA, role: CURRENT_ROLE };
+    events.push({ ...base, ts: c, action: 'Created' });
+    events.push({ ...base, ts: del, action: 'Deleted' });
   });
 
   events.sort((a, b) => b.ts - a.ts);

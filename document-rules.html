@@ -6,7 +6,7 @@
 <title>Kashier | Document Rules</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --primary:#001F5F;
@@ -73,7 +73,8 @@
   /* ---------- Page content ---------- */
   .page{max-width:1600px;margin:0 auto;padding:8px 28px 48px;width:100%;}
   .page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
-  .page-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:28px;margin:0 0 4px;color:#000;}
+  .page-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:39px;line-height:1.2;margin:0 0 4px;color:var(--foreground);}
+  .cta-row{display:flex;justify-content:flex-end;margin-bottom:8px;}
   .page-subtitle{color:var(--muted-foreground);font-size:13.5px;margin:0;max-width:640px;}
 
   /* ---------- Buttons ---------- */
@@ -112,75 +113,132 @@
   .breadcrumb svg{width:10px;height:10px;stroke-width:2;}
   .breadcrumb .cur{color:var(--foreground);}
 
-  /* ---------- All Rules card: title + search + filter, then one table per service/channel ---------- */
-  .rules-card{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius);padding:20px 22px 22px;}
-  .rules-head{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
-  .rules-title{font-family:'Outfit',sans-serif;font-weight:600;font-size:17px;color:var(--cadet-base);margin:0;white-space:nowrap;}
-  .search-wrap{position:relative;flex:1;min-width:180px;max-width:380px;}
+  [hidden]{display:none !important;}
+
+  /* ---------- Filter row — OUTSIDE the table card, 12px above it (styleguide tables.md §1) ---------- */
+  /* Card header: title, search, Filter button — then the filter strip when opened */
+  .dt-head{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:16px 22px;}
+  .dt-title{font-family:'Outfit',sans-serif;font-weight:600;font-size:17px;color:var(--cadet-base);margin:0;white-space:nowrap;}
+  .search-wrap{position:relative;flex:1 1 300px;max-width:420px;min-width:180px;}
   .search-wrap svg{position:absolute;inset-inline-start:10px;top:50%;transform:translateY(-50%);color:var(--muted-foreground);width:15px;height:15px;pointer-events:none;}
   .search-wrap input{width:100%;padding:8px 10px;padding-inline-start:34px;border:1px solid transparent;border-radius:var(--radius);color:var(--foreground);outline:none;background:transparent;}
   .search-wrap input:hover{background:var(--muted);}
   .search-wrap input:focus{border-color:var(--primary);background:#fff;}
-  .filter-wrap{position:relative;margin-inline-start:auto;}
+  .btn-filter{margin-inline-start:auto;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--primary);border-radius:var(--radius);background:#fff;color:var(--foreground);font-weight:600;font-size:14px;cursor:pointer;}
+  .btn-filter:hover,.btn-filter[aria-expanded="true"]{background:var(--primary-10);}
+  .btn-filter svg{width:18px;height:18px;}
   .filter-count{background:var(--primary);color:#fff;border-radius:9px;font-size:10.5px;font-weight:700;padding:0 6px;line-height:17px;}
-  .filter-panel{display:none;position:absolute;inset-inline-end:0;top:calc(100% + 6px);width:300px;max-width:calc(100vw - 32px);background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 10px 30px rgba(0,20,60,.14);padding:6px 16px 16px;z-index:30;}
-  .filter-panel.open{display:block;}
-  .filter-panel label{display:block;font-size:11px;font-weight:700;color:var(--cadet-base);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 5px;}
-  .filter-panel select{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:8px 9px;background:#fff;color:var(--foreground);outline:none;}
-  .filter-panel select:focus{border-color:var(--primary);}
-  .filter-clear{margin-top:14px;background:none;border:none;color:var(--link);font-weight:600;font-size:12.5px;padding:0;text-decoration:underline;}
+  .filter-strip{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;background:var(--muted);border-radius:6px;margin:0 22px 16px;padding:16px;}
+  .filter-strip[hidden]{display:none;}
+  .ff{flex:1 1 150px;min-width:150px;}
+  .ff label{display:block;font-size:12px;color:var(--cadet-base);margin-bottom:6px;}
+  .combo{position:relative;}
+  .combo input{width:100%;height:38px;padding:0 34px 0 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff;color:var(--foreground);font-size:14px;outline:none;}
+  .combo input::placeholder{color:var(--cadet-base);}
+  .combo input:focus{border-color:var(--primary);}
+  .combo > svg{position:absolute;inset-inline-end:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke-width:2;color:var(--foreground);pointer-events:none;}
+  .combo-list{position:absolute;inset-inline:0;top:calc(100% + 4px);max-height:220px;overflow-y:auto;margin:0;padding:4px;list-style:none;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,20,60,.14);z-index:40;}
+  .combo-list[hidden]{display:none;}
+  .combo-list li{padding:8px 10px;border-radius:3px;font-size:14px;cursor:pointer;}
+  .combo-list li:hover,.combo-list li.on{background:var(--primary-10);}
+  .combo-list li.none{color:var(--muted-foreground);cursor:default;}
+  .combo-list li.none:hover{background:none;}
+  .strip-actions{display:flex;gap:10px;}
+  .strip-actions .btn{height:38px;padding:0 16px;}
+  .btn-outline-primary{background:#fff;border-color:var(--primary);color:var(--primary);}
+  .btn-outline-primary:hover{background:var(--primary-10);}
 
-  .rule-group{margin-top:24px;}
-  .rg-title{margin:0 0 10px;font-size:12.5px;color:var(--muted-foreground);font-weight:400;font-family:'Noto Sans',sans-serif;}
-  .rg-title b{font-family:'Outfit',sans-serif;font-weight:700;font-size:14.5px;color:var(--foreground);margin-inline-end:6px;}
-  .rg-table{background:#FAFBFB;border:1px solid var(--border-subtle);border-radius:6px;overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;}
-  thead th{text-align:start;font-size:11px;font-weight:700;color:var(--cadet-base);text-transform:uppercase;letter-spacing:.04em;padding:14px 12px;white-space:nowrap;}
-  tbody td{padding:14px 12px;border-top:1px solid var(--border-subtle);vertical-align:middle;font-size:13px;}
-  .row-click{cursor:pointer;}
-  .row-click:hover{background:var(--primary-10);}
-  .row-click:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
-  .svc-name{font-weight:700;color:var(--foreground);min-width:170px;max-width:260px;overflow-wrap:anywhere;}
-  .chevron-affordance{color:var(--muted-foreground);width:24px;}
-  .chevron-affordance svg{width:16px;height:16px;}
+  /* ---------- DataTable — header 40px #F7F9FC, rows 49px, zebra, hover ocean-10, no toolbar ---------- */
+  .dt{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius);overflow:hidden;}
+  .dt-scroll{overflow-x:auto;}
+  .dt table{width:100%;border-collapse:collapse;min-width:1180px;}
+  .dt thead th{height:40px;padding:16px 8px 8px;background:#F7F9FC;border-bottom:1px solid #E9EDF5;font-family:Inter,'Noto Sans',sans-serif;font-size:11px;font-weight:600;line-height:16px;color:#464F60;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;text-align:start;vertical-align:bottom;}
+  .dt thead th button{display:inline-flex;align-items:center;gap:4px;background:none;border:none;padding:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;}
+  .dt thead th button:hover,.dt thead th button.on{color:var(--primary);}
+  .dt thead th button svg{width:12px;height:12px;stroke-width:2;opacity:.5;}
+  .dt thead th button.on svg{opacity:1;}
+  .dt tbody td{height:49px;padding:8px;font-size:14px;color:var(--foreground);vertical-align:middle;white-space:nowrap;}
+  .dt tbody tr:nth-child(even){background:rgba(248,249,249,.75);}
+  .dt tbody tr.row-click{cursor:pointer;}
+  .dt tbody tr.row-click:hover{background:var(--primary-10);}
+  .dt tbody tr.row-click:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+  .dt td.wrap{white-space:normal;min-width:150px;max-width:230px;}
+  /* TwoLineCell — the identity column: 14px primary over a muted 12px secondary */
+  .cell2{display:flex;flex-direction:column;gap:2px;min-width:190px;max-width:280px;}
+  .cell2 .p{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cell2 .s{font-size:12px;color:#687182;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .dt td.util{width:44px;text-align:end;}
+  .kebab{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:none;border-radius:50%;background:none;color:var(--cadet-base);cursor:pointer;}
+  .kebab:hover,.kebab[aria-expanded="true"]{background:var(--primary-10);color:var(--primary);}
+  .kebab svg{width:19px;height:19px;}
+  .skel{height:14px;border-radius:4px;background:var(--cadet-09);animation:pulse 1.2s ease-in-out infinite;}
+  @keyframes pulse{50%{opacity:.45;}}
 
-  /* ---------- Pills (industry / document values) ---------- */
-  .pill-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
-  .pill{display:inline-block;background:#F1F3F3;color:var(--foreground);font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;white-space:nowrap;}
+  /* Row action menu — one floating menu, positioned under the kebab that opened it */
+  .row-menu{position:fixed;z-index:120;min-width:180px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,20,60,.16);padding:4px;display:none;}
+  .row-menu.open{display:block;}
+  .row-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;background:none;border-radius:3px;font-size:14px;color:var(--foreground);text-align:start;cursor:pointer;}
+  .row-menu button:hover{background:var(--primary-10);}
+  .row-menu button svg{width:18px;height:18px;color:var(--cadet-base);}
+  .row-menu button.danger,.row-menu button.danger svg{color:var(--destructive);}
+  .row-menu button.danger:hover{background:var(--destructive-10);}
+
+  /* Tags for multi-value cells (industry / documents) */
+  .pill-row{display:flex;gap:6px;flex-wrap:nowrap;align-items:center;}
+  .pill{display:inline-block;background:var(--muted);color:var(--cadet-base);font-size:12px;padding:3px 8px;border-radius:2px;white-space:nowrap;}
   .pill-more{color:var(--muted-foreground);font-weight:700;letter-spacing:1px;cursor:default;}
 
-  /* ---------- Empty state ---------- */
-  .empty-state{padding:56px 24px;text-align:center;color:var(--muted-foreground);}
-  .empty-state svg{width:36px;height:36px;margin:0 auto 12px;color:var(--border);}
-  .empty-state p{margin:0 0 14px;font-size:13.5px;}
+  /* ---------- EmptyState ---------- */
+  .empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:56px 24px;white-space:normal;}
+  .empty .ic{width:48px;height:48px;border-radius:50%;background:var(--muted);display:flex;align-items:center;justify-content:center;}
+  .empty .ic svg{width:24px;height:24px;color:var(--muted-foreground);}
+  .empty .t{font-size:16px;font-weight:600;color:var(--foreground);margin:0;}
+  .empty .d{font-size:14px;color:var(--muted-foreground);max-width:380px;margin:0;}
+
+  /* ---------- TablePagination — compact 44px bar: count · rows per page · prev / fraction / next ---------- */
+  .dt-pager{display:flex;align-items:center;gap:20px;padding:12px 20px;border-top:1px solid var(--border-subtle);background:#FDFDFD;font-family:Inter,'Noto Sans',sans-serif;font-size:12px;font-weight:500;line-height:18px;letter-spacing:.36px;color:#687182;flex-wrap:wrap;}
+  .pg-count{flex:1;min-width:0;white-space:nowrap;}
+  .pg-rows{display:flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer;}
+  .pg-sel{position:relative;display:flex;align-items:center;}
+  .pg-sel select{appearance:none;-webkit-appearance:none;background:transparent;border:0;padding:0 16px 0 0;font:inherit;letter-spacing:inherit;color:#687182;cursor:pointer;outline:none;}
+  .pg-sel svg{position:absolute;inset-inline-end:0;width:16px;height:16px;pointer-events:none;stroke-width:2;}
+  .pg-nav{display:flex;align-items:center;gap:10px;}
+  .pg-btn{display:flex;align-items:center;justify-content:center;padding:2px 4px;border:0;border-radius:6px;color:#464F60;background:#fff;box-shadow:0 1px 1px rgba(0,0,0,.1),0 0 0 1px rgba(70,79,96,.16),0 2px 5px rgba(89,96,120,.1);cursor:pointer;}
+  .pg-btn:disabled{background:#F7F9FC;box-shadow:0 0 0 1px rgba(70,79,96,.24);color:#868FA0;cursor:not-allowed;}
+  .pg-btn svg{width:16px;height:16px;stroke-width:2;}
+  .pg-frac b{font-weight:500;color:#171C26;}
 
   /* ---------- History (audit trail) ---------- */
   .hist-head{display:flex;align-items:center;gap:10px;margin:2px 0 4px;}
   .hist-head svg{width:20px;height:20px;color:var(--muted-foreground);}
   .hist-head h2{font-family:'Outfit',sans-serif;font-weight:600;font-size:20px;color:var(--cadet-base);margin:0;}
   .hist-sub{font-size:12px;color:var(--muted-foreground);margin:0 0 14px;}
-  .event-item{display:flex;align-items:flex-start;gap:14px;padding:9px 6px;}
+  .ev-list{padding:12px;display:flex;flex-direction:column;gap:8px;}
+  .event-item{display:flex;align-items:center;gap:14px;padding:10px 12px;border:1px solid var(--border-subtle);border-radius:var(--radius);background:#FDFDFD;}
   .ev-icon{width:34px;height:34px;border-radius:50%;background:var(--muted);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .ev-icon svg{width:15px;height:15px;stroke-width:2;}
+  .ev-icon svg{width:16px;height:16px;stroke-width:2;}
   .ev-icon.created{background:var(--success);color:#fff;}
   .ev-icon.updated{background:#E6E8E8;color:var(--muted-foreground);}
   .ev-icon.deleted,.ev-icon.removed{background:var(--destructive);color:#fff;}
   .ev-body{min-width:0;}
-  .ev-ts{font-size:13.5px;color:var(--foreground);}
-  .ev-sentence{font-size:13.5px;color:var(--foreground);line-height:1.45;overflow-wrap:anywhere;}
+  .ev-ts{font-size:14px;color:var(--foreground);}
+  .ev-sentence{font-size:14px;color:var(--foreground);line-height:1.45;overflow-wrap:anywhere;}
   .ev-scope{color:var(--muted-foreground);font-size:12px;margin-inline-start:4px;}
-  .ev-changes{margin:6px 0 2px;padding:0;list-style:none;font-size:12.5px;color:var(--muted-foreground);}
-  .ev-changes li{margin-top:3px;overflow-wrap:anywhere;}
-  .ev-changes .f{font-weight:600;color:var(--cadet-base);}
-  .ev-changes .from{text-decoration:line-through;}
-  .ev-changes .to{color:var(--foreground);}
-  .pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;font-size:12px;color:var(--muted-foreground);flex-wrap:wrap;}
-  .pager-right{display:flex;align-items:center;gap:12px;}
-  .pager select{border:none;background:transparent;font-weight:600;color:var(--foreground);font-size:12px;padding:2px;}
-  .pager .pg-btn{border:none;background:none;padding:4px;color:var(--foreground);display:inline-flex;border-radius:var(--radius);}
-  .pager .pg-btn:hover:not(:disabled){background:var(--muted);}
-  .pager .pg-btn:disabled{color:var(--border);cursor:default;}
-  .pager .pg-btn svg{width:14px;height:14px;stroke-width:2;}
+  /* Rule log — timeline in the drawer, with the same solid circle icons as History */
+  .hist{display:flex;flex-direction:column;}
+  .hist-item{display:flex;gap:12px;padding-bottom:18px;position:relative;}
+  .hist-item:not(:last-child)::before{content:'';position:absolute;inset-inline-start:16px;top:36px;bottom:2px;width:1px;background:var(--border);}
+  .hist-dot{width:32px;height:32px;border-radius:50%;background:var(--muted);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;}
+  .hist-dot svg{width:15px;height:15px;stroke-width:2;}
+  .hist-dot.created{background:var(--success);color:#fff;}
+  .hist-dot.updated{background:#E6E8E8;color:var(--muted-foreground);}
+  .hist-dot.deleted,.hist-dot.removed{background:var(--destructive);color:#fff;}
+  .hist-body{min-width:0;flex:1;padding-top:1px;}
+  .hist-action{font-size:14px;font-weight:600;color:var(--foreground);}
+  .hist-meta{font-size:12px;color:var(--muted-foreground);margin-top:2px;}
+  .log-lines{list-style:none;margin:6px 0 0;padding:0;font-size:12.5px;color:var(--muted-foreground);}
+  .log-lines li{padding:2px 0;line-height:1.45;overflow-wrap:anywhere;}
+  .log-lines .f{color:var(--foreground);font-weight:600;}
 
   /* ---------- Delete confirmation modal ---------- */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,10,30,.45);display:none;align-items:center;justify-content:center;z-index:110;padding:20px;}
@@ -286,10 +344,11 @@
           <h1 class="page-title">Document Rules</h1>
           <p class="page-subtitle">Define which documents merchants must submit based on channel, service, merchant type, owner nationality, industry, financial institution and settlement type.</p>
         </div>
-        <a class="btn btn-primary" href="document-rules-create.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          Add Document Rule
-        </a>
+      </div>
+
+      <!-- Primary CTA — its own end-aligned row (styleguide list page) -->
+      <div class="cta-row">
+        <a class="btn btn-primary" href="document-rules-create.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Add Document Rule</a>
       </div>
 
       <div class="tabs" role="tablist">
@@ -297,62 +356,56 @@
         <button class="tab" id="tabHistory" role="tab" aria-selected="false" aria-controls="panelHistory">History</button>
       </div>
 
-      <!-- ══════════ All Rules ══════════ -->
+      <!-- ══════════ All Rules: filter row, then the table card (no toolbar inside it) ══════════ -->
       <section id="panelRules" role="tabpanel" aria-labelledby="tabRules">
-        <div class="rules-card">
-          <div class="rules-head">
-            <h2 class="rules-title">All document rules</h2>
+        <div class="dt">
+          <div class="dt-head">
+            <h2 class="dt-title">All document rules</h2>
             <div class="search-wrap">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
               <input type="text" id="ruleSearch" placeholder="Search by rule name..." aria-label="Search by rule name">
             </div>
-            <div class="filter-wrap">
-              <button class="btn btn-outline" id="filterBtn" aria-expanded="false" aria-controls="filterPanel">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/></svg>
-                Filter <span class="filter-count" id="filterCount" hidden></span>
-              </button>
-              <div class="filter-panel" id="filterPanel">
-                <label for="fChannel">Channel</label><select id="fChannel"><option value="">All channels</option></select>
-                <label for="fService">Service</label><select id="fService"><option value="">All services</option></select>
-                <label for="fEntity">Merchant type</label><select id="fEntity"><option value="">All merchant types</option></select>
-                <label for="fOwner">Owner nationality</label><select id="fOwner"><option value="">All owner nationalities</option></select>
-                <label for="fIndustry">Industry</label><select id="fIndustry"><option value="">All industries</option></select>
-                <label for="fBank">Financial institution</label><select id="fBank"><option value="">All financial institutions</option></select>
-                <label for="fModule">Settlement type</label><select id="fModule"><option value="">All settlement types</option></select>
-                <button type="button" class="filter-clear" id="filterClear">Clear all filters</button>
-              </div>
+            <button type="button" class="btn-filter" id="filterBtn" aria-expanded="false" aria-controls="filterStrip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/></svg>
+              Filter <span class="filter-count" id="filterCount" hidden></span>
+            </button>
+          </div>
+          <div class="filter-strip" id="filterStrip" hidden>
+            <div style="display:contents" id="filterFields"></div>
+            <div class="strip-actions">
+              <button type="button" class="btn btn-outline-primary" id="filterClear">Clear All</button>
+              <button type="button" class="btn btn-primary" id="filterSubmit">Submit Filters</button>
             </div>
           </div>
-
-          <div id="ruleGroups"></div>
-
-          <div class="empty-state" id="rulesEmpty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
-            <p id="emptyText" style="margin-bottom:0;"></p>
-          </div>
+          <div class="dt-scroll"><table id="rulesTable"><thead id="rulesHead"></thead><tbody id="ruleGroups"></tbody></table></div>
+          <div class="dt-pager" id="rulesPager" hidden></div>
         </div>
       </section>
 
       <!-- ══════════ History ══════════ -->
       <section id="panelHistory" role="tabpanel" aria-labelledby="tabHistory" hidden>
         <div class="hist-head">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
           <h2>Events</h2>
         </div>
         <p class="hist-sub">Full audit trail of this module. Every rule that is created, updated or deleted is recorded here with who did it and when.</p>
-        <div id="eventsList"></div>
-        <div class="empty-state" id="eventsEmpty" style="display:none;padding:32px 0;"><p style="margin:0;">No events recorded yet — actions on rules will appear here.</p></div>
-        <div class="pager" id="pager">
-          <span id="pagerCount"></span>
-          <div class="pager-right">
-            <label for="pagerSize">Rows per page</label>
-            <select id="pagerSize"><option>10</option><option>20</option><option>50</option></select>
-            <button class="pg-btn" id="pagerPrev" aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg></button>
-            <span id="pagerPos"></span>
-            <button class="pg-btn" id="pagerNext" aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
+        <div class="dt">
+          <div class="ev-list" id="eventsList"></div>
+          <div class="empty" id="eventsEmpty" hidden>
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg></div>
+            <p class="t">No events yet</p>
+            <p class="d">Actions on rules — created, updated or deleted — will appear here.</p>
           </div>
+          <div class="dt-pager" id="histPager"></div>
         </div>
       </section>
+
+      <!-- Row action menu (positioned under the kebab that opened it) -->
+      <div class="row-menu" id="rowMenu" role="menu">
+        <button type="button" role="menuitem" data-act="details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>Details</button>
+        <button type="button" role="menuitem" data-act="edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>Edit</button>
+        <button type="button" role="menuitem" data-act="delete" class="danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>Delete</button>
+      </div>
     </main>
   </div>
 </div>
@@ -419,7 +472,6 @@
 
   /* ══════════ Icons ══════════ */
   const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
-  const CHEVRON_RIGHT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>';
   const PLUS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>';
   const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>';
   const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>';
@@ -450,109 +502,230 @@
   $('tabRules').addEventListener('click', () => showTab('rules'));
   $('tabHistory').addEventListener('click', () => showTab('history'));
 
-  /* ══════════ Filters ══════════ */
-  const FILTERS = [
-    ['fChannel', 'channels', CHANNELS], ['fService', 'services', SERVICES], ['fEntity', 'entities', ENTITIES],
-    ['fOwner', 'owners', OWNER_NATIONALITIES], ['fIndustry', 'industries', INDUSTRIES], ['fBank', 'banks', BANKS],
-    ['fModule', 'modules', MODULES],
-  ];
-  FILTERS.forEach(([id, key, options]) => {
-    options.forEach(o => {
-      const opt = document.createElement('option');
-      opt.value = o; opt.textContent = optionLabel(key, o);
-      $(id).appendChild(opt);
-    });
-    $(id).addEventListener('change', renderRules);
-  });
-  $('ruleSearch').addEventListener('input', renderRules);
-
-  function setFilterPanel(open) {
-    $('filterPanel').classList.toggle('open', open);
-    $('filterBtn').setAttribute('aria-expanded', String(open));
+  /* ══════════ Pagination — the compact bar shared by the rules table and History ══════════ */
+  const CHEV_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>';
+  const CHEV_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>';
+  const CHEV_D = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>';
+  /** Renders "1-10 of 97 · Rows per page: 10 ▾ · ‹ 1/10 ›" into `el` and returns the visible slice [from, to). */
+  function mountPager(el, st, total, rerender) {
+    const pages = Math.max(1, Math.ceil(total / st.size));
+    st.page = Math.min(st.page, pages);
+    const from = total === 0 ? 0 : (st.page - 1) * st.size + 1, to = Math.min(st.page * st.size, total);
+    el.hidden = total === 0;
+    el.innerHTML =
+      '<span class="pg-count">' + from + '-' + to + ' of ' + total + '</span>' +
+      '<label class="pg-rows">Rows per page:<span class="pg-sel"><select aria-label="Rows per page">' +
+        [10, 20, 50].map(n => '<option value="' + n + '"' + (n === st.size ? ' selected' : '') + '>' + n + '</option>').join('') +
+      '</select>' + CHEV_D + '</span></label>' +
+      '<div class="pg-nav"><button class="pg-btn" data-d="-1" aria-label="Previous page"' + (st.page <= 1 ? ' disabled' : '') + '>' + CHEV_L + '</button>' +
+      '<span class="pg-frac"><b>' + st.page + '</b>/' + pages + '</span>' +
+      '<button class="pg-btn" data-d="1" aria-label="Next page"' + (st.page >= pages ? ' disabled' : '') + '>' + CHEV_R + '</button></div>';
+    el.querySelector('select').addEventListener('change', e => { st.size = parseInt(e.target.value, 10); st.page = 1; rerender(); });
+    el.querySelectorAll('.pg-btn').forEach(b => b.addEventListener('click', () => { st.page += parseInt(b.dataset.d, 10); rerender(); }));
+    return [from ? from - 1 : 0, to];
   }
-  $('filterBtn').addEventListener('click', e => { e.stopPropagation(); setFilterPanel(!$('filterPanel').classList.contains('open')); });
-  $('filterPanel').addEventListener('click', e => e.stopPropagation());
-  document.addEventListener('click', () => setFilterPanel(false));
-  $('filterClear').addEventListener('click', () => { FILTERS.forEach(([id]) => { $(id).value = ''; }); renderRules(); });
+
+  /* ══════════ Filters — a Filter button opens a strip of searchable dropdowns ══════════
+     Nothing is applied until Submit Filters; Clear All resets and applies. */
+  const FILTERS = [
+    ['channels', CHANNELS, 'Channel'], ['services', SERVICES, 'Service'], ['entities', ENTITIES, 'Merchant type'],
+    ['industries', INDUSTRIES, 'Industry'], ['banks', BANKS, 'Financial institution'], ['modules', MODULES, 'Settlement type'],
+  ];
+  const listState = { page: 1, size: 10, sort: null, loading: true };
+  const applied = {};   // key → chosen option, set by Submit Filters
+  const combos = {};    // key → { get(), set(v) }
+  const COMBO_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>';
+
+  /** A single-select dropdown you can type into to narrow the options. */
+  function makeCombo(root, key, options, label) {
+    root.innerHTML = '<input type="text" role="combobox" aria-expanded="false" aria-label="' + esc(label) + '" placeholder="Search" autocomplete="off">' + COMBO_CHEVRON + '<ul class="combo-list" role="listbox" hidden></ul>';
+    const input = root.querySelector('input'), list = root.querySelector('ul');
+    let value = '';
+    const text = v => (v ? optionLabel(key, v) : '');
+    const open = filter => {
+      const q = (filter || '').trim().toLowerCase();
+      const items = options.filter(o => !q || text(o).toLowerCase().includes(q));
+      list.innerHTML = items.length ? items.map(o => '<li role="option" data-v="' + esc(o) + '"' + (o === value ? ' class="on"' : '') + '>' + esc(text(o)) + '</li>').join('') : '<li class="none">No matches</li>';
+      list.hidden = false; input.setAttribute('aria-expanded', 'true');
+    };
+    const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); input.value = text(value); };
+    input.addEventListener('focus', () => { input.select(); open(''); });
+    input.addEventListener('click', () => open(''));
+    input.addEventListener('input', () => { if (!input.value.trim()) value = ''; open(input.value); });
+    list.addEventListener('mousedown', e => {   // mousedown: fires before the input loses focus
+      const li = e.target.closest('li[data-v]');
+      if (!li) return;
+      value = li.dataset.v; close(); input.blur();
+    });
+    input.addEventListener('blur', close);
+    input.addEventListener('keydown', e => { if (e.key === 'Escape') { close(); input.blur(); } });
+    combos[key] = { get: () => value, set: v => { value = v || ''; input.value = text(value); } };
+  }
+  $('filterFields').innerHTML = FILTERS.map(([key, , label]) => '<div class="ff"><label>' + esc(label) + '</label><div class="combo" id="cmb_' + key + '"></div></div>').join('');
+  FILTERS.forEach(([key, options, label]) => makeCombo($('cmb_' + key), key, options, label));
+
+  $('ruleSearch').addEventListener('input', () => { listState.page = 1; renderRules(); });
+  $('filterBtn').addEventListener('click', () => {
+    const open = $('filterStrip').hidden;
+    $('filterStrip').hidden = !open;
+    $('filterBtn').setAttribute('aria-expanded', String(open));
+  });
+  function submitFilters() { FILTERS.forEach(([key]) => { applied[key] = combos[key].get(); }); listState.page = 1; renderRules(); }
+  function clearFilters() { FILTERS.forEach(([key]) => { combos[key].set(''); applied[key] = ''; }); listState.page = 1; renderRules(); }
+  $('filterSubmit').addEventListener('click', submitFilters);
+  $('filterClear').addEventListener('click', clearFilters);
 
   function ruleVisible(r) {
-    const ok = FILTERS.every(([id, key]) => {
-      const v = $(id).value;
+    const ok = FILTERS.every(([key]) => {
+      const v = applied[key];
       return !v || coversAll(key, r[key]) || r[key].includes(v);
     });
     if (!ok) return false;
+    /* With both a channel and a service chosen, the service must be configured under that channel. */
+    if (applied.channels && applied.services && !((r.serviceMap || {})[applied.channels] || []).includes(applied.services)) return false;
     const q = $('ruleSearch').value.trim().toLowerCase();
     return !q || r.name.toLowerCase().includes(q);
   }
+  function updateFilterBadge() {
+    const n = FILTERS.filter(([key]) => applied[key]).length;
+    $('filterCount').textContent = n;
+    $('filterCount').hidden = !n;
+  }
 
-  /* ══════════ Rule list — one table per service and channel ══════════
-     A rule belongs to exactly one of each, so groups read "Tru  POS - 2 rules". Newest rules
-     (and the groups they sit in) come first. */
+  /* ══════════ Rule table — DataTable per the Kashier styleguide ══════════
+     One flat table by rule name; channel and service are columns because a rule can cover several. */
   const MAX_PILLS = 3;
   function pills(values) {
     const shown = values.slice(0, MAX_PILLS).map(v => '<span class="pill">' + esc(v) + '</span>').join('');
     const more = values.length > MAX_PILLS ? '<span class="pill-more" title="' + esc(values.slice(MAX_PILLS).join(', ')) + '">…</span>' : '';
     return '<div class="pill-row">' + shown + more + '</div>';
   }
+  const KEBAB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/></svg>';
+  const CARET = {
+    both: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"/></svg>',
+    asc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5"/></svg>',
+    desc: CHEV_D,
+  };
+  const COLUMNS = [
+    { key: 'name', label: 'Rule name', sort: (a, b) => a.name.localeCompare(b.name) },
+    { key: 'channel', label: 'Channel', sort: (a, b) => a.channels.join().localeCompare(b.channels.join()) },
+    { key: 'service', label: 'Service', sort: (a, b) => describeServices(a).localeCompare(describeServices(b)) },
+    { key: 'entities', label: 'Merchant type' }, { key: 'owners', label: 'Owner nationality' }, { key: 'industries', label: 'Industry' },
+    { key: 'banks', label: 'Financial institution' }, { key: 'modules', label: 'Settlement type' }, { key: 'docs', label: 'Documents' },
+    { key: 'menu', label: '' },
+  ];
 
-  function renderRules() {
-    const groupsEl = $('ruleGroups');
-    const visible = rules.filter(ruleVisible).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    groupsEl.innerHTML = '';
-
-    const active = FILTERS.filter(([id]) => $(id).value).length;
-    $('filterCount').textContent = active;
-    $('filterCount').hidden = !active;
-
-    $('rulesEmpty').style.display = visible.length === 0 ? 'block' : 'none';
-    $('emptyText').textContent = rules.length === 0
-      ? 'No document rules yet — add your first one.'
-      : 'No rules match your search or filters — try clearing them.';
-    if (visible.length === 0) return;
-
-    const groups = new Map();   // insertion order = newest group first
-    visible.forEach(r => {
-      const k = r.services[0] + '\u0000' + r.channels[0];
-      if (!groups.has(k)) groups.set(k, []);
-      groups.get(k).push(r);
-    });
-
-    groups.forEach(list => {
-      const service = list[0].services[0], channel = list[0].channels[0];
-      const wrap = document.createElement('div');
-      wrap.className = 'rule-group';
-      wrap.innerHTML =
-        '<h3 class="rg-title"><b>' + esc(service) + '</b>' + esc(channel) + ' - ' + list.length + (list.length === 1 ? ' rule' : ' rules') + '</h3>' +
-        '<div class="rg-table"><table><thead><tr>' +
-          '<th>Rule name</th><th>Channel</th><th>Merchant type</th><th>Owner nationality</th><th>Industry</th>' +
-          '<th>Financial institution</th><th>Settlement type</th><th>Documents</th><th></th>' +
-        '</tr></thead><tbody></tbody></table></div>';
-      const tbody = wrap.querySelector('tbody');
-
-      list.forEach(r => {
-        const row = document.createElement('tr');
-        row.className = 'row-click';
-        row.tabIndex = 0;
-        row.innerHTML =
-          '<td class="svc-name">' + esc(r.name) + '</td>' +
-          '<td>' + esc(r.channels[0]) + '</td>' +
-          '<td>' + esc(describe('entities', r.entities)) + '</td>' +
-          '<td>' + esc(describe('owners', r.owners)) + '</td>' +
-          '<td>' + (coversAll('industries', r.industries) ? esc(ALL_LABELS.industries) : pills(r.industries)) + '</td>' +
-          '<td>' + esc(describe('banks', r.banks)) + '</td>' +
-          '<td>' + esc(describe('modules', r.modules)) + '</td>' +
-          '<td>' + pills(r.docs) + '</td>' +
-          '<td class="chevron-affordance">' + CHEVRON_RIGHT + '</td>';
-        row.addEventListener('click', () => openDrawer(r, row));
-        row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrawer(r, row); } });
-        tbody.appendChild(row);
-      });
-      groupsEl.appendChild(wrap);
-    });
+  function renderHead() {
+    $('rulesHead').innerHTML = '<tr>' + COLUMNS.map(c => {
+      if (!c.sort) return '<th' + (c.key === 'menu' ? ' class="util" aria-label="Actions"' : '') + '>' + c.label + '</th>';
+      const st = listState.sort && listState.sort.key === c.key ? listState.sort.dir : null;
+      return '<th aria-sort="' + (st === 'asc' ? 'ascending' : st === 'desc' ? 'descending' : 'none') + '"><button type="button" data-sort="' + c.key + '"' + (st ? ' class="on"' : '') + '>' +
+        c.label + (st ? CARET[st] : CARET.both) + '</button></th>';
+    }).join('') + '</tr>';
+    $('rulesHead').querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => {
+      const cur = listState.sort;
+      listState.sort = !cur || cur.key !== b.dataset.sort ? { key: b.dataset.sort, dir: 'asc' } : cur.dir === 'asc' ? { key: b.dataset.sort, dir: 'desc' } : null;
+      listState.page = 1;
+      renderRules();
+    }));
   }
 
+  function renderRules() {
+    renderHead();
+    updateFilterBadge();
+    const body = $('ruleGroups');
+    body.innerHTML = '';
+
+    if (listState.loading) {   // skeleton: always 5 rows so the layout doesn't jump
+      body.innerHTML = Array.from({ length: 5 }, (_, r) => '<tr>' + COLUMNS.map((_, c) =>
+        '<td><div class="skel" style="width:' + (55 + ((r * 7 + c * 13) % 35)) + '%"></div></td>').join('') + '</tr>').join('');
+      $('rulesPager').hidden = true;
+      return;
+    }
+
+    let visible = rules.filter(ruleVisible).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));   // newest first
+    if (listState.sort) {
+      const col = COLUMNS.find(c => c.key === listState.sort.key);
+      visible = visible.slice().sort((a, b) => (listState.sort.dir === 'asc' ? 1 : -1) * col.sort(a, b));
+    }
+
+    if (visible.length === 0) {
+      const any = rules.length > 0;
+      body.innerHTML = '<tr><td colspan="' + COLUMNS.length + '" style="padding:0;height:auto"><div class="empty">' +
+        '<div class="ic">' + DOC_ICON + '</div>' +
+        '<p class="t">' + (any ? 'No rules match' : 'No document rules yet') + '</p>' +
+        '<p class="d">' + (any ? 'Nothing matches your search or filters — try clearing them.' : 'Add your first rule to choose which documents merchants must submit.') + '</p>' +
+        (any ? '<button type="button" class="btn btn-outline" id="emptyClear">Clear filters</button>'
+             : '<a class="btn btn-primary" href="document-rules-create.html">' + PLUS_ICON_SM + ' Add Document Rule</a>') +
+        '</div></td></tr>';
+      const clear = $('emptyClear');
+      if (clear) clear.addEventListener('click', () => { $('ruleSearch').value = ''; clearFilters(); });
+      $('rulesPager').hidden = true;
+      return;
+    }
+
+    const [from, to] = mountPager($('rulesPager'), listState, visible.length, renderRules);
+    visible.slice(from, to).forEach(r => {
+      const row = document.createElement('tr');
+      row.className = 'row-click';
+      row.tabIndex = 0;
+      row.innerHTML =
+        '<td><div class="cell2"><span class="p" title="' + esc(r.name) + '">' + esc(r.name) + '</span><span class="s">Updated ' + esc(formatStamp(new Date(r.updatedAt))) + '</span></div></td>' +
+        '<td>' + esc(r.channels.join(', ')) + '</td>' +
+        '<td class="wrap">' + esc(describeServices(r)) + '</td>' +
+        '<td>' + esc(describe('entities', r.entities)) + '</td>' +
+        '<td>' + esc(describe('owners', r.owners)) + '</td>' +
+        '<td>' + (coversAll('industries', r.industries) ? esc(ALL_LABELS.industries) : pills(r.industries)) + '</td>' +
+        '<td>' + esc(describe('banks', r.banks)) + '</td>' +
+        '<td>' + esc(describe('modules', r.modules)) + '</td>' +
+        '<td>' + pills(r.docs) + '</td>' +
+        '<td class="util"><button type="button" class="kebab" aria-label="Actions for ' + esc(r.name) + '" aria-haspopup="menu" aria-expanded="false">' + KEBAB + '</button></td>';
+      row.addEventListener('click', () => openDrawer(r, row));
+      row.addEventListener('keydown', e => { if (e.target === row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDrawer(r, row); } });
+      const kebab = row.querySelector('.kebab');
+      kebab.addEventListener('click', e => { e.stopPropagation(); openRowMenu(kebab, r); });
+      body.appendChild(row);
+    });
+  }
+  const DOC_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>';
+  const PLUS_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>';
+
+  /* ══════════ Row action menu — Details / Edit / Delete under the kebab ══════════ */
+  let menuRule = null, menuBtn = null;
+  function closeRowMenu() {
+    $('rowMenu').classList.remove('open');
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+    menuRule = null; menuBtn = null;
+  }
+  function openRowMenu(btn, r) {
+    if (menuBtn === btn) { closeRowMenu(); return; }
+    closeRowMenu();
+    menuRule = r; menuBtn = btn;
+    btn.setAttribute('aria-expanded', 'true');
+    const menu = $('rowMenu');
+    menu.classList.add('open');
+    const b = btn.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight;
+    const left = Math.max(8, Math.min(window.innerWidth - mw - 8, b.right - mw));
+    const top = b.bottom + 4 + mh > window.innerHeight ? Math.max(8, b.top - mh - 4) : b.bottom + 4;
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    menu.querySelector('button').focus();
+  }
+  $('rowMenu').addEventListener('click', e => {
+    const act = e.target.closest('button') && e.target.closest('button').dataset.act;
+    if (!act) return;
+    const r = menuRule, opener = menuBtn;
+    closeRowMenu();
+    if (act === 'details') openDrawer(r, opener);
+    else if (act === 'edit') location.href = 'document-rules-create.html?edit=' + encodeURIComponent(r.id);
+    else openDelete(r);
+  });
+  document.addEventListener('click', closeRowMenu);
+  window.addEventListener('resize', closeRowMenu);
+  window.addEventListener('scroll', closeRowMenu, true);
+
   /* ══════════ History — the module-wide audit trail, paginated ══════════ */
-  let histPage = 1, histSize = 10;
+  const histState = { page: 1, size: 10 };
 
   function eventKind(ev) { return ev.action.startsWith('Removed') ? 'removed' : ev.action.toLowerCase(); }
 
@@ -564,28 +737,16 @@
   }
 
   function renderEvents() {
-    const total = events.length;
-    const pages = Math.max(1, Math.ceil(total / histSize));
-    histPage = Math.min(histPage, pages);
-    const start = (histPage - 1) * histSize;
-    const slice = events.slice(start, start + histSize);
-
-    $('eventsEmpty').style.display = total === 0 ? 'block' : 'none';
-    $('pager').style.display = total === 0 ? 'none' : 'flex';
-    $('eventsList').innerHTML = slice.map(ev => {
+    $('eventsEmpty').hidden = events.length > 0;
+    $('eventsList').hidden = events.length === 0;
+    const [from, to] = mountPager($('histPager'), histState, events.length, renderEvents);
+    $('eventsList').innerHTML = events.slice(from, to).map(ev => {
       const kind = eventKind(ev);
       return '<div class="event-item"><div class="ev-icon ' + kind + '">' + EVENT_ICON[kind] + '</div>' +
         '<div class="ev-body"><div class="ev-ts">' + formatEventTime(ev.ts) + '</div>' +
         '<div class="ev-sentence">' + eventSentence(ev) + '</div></div></div>';
     }).join('');
-    $('pagerCount').textContent = total ? (start + 1) + ' - ' + (start + slice.length) + ' Of ' + total : '';
-    $('pagerPos').textContent = histPage + ' / ' + pages;
-    $('pagerPrev').disabled = histPage <= 1;
-    $('pagerNext').disabled = histPage >= pages;
   }
-  $('pagerPrev').addEventListener('click', () => { histPage--; renderEvents(); });
-  $('pagerNext').addEventListener('click', () => { histPage++; renderEvents(); });
-  $('pagerSize').addEventListener('change', () => { histSize = parseInt($('pagerSize').value, 10); histPage = 1; renderEvents(); });
 
   /* ══════════ Rule details drawer — Details / Logs ══════════ */
   let drawerRule = null, drawerOpener = null;
@@ -595,17 +756,16 @@
   }
 
   function renderDetails(r) {
-    const service = r.services[0];
     const industry = coversAll('industries', r.industries)
       ? esc(ALL_LABELS.industries)
       : r.industries.map(i => '<span class="pill">' + esc(i) + '</span>').join('');
     const docs = r.docs.map(d => '<div class="vd-doc">' + CHECK_ICON + esc(d) + '</div>').join('');
-    return kv('Channel', esc(r.channels[0])) +
-      kv('Service', esc(service)) +
+    return kv('Channel', esc(r.channels.join(', '))) +
+      kv('Service', esc(describeServices(r))) +
       kv('Merchant type', esc(describe('entities', r.entities))) +
       kv('Owner nationality', esc(describe('owners', r.owners))) +
       kv('Industry', industry) +
-      (NO_FI_SERVICES.includes(service) ? '' : kv('Financial institution', esc(describe('banks', r.banks)))) +
+      (ruleHasNoFI(r) ? '' : kv('Financial institution', esc(describe('banks', r.banks)))) +
       kv('Settlement type', esc(describe('modules', r.modules))) +
       '<div class="vd-label">Required documents (' + r.docs.length + ')</div>' + docs +
       '<div class="vd-sep"></div>' +
@@ -613,19 +773,36 @@
       kv('Last updated', esc(formatStamp(new Date(r.updatedAt))));
   }
 
+  /* The rule's own log, in the Kashier logs timeline style: a dot per entry, the action, who did it
+     and when, then exactly what it set (Created) or changed (Updated). */
+  const LOG_TITLE = { created: 'Rule created', updated: 'Rule updated', deleted: 'Rule deleted', removed: 'Rule removed' };
+  /* Just the names of the sections touched: what a rule was created with, or which sections an
+     update added to, removed from, or changed. */
+  function logSections(ev) {
+    const line = (verb, names) => names.length ? '<li><span class="f">' + verb + '</span>: ' + esc(names.join(', ')) + '</li>' : '';
+    if (ev.details && ev.details.length) return '<ul class="log-lines">' + line('Created', ev.details.map(d => d.field)) + '</ul>';
+    if (ev.changes && ev.changes.length) {
+      const added = [], removed = [], updated = [];
+      ev.changes.forEach(c => {
+        if (c.added || c.removed) {
+          const a = c.added && c.added.length, r = c.removed && c.removed.length;
+          (a && r ? updated : a ? added : removed).push(c.field);
+        } else updated.push(c.field);
+      });
+      return '<ul class="log-lines">' + line('Added', added) + line('Updated', updated) + line('Removed', removed) + '</ul>';
+    }
+    return '';
+  }
   function renderLogs(r) {
     const mine = eventsForRule(r, events);
     if (!mine.length) return '<p class="logs-empty">No activity recorded for this rule yet.</p>';
-    return mine.map(ev => {
+    return '<div class="hist">' + mine.map(ev => {
       const kind = eventKind(ev);
-      const changes = ev.changes && ev.changes.length
-        ? '<ul class="ev-changes">' + ev.changes.map(c =>
-            '<li><span class="f">' + esc(c.field) + ':</span> <span class="from">' + esc(c.from) + '</span> → <span class="to">' + esc(c.to) + '</span></li>').join('') + '</ul>'
-        : '';
-      return '<div class="event-item"><div class="ev-icon ' + kind + '">' + EVENT_ICON[kind] + '</div>' +
-        '<div class="ev-body"><div class="ev-ts">' + formatEventTime(ev.ts) + '</div>' +
-        '<div class="ev-sentence">' + esc(ev.actor) + ' ' + EVENT_PHRASE[kind] + '</div>' + changes + '</div></div>';
-    }).join('');
+      return '<div class="hist-item"><div class="hist-dot ' + kind + '">' + EVENT_ICON[kind] + '</div>' +
+        '<div class="hist-body"><div class="hist-action">' + LOG_TITLE[kind] + '</div>' +
+        '<div class="hist-meta">' + esc(ev.actor) + ' · ' + formatEventTime(ev.ts) + '</div>' +
+        logSections(ev) + '</div></div>';
+    }).join('') + '</div>';
   }
 
   function setSubTab(name) {
@@ -667,16 +844,16 @@
   $('drDelete').addEventListener('click', () => { const r = drawerRule; closeDrawer(); openDelete(r); });
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
+    if ($('rowMenu').classList.contains('open')) { const b = menuBtn; closeRowMenu(); if (b) b.focus(); return; }
     if ($('deleteBackdrop').classList.contains('open')) closeDelete();
     else if ($('drawer').classList.contains('open')) closeDrawer();
-    else setFilterPanel(false);
   });
 
   /* ══════════ Delete modal ══════════ */
   let deleteTarget = null;
   function openDelete(r) {
     deleteTarget = r;
-    $('deleteText').innerHTML = 'Are you sure you want to delete the rule <b>' + esc(r.name) + '</b> (' + esc(r.services[0]) + ' · ' + esc(r.channels[0]) + ')? ' +
+    $('deleteText').innerHTML = 'Are you sure you want to delete the rule <b>' + esc(r.name) + '</b> (' + esc(describeServices(r)) + ' · ' + esc(r.channels.join(', ')) + ')? ' +
       'Merchants matching its conditions will no longer be asked for: <b>' + r.docs.map(esc).join(', ') + '</b>.';
     $('deleteBackdrop').classList.add('open');
     $('deleteCancel').focus();
@@ -719,8 +896,9 @@
   });
 
   /* ══════════ Init ══════════ */
-  renderRules();
+  renderRules();   // skeleton first — the loading state — then the data
   renderEvents();
+  setTimeout(() => { listState.loading = false; renderRules(); }, 450);
   if (location.hash === '#history') showTab('history');
 
   /* Report anything the migration removed. */
